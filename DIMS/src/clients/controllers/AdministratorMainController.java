@@ -724,7 +724,10 @@ public class AdministratorMainController implements Initializable {
 									cd.showAndWait();
 									
 									JSONObject json = (JSONObject)cd.getUserData();
-									sendProtocol(json);
+									if(json!=null)
+									{
+										sendProtocol(json);
+									}
 									
 								}
 							});
