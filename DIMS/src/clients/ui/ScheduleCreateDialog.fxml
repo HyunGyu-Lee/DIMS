@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="530.0" prefWidth="517.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="clients.controllers.ScheduleCreateDialogController">
+   <children>
+      <Button layoutX="213.0" layoutY="456.0" mnemonicParsing="false" onAction="#onCreate" prefHeight="37.0" prefWidth="91.0" text="추가">
+         <font>
+            <Font name="HYwulM" size="19.0" />
+         </font>
+      </Button>
+      <Label alignment="CENTER" layoutX="32.0" layoutY="41.0" prefHeight="37.0" prefWidth="115.0" text="일정 이름">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <TextField fx:id="sTitle" layoutX="174.0" layoutY="41.0" prefHeight="37.0" prefWidth="301.0">
+         <font>
+            <Font name="HYwulM" size="20.0" />
+         </font>
+      </TextField>
+      <Label alignment="CENTER" layoutX="32.0" layoutY="97.0" prefHeight="37.0" prefWidth="115.0" text="일 시">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="datePick" layoutX="174.0" layoutY="104.0" prefHeight="19.0" prefWidth="128.0" />
+      <ComboBox fx:id="hourPick" layoutX="318.0" layoutY="104.0" prefHeight="23.0" prefWidth="71.0" promptText="시" />
+      <ComboBox fx:id="minitePick" layoutX="404.0" layoutY="104.0" prefHeight="23.0" prefWidth="71.0" promptText="분" />
+      <Label alignment="CENTER" layoutX="32.0" layoutY="145.0" prefHeight="37.0" prefWidth="115.0" text="분 류">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="cate_im" layoutX="174.0" layoutY="151.0" mnemonicParsing="false" text="중 요">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="cate_ev" layoutX="287.0" layoutY="151.0" mnemonicParsing="false" text="행 사">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="cate_norm" layoutX="400.0" layoutY="151.0" mnemonicParsing="false" text="일 반">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </CheckBox>
+      <Label alignment="CENTER" layoutX="32.0" layoutY="193.0" prefHeight="37.0" prefWidth="115.0" text="내 용">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="contentA" layoutX="38.0" layoutY="239.0" prefHeight="191.0" prefWidth="433.0">
+         <font>
+            <Font name="HYwulM" size="21.0" />
+         </font>
+      </TextArea>
+   </children>
+</AnchorPane>

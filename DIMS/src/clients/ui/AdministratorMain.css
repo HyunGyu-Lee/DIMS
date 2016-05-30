@@ -1,0 +1,59 @@
+.mainMenuBtn {
+	/* 
+	
+	 -fx-background-color : linear-gradient(to bottom, rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%);
+	 
+	
+	 -fx-background-color : linear-gradient(to bottom, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+	 
+	 -fx-background-color : linear-gradient(to right, rgba(228,245,252,1) 0%,rgba(191,232,249,1) 0%,rgba(191,232,249,1) 26%,rgba(159,216,239,1) 46%,rgba(42,176,237,1) 77%,rgba(42,176,237,1) 93%);
+	 
+	*/
+	
+   
+     -fx-background-color :  linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);
+   	 -fx-pref-width : 200px;
+   	 -fx-pref-height : 37px;
+
+	 
+	 -fx-pref-width : 200px;
+	 -fx-font: 20pt "HYwulM";
+	 -fx-border-radius : 5px;
+	 -fx-border-color : #fafafa;
+	 	
+	
+}
+
+.mainMenuBtn:hover {
+	-fx-background-color : linear-gradient(to bottom, rgba(0,0,0,0.0) 0%,rgba(0,0,0,0) 100%);
+	
+}
+
+.list-cell:even {
+	-fx-text-fill: black;
+	-fx-text-alignment : center;
+	-fx-font: 18pt "Arial";
+}
+
+.list-cell:odd {
+	-fx-text-fill: black;
+	-fx-font: 18pt "Arial";
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+	-fx-background: #0000FF;
+}
+
+.tab{
+	-fx-skin: "com.sun.javafx.scene.control.skin.LabelSkin";
+	-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);
+	-fx-text-fill: -fx-text-base-color;
+	-fx-font: 15pt "HYwulM";
+}
+
+.btn
+{
+	-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);
+	-fx-text-fill: -fx-text-base-color;
+	-fx-font: 17pt "HYwulM";
+}

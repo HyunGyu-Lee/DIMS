@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="515.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.MemberJoinController">
+   <children>
+      <AnchorPane layoutX="10.0" layoutY="10.0" minHeight="0.0" minWidth="0.0" prefHeight="504.0" prefWidth="598.0">
+         <children>
+            <Button layoutX="310.0" layoutY="448.0" mnemonicParsing="false" onAction="#onCancle" text="가입 취소" />
+            <Button layoutX="224.0" layoutY="448.0" mnemonicParsing="false" text="작성 완료" />
+            <TextField fx:id="idField" layoutX="152.0" layoutY="29.0" />
+            <PasswordField layoutX="152.0" layoutY="60.0" />
+            <Label layoutX="93.0" layoutY="33.0" text="아이디" />
+            <Button layoutX="299.0" layoutY="29.0" mnemonicParsing="false" onAction="#onDuplicate" text="중복 확인" />
+            <Label layoutX="87.0" layoutY="64.0" text="비밀번호" />
+            <ComboBox editable="true" layoutX="153.0" layoutY="118.0" prefHeight="23.0" prefWidth="312.0" promptText="비밀번호를 찾을 때 사용할 질문을 선택하세요." />
+            <Label layoutX="100.0" layoutY="122.0" text="질문" />
+            <Label layoutX="100.0" layoutY="151.0" text="답변" />
+            <TextField layoutX="153.0" layoutY="179.0" />
+            <Label layoutX="100.0" layoutY="183.0" text="성명" />
+            <TextField layoutX="154.0" layoutY="147.0" prefHeight="23.0" prefWidth="311.0" />
+            <Label layoutX="100.0" layoutY="217.0" text="주소" />
+            <TextArea layoutX="153.0" layoutY="217.0" prefHeight="54.0" prefWidth="311.0" promptText="상세한 주소를 입력해 주세요." />
+            <Label layoutX="82.0" layoutY="288.0" text="휴대폰번호" />
+            <ComboBox layoutX="154.0" layoutY="284.0" prefHeight="23.0" prefWidth="67.0" promptText=" " />
+            <Label layoutX="222.0" layoutY="289.0" text="-" />
+            <TextField layoutX="231.0" layoutY="284.0" prefHeight="23.0" prefWidth="43.0" />
+            <TextField layoutX="287.0" layoutY="284.0" prefHeight="23.0" prefWidth="43.0" />
+            <Label layoutX="276.0" layoutY="289.0" text="-" />
+            <Label layoutX="74.0" layoutY="323.0" text="자택 전화번호" />
+            <ComboBox layoutX="154.0" layoutY="319.0" prefHeight="23.0" prefWidth="67.0" promptText=" " />
+            <TextField layoutX="231.0" layoutY="319.0" prefHeight="23.0" prefWidth="43.0" />
+            <TextField layoutX="287.0" layoutY="319.0" prefHeight="23.0" prefWidth="43.0" />
+            <Label layoutX="222.0" layoutY="324.0" text="-" />
+            <Label layoutX="276.0" layoutY="324.0" text="-" />
+            <Label layoutX="88.0" layoutY="356.0" text="주민번호" />
+            <TextField layoutX="152.0" layoutY="352.0" prefHeight="23.0" prefWidth="70.0" />
+            <Label layoutX="222.0" layoutY="357.0" text="-" />
+            <PasswordField layoutX="231.0" layoutY="352.0" prefHeight="23.0" prefWidth="70.0" />
+            <Label layoutX="100.0" layoutY="385.0" text="성별" />
+            <ComboBox layoutX="152.0" layoutY="381.0" prefHeight="23.0" prefWidth="55.0" />
+            <Label layoutX="97.0" layoutY="415.0" text="방번호" />
+            <TextField layoutX="152.0" layoutY="411.0" prefHeight="23.0" prefWidth="37.0" />
+            <Label layoutX="73.0" layoutY="91.0" text="비밀번호 확인" />
+            <PasswordField layoutX="153.0" layoutY="87.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

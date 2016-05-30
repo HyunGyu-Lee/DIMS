@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="497.0" prefWidth="611.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.CheckWeabakDialog_Controller">
+   <children>
+      <Label layoutX="265.0" layoutY="35.0" text="학생 외박 관리">
+         <font>
+            <Font name="HYwulM" size="30.0" />
+         </font>
+      </Label>
+      <Label fx:id="Lable_name" layoutX="170.0" layoutY="35.0" text="ㅁㅁㅁ">
+         <font>
+            <Font name="HYwulM" size="30.0" />
+         </font>
+      </Label>
+      <Label layoutX="108.0" layoutY="105.0" text="학번 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="108.0" layoutY="137.0" text="이름 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="90.0" layoutY="173.0" text="신청일자 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="108.0" layoutY="275.0" text="사유 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="99.0" layoutY="243.0" text="목적지 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="90.0" layoutY="206.0" text="외박일자 :">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="content_field" layoutX="174.0" layoutY="275.0" prefHeight="135.0" prefWidth="342.0" />
+      <TextField fx:id="num_field" layoutX="179.0" layoutY="100.0" prefHeight="29.0" prefWidth="342.0" />
+      <TextField fx:id="name_field" layoutX="179.0" layoutY="132.0" prefHeight="29.0" prefWidth="342.0" />
+      <TextField fx:id="date1_field" layoutX="179.0" layoutY="201.0" prefHeight="29.0" prefWidth="342.0" />
+      <TextField fx:id="destination_field" layoutX="179.0" layoutY="238.0" prefHeight="29.0" prefWidth="342.0" />
+      <TextField fx:id="date_filed" layoutX="179.0" layoutY="168.0" prefHeight="29.0" prefWidth="342.0" />
+      <Button layoutX="80.0" layoutY="435.0" mnemonicParsing="false" onAction="#onApply" prefHeight="29.0" prefWidth="135.0" text="승낙">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font></Button>
+      <Button layoutX="238.0" layoutY="435.0" mnemonicParsing="false" onAction="#onDeny" prefHeight="29.0" prefWidth="135.0" text="거절">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font></Button>
+      <Button layoutX="403.0" layoutY="435.0" mnemonicParsing="false" onAction="#onCancle" prefHeight="29.0" prefWidth="135.0" text="닫기">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font></Button>
+   </children>
+</AnchorPane>

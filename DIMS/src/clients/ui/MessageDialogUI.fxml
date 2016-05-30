@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="130.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.MessageDialogController">
+   <children>
+      <Label fx:id="msg_area" layoutX="14.0" layoutY="40.0" prefHeight="50.0" prefWidth="582.0" text="이 글자는 얼마나 크게 보일까?">
+         <font>
+            <Font name="HYwulM" size="21.0" />
+         </font></Label>
+      <Button layoutX="493.0" layoutY="90.0" mnemonicParsing="false" onAction="#onOK" prefHeight="23.0" prefWidth="77.0" text="확 인">
+         <font>
+            <Font name="HYwulM" size="16.0" />
+         </font></Button>
+   </children>
+</AnchorPane>

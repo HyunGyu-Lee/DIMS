@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="root" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="580.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.LoginController">
+   <children>
+      <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ffffff;">
+         <children>
+            <ImageView fitHeight="436.0" fitWidth="712.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../bin/resources/Login.png" />
+               </image>
+            </ImageView>
+         </children>
+      </StackPane>
+      <TextField fx:id="idField" layoutX="433.0" layoutY="100.0" />
+      <Label layoutX="383.0" layoutY="104.0" text="아이디" />
+      <Label layoutX="377.0" layoutY="163.0" text="비밀번호" />
+      <PasswordField fx:id="passwordField" layoutX="433.0" layoutY="160.0" />
+      <Button fx:id="loginBtn" layoutX="435.0" layoutY="221.0" mnemonicParsing="false" onAction="#onLogin" prefHeight="37.0" prefWidth="138.0" text="로그인" />
+      <Button layoutX="433.0" layoutY="277.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="23.0" prefWidth="138.0" text="회원가입" />
+      <Button layoutX="432.0" layoutY="320.0" mnemonicParsing="false" onAction="#onFindPassword" prefHeight="23.0" prefWidth="138.0" text="비밀번호찾기" />
+   </children>
+</AnchorPane>

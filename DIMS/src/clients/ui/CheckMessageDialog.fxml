@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.CheckMessageDialog_Controller">
+   <children>
+      <Button layoutX="187.0" layoutY="511.0" mnemonicParsing="false" onAction="#onConfirm" prefHeight="40.0" prefWidth="96.0" styleClass="btn" stylesheets="@CheckMessageDialog.css" text="확 인">
+         <font>
+            <Font name="HYwulM" size="20.0" />
+         </font></Button>
+      <Button layoutX="322.0" layoutY="511.0" mnemonicParsing="false" onAction="#onReply" prefHeight="40.0" prefWidth="96.0" styleClass="btn" stylesheets="@CheckMessageDialog.css" text="답 장">
+         <font>
+            <Font name="HYwulM" size="20.0" />
+         </font></Button>
+      <Label layoutX="35.0" layoutY="30.0" prefHeight="30.0" prefWidth="122.0" text="◎ 제      목">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <Label layoutX="35.0" layoutY="73.0" prefHeight="30.0" prefWidth="122.0" text="◎ 보낸사람">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <TextField fx:id="title" layoutX="174.0" layoutY="30.0" prefHeight="30.0" prefWidth="389.0" promptText="제목">
+         <font>
+            <Font name="HYwulM" size="16.0" />
+         </font></TextField>
+      <Label layoutX="35.0" layoutY="122.0" prefHeight="30.0" prefWidth="116.0" text="◎ 본    문">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="290.0" layoutY="73.0" prefHeight="30.0" prefWidth="128.0" text="◎ 보낸날짜">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <Label fx:id="sender" layoutX="174.0" layoutY="73.0" prefHeight="30.0" prefWidth="116.0" text="보낸사람" underline="true">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <Label fx:id="sendTime" alignment="CENTER" layoutX="411.0" layoutY="73.0" prefHeight="30.0" prefWidth="161.0" text="보낸사람" underline="true">
+         <font>
+            <Font name="HYwulM" size="22.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="content" layoutX="35.0" layoutY="167.0" prefHeight="300.0" prefWidth="532.0" promptText="본문">
+         <font>
+            <Font name="HYwulM" size="23.0" />
+         </font></TextArea>
+   </children>
+</AnchorPane>

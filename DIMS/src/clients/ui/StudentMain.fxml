@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="1050.0" prefWidth="1900.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" stylesheets="@StudentMain.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.StudentMain">
+   <left>
+      <VBox>
+         <children>
+            <Accordion minHeight="-Infinity" prefHeight="421.0" prefWidth="241.0" BorderPane.alignment="CENTER">
+              <panes>
+                  <TitledPane alignment="CENTER" animated="false" text="개 인 정 보">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+                           <children>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="20.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="개인정보조회">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                  </TitledPane>
+                <TitledPane alignment="CENTER" animated="false" prefHeight="42.0" prefWidth="241.0" text="메   세   지">
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                     <content>
+                        <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+                           <children>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="87.0" mnemonicParsing="false" onAction="#onRMessage" prefHeight="37.0" prefWidth="199.0" styleClass="Button_subItem" text="받은메세지함">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="157.0" mnemonicParsing="false" onAction="#onSMessage" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="보낸메세지함">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="21.0" mnemonicParsing="false" onAction="#onWriteMessage" prefHeight="37.0" prefWidth="201.0" styleClass="Button_subItem" text="메 세 지 작 성">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                </TitledPane>
+                <TitledPane alignment="CENTER" animated="false" prefWidth="241.0" text="게   시   판">
+                  <content>
+                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="138.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+                           <children>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="23.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="공 지 사 항">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="87.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="건 의 사 항">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="149.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="자유 게시판">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                </TitledPane>
+                <TitledPane alignment="CENTER" animated="false" prefWidth="241.0" text="외         박">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="131.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+                           <children>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="23.0" mnemonicParsing="false" onAction="#onShowEnrollOvernight" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신      청">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="78.0" mnemonicParsing="false" onAction="#onOvernightListRequest" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신청내역">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                </TitledPane>
+                  <TitledPane alignment="CENTER" animated="false" maxWidth="1.7976931348623157E308" prefWidth="241.0" text="시청각 교육">
+                    <content>
+                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="397.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" />
+                    </content>
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                  </TitledPane>
+              </panes>
+            </Accordion>
+            <ImageView fitHeight="226.0" fitWidth="240.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </VBox>
+   </left>
+   <top>
+      <HBox prefHeight="91.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane prefHeight="100.0" prefWidth="241.0">
+               <children>
+                  <Button id="Button_Logout" layoutX="64.0" layoutY="79.0" mnemonicParsing="false" onAction="#onLogOut" prefHeight="23.0" prefWidth="112.0" text="로그아웃">
+                     <font>
+                        <Font name="HYwulM" size="14.0" />
+                     </font></Button>
+                  <Label alignment="CENTER" layoutY="-1.0" prefHeight="27.0" prefWidth="240.0" text="환영합니다">
+                     <font>
+                        <Font name="HYwulM" size="21.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="userName" alignment="CENTER" layoutX="41.0" layoutY="31.0" prefHeight="39.0" prefWidth="159.0">
+                     <font>
+                        <Font name="HYwulM" size="36.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="188.0" layoutY="50.0" prefHeight="20.0" prefWidth="24.0" text="님">
+                     <font>
+                        <Font name="HYwulM" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <ImageView fx:id="image" fitHeight="113.0" fitWidth="702.0" onMouseClicked="#onMainLogoClicked" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="400.0" right="385.0" />
+               </HBox.margin>
+               <image>
+                  <Image url="@../../resources/_ai%20(2).png" />
+               </image>
+            </ImageView>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label id="dateLabel" fx:id="dateText" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="2016-05-25 (수)" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font name="HYwulM" size="20.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <Label id="timeLabel" fx:id="dateTime" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="오후 4:35:35" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font name="HYwulM" size="30.0" />
+                     </font>
+                  </Label>
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets bottom="20.0" left="5.0" right="5.0" top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <ScrollPane prefViewportHeight="859.0" prefViewportWidth="1559.0">
+         <content>
+            <StackPane prefHeight="1000.0" prefWidth="1450.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="560.0" fitWidth="844.0" opacity="0.12" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../../resources/CENTER.png" />
+                     </image>
+                  </ImageView>
+                  <StackPane fx:id="OVERNIGHT_MAIN_VIEW" visible="false">
+                     <children>
+                        <AnchorPane fx:id="OVERNIGHT_INFO_VIEW">
+                           <children>
+                              <Label layoutX="14.0" layoutY="14.0" prefHeight="59.0" prefWidth="235.0" text="외박 관리">
+                                 <font>
+                                    <Font name="HYwulM" size="48.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="14.0" layoutY="114.0" prefHeight="59.0" prefWidth="235.0" text="◎ 내 신청내역">
+                                 <font>
+                                    <Font name="HYwulM" size="23.0" />
+                                 </font>
+                              </Label>
+                              <ListView fx:id="overnight_list_view" layoutX="49.0" layoutY="209.0" prefHeight="500.0" prefWidth="1300.0" />
+                              <HBox layoutX="49.0" layoutY="174.0" prefHeight="35.0" prefWidth="1300.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                 <children>
+                                    <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="35.0" prefWidth="232.0" text="신 청 시 간">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" prefHeight="35.0" prefWidth="232.0" text="외 박 일 자">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" prefHeight="35.0" prefWidth="232.0" text="목 적 지">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="420.0" text="외 박 사 유">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" prefHeight="35.0" prefWidth="157.0" text="승 인 여 부">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="OVERNIGHT_REQUEST_VIEW" visible="false">
+                           <children>
+                              <Label layoutX="14.0" layoutY="14.0" prefHeight="59.0" prefWidth="235.0" text="외박 신청">
+                                 <font>
+                                    <Font name="HYwulM" size="48.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="14.0" layoutY="114.0" prefHeight="59.0" prefWidth="235.0" text="◎ 정보 입력">
+                                 <font>
+                                    <Font name="HYwulM" size="23.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="62.0" layoutY="196.0" prefHeight="38.0" prefWidth="183.0" text="▶ 희 망 일 자">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <DatePicker fx:id="overnight_date_pciker" layoutX="249.0" layoutY="202.0" prefHeight="23.0" prefWidth="272.0" promptText="희망날짜선택" />
+                              <Label layoutX="62.0" layoutY="250.0" prefHeight="38.0" prefWidth="183.0" text="▶ 목   적   지">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="destination" layoutX="249.0" layoutY="253.0" prefHeight="32.0" prefWidth="272.0" promptText="ex) 경기도 의정부시">
+                                 <font>
+                                    <Font name="HYwulM" size="15.0" />
+                                 </font>
+                              </TextField>
+                              <Label layoutX="62.0" layoutY="300.0" prefHeight="38.0" prefWidth="183.0" text="▶ 외 박 사 유">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextArea fx:id="reason" layoutX="94.0" layoutY="354.0" prefHeight="380.0" prefWidth="1251.0" promptText="200자 이내 사유 입력">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </TextArea>
+                              <Button layoutX="614.0" layoutY="755.0" mnemonicParsing="false" onAction="#onEnrollOvernightRequest" prefHeight="57.0" prefWidth="211.0" styleClass="Button_subItem" text="신청하기">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Button>
+                              <Button layoutX="1248.0" layoutY="24.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="97.0" styleClass="Back_btn" text="뒤로가기" textFill="WHITE">
+                                 <font>
+                                    <Font name="HYwulM" size="15.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="MESSAGE_VIEW" prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane fx:id="message_re_view" prefHeight="200.0" prefWidth="200.0" visible="false">
+                           <children>
+                              <Label layoutX="14.0" layoutY="14.0" text="◎ 받은 메세지함">
+                                 <font>
+                                    <Font name="HYwulM" size="48.0" />
+                                 </font>
+                              </Label>
+                              <VBox layoutX="81.0" layoutY="100.0">
+                                 <children>
+                                    <HBox prefHeight="35.0" prefWidth="1054.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="35.0" prefWidth="203.0" text="발 신 시 각">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" prefHeight="35.0" prefWidth="132.0" text="발 신 자">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" prefHeight="35.0" prefWidth="708.0" text="메 세 지 제 목">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <ListView fx:id="recieve_message_view" prefHeight="524.0" prefWidth="653.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="message_se_view" prefHeight="200.0" prefWidth="200.0" visible="false">
+                           <children>
+                              <Label layoutX="14.0" layoutY="14.0" text="◎ 보낸 메세지함">
+                                 <font>
+                                    <Font name="HYwulM" size="48.0" />
+                                 </font>
+                              </Label>
+                              <VBox layoutX="81.0" layoutY="100.0">
+                                 <children>
+                                    <HBox prefHeight="35.0" prefWidth="1054.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="35.0" prefWidth="203.0" text="발 신 시 각">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" prefHeight="35.0" prefWidth="132.0" text="수 신 자">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" prefHeight="35.0" prefWidth="708.0" text="메 세 지 제 목">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <ListView fx:id="send_message_view" prefHeight="524.0" prefWidth="653.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="message_write_view" prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Label layoutX="14.0" layoutY="113.0" text="◎ 메세지 제목">
+                                 <font>
+                                    <Font name="HYwulM" size="30.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="msgTitle" layoutX="243.0" layoutY="109.0" prefHeight="38.0" prefWidth="1135.0" promptText="제목을 입력하세요">
+                                 <font>
+                                    <Font name="HYwulM" size="22.0" />
+                                 </font>
+                              </TextField>
+                              <Label layoutX="14.0" layoutY="14.0" text="메세지 작성">
+                                 <font>
+                                    <Font name="HYwulM" size="49.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="14.0" layoutY="204.0" text="◎ 수신자 목록">
+                                 <font>
+                                    <Font name="HYwulM" size="30.0" />
+                                 </font>
+                              </Label>
+                              <VBox layoutX="56.0" layoutY="250.0">
+                                 <children>
+                                    <HBox layoutX="53.0" layoutY="219.0" prefHeight="35.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="사용자 ID" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="이 름" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <ListView fx:id="whole_reciever_list" prefHeight="376.0" prefWidth="272.0" />
+                                    <TextField fx:id="msgRecieverSearchField" alignment="CENTER_RIGHT" onKeyPressed="#onMsgSearch" promptText="메세지 받을 사람의 이름" HBox.hgrow="ALWAYS">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </TextField>
+                                 </children>
+                              </VBox>
+                              <VBox layoutX="428.0" layoutY="250.0">
+                                 <children>
+                                    <HBox layoutX="53.0" layoutY="219.0" prefHeight="35.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="사용자 ID" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="이 름" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <ListView fx:id="selected_reciever_list" prefHeight="398.0" prefWidth="272.0" />
+                                 </children>
+                              </VBox>
+                              <Button layoutX="349.0" layoutY="478.0" mnemonicParsing="false" onAction="#onAddReciever" prefHeight="44.0" prefWidth="44.0" styleClass="add_btn" text="→">
+                                 <font>
+                                    <Font name="HYwulM" size="22.0" />
+                                 </font>
+                              </Button>
+                              <Label layoutX="824.0" layoutY="204.0" text="◎ 본          문">
+                                 <font>
+                                    <Font name="HYwulM" size="30.0" />
+                                 </font>
+                              </Label>
+                              <TextArea fx:id="msgContentArea" layoutX="861.0" layoutY="248.0" prefHeight="432.0" prefWidth="523.0" promptText="200자 이내">
+                                 <font>
+                                    <Font name="HYwulM" size="27.0" />
+                                 </font>
+                              </TextArea>
+                              <Button layoutX="627.0" layoutY="747.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="64.0" prefWidth="197.0" styleClass="add_btn" text="보내기">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </StackPane>
+               </children>
+            </StackPane>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <AnchorPane prefHeight="77.0" prefWidth="1900.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="572.0" layoutY="14.0" prefHeight="23.0" prefWidth="965.0" text="[437-763] 경기도 의왕시 월암동 374-18  한국교통대학교 의왕캠퍼스 / TEL :  070-8855-1699 / FAX : 031-462-2944 / 야간전화 :  031-461-1681" textFill="#949191" />
+            <Label layoutX="572.0" layoutY="39.0" prefHeight="15.0" prefWidth="839.0" text="COPYRIGHT(C) KOREA NATIONAL UNIVERSITY OF TRANSFORTATION. ALL RIGHT RESERVED" textFill="#949191" />
+         </children>
+      </AnchorPane>
+   </bottom>
+   <right>
+      <VBox prefHeight="859.0" prefWidth="225.0" BorderPane.alignment="CENTER" />
+   </right>
+</BorderPane>

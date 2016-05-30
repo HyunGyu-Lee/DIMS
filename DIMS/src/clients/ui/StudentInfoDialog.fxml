@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="516.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.CheckStudentDialog_Controller">
+   <children>
+      <Label layoutX="239.0" layoutY="22.0" prefHeight="49.0" prefWidth="237.0" text="학생 신상 정보 조회">
+         <font>
+            <Font name="HYwulB" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="Lable_name" layoutX="142.0" layoutY="28.0" prefHeight="38.0" prefWidth="80.0" text="ㅁㅁㅁ">
+         <font>
+            <Font name="HYwulM" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="90.0" layoutY="110.0" text="학번 : " />
+      <Label layoutX="90.0" layoutY="190.0" text="성별 : " />
+      <Label layoutX="90.0" layoutY="199.0" />
+      <Label layoutX="83.0" layoutY="230.0" text="전화번호 : " />
+      <Label layoutX="90.0" layoutY="151.0" text="이름 : " />
+      <TextField fx:id="StudentNum" layoutX="164.0" layoutY="105.0" prefHeight="29.0" prefWidth="263.0" />
+      <TextField fx:id="name" layoutX="164.0" layoutY="146.0" prefHeight="29.0" prefWidth="263.0" />
+      <TextField layoutX="164.0" layoutY="185.0" prefHeight="29.0" prefWidth="263.0" />
+      <TextField layoutX="164.0" layoutY="225.0" prefHeight="29.0" prefWidth="263.0" />
+      <Label layoutX="83.0" layoutY="275.0" text="방번호 : " />
+      <TextField layoutX="164.0" layoutY="270.0" prefHeight="29.0" prefWidth="263.0" />
+      <Button layoutX="164.0" layoutY="420.0" mnemonicParsing="false" onAction="#onConfirm" prefHeight="29.0" prefWidth="110.0" text="확인" />
+      <Button layoutX="317.0" layoutY="420.0" mnemonicParsing="false" onAction="#onReply" prefHeight="29.0" prefWidth="110.0" text="취소" />
+   </children>
+</AnchorPane>
