@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,6 +27,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -38,6 +41,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import tools.NetworkProtocols;
@@ -86,6 +90,21 @@ public class StudentMain implements Initializable {
 	private ObservableList<HBox> wholeRListData, selectedRListData;		// 위 두 개 리스트 데이터
 	private ArrayList<String> rcList;	// 전체 받을사람 데이터
 
+	// 게시판
+	@FXML StackPane BOARD_VIEW;							// 메인
+	@FXML AnchorPane BOARD_SEE_VIEW, BOARD_WRITE_VIEW, BOARD_CONTENT_VIEW;	// 글 확인, 글 작성
+	@FXML ListView<HBox> board_list_view;				// 게시글 리스트
+	private ObservableList<HBox> boardListData;			// 게시글 리스트 데이터
+	
+	@FXML TextField board_title;						// 작성 - 제목
+	@FXML ComboBox<String> board_category;				// 작성 - 카테고리선택
+	@FXML TextArea board_content;						// 작성 - 본문
+	String s_category = "";
+	
+	@FXML TextField board_c_title;
+	@FXML Label board_c_time, board_c_creator, board_c_category;
+	@FXML TextArea board_c_content;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
@@ -103,12 +122,17 @@ public class StudentMain implements Initializable {
 		timeline.play();
 		
 		overnight_list_view_data = FXCollections.observableArrayList();
-		
 		recieve_message_view_data = FXCollections.observableArrayList();
 		send_message_view_data = FXCollections.observableArrayList();
 		wholeRListData = FXCollections.observableArrayList();;
 		selectedRListData = FXCollections.observableArrayList();
 		selected_reciever_list.setItems(selectedRListData);
+		boardListData = FXCollections.observableArrayList();		
+		
+		ObservableList<String> category = FXCollections.observableArrayList();
+		category.addAll("공지사항","건의사항","자유게시판");
+		board_category.setItems(category);
+		
 		shutdown();
 		
 		
@@ -206,6 +230,7 @@ public class StudentMain implements Initializable {
 								@Override
 								public void run() {
 									createMessageList("r", arr);
+									shutdown();
 									MESSAGE_VIEW.setVisible(true);
 									message_re_view.setVisible(true);
 									message_se_view.setVisible(false);
@@ -221,6 +246,7 @@ public class StudentMain implements Initializable {
 								@Override
 								public void run() {
 									createMessageList("s", arr);
+									shutdown();
 									MESSAGE_VIEW.setVisible(true);
 									message_se_view.setVisible(true);
 									message_re_view.setVisible(false);
@@ -261,6 +287,33 @@ public class StudentMain implements Initializable {
 									CustomDialog.showMessageDialog(prc.get("msg").toString(), sManager.getStage());
 								}
 							});
+						}
+						else if(type.equals(NetworkProtocols.BOARD_LIST_RESPOND))
+						{
+							JSONObject prc = line;
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									createBoardList((JSONArray)prc.get("board_list"));
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.ENROLL_BOARD_RESPOND))
+						{
+							BOARD_WRITE_VIEW.setVisible(false);
+							BOARD_SEE_VIEW.setVisible(true);
+
+							String[] keys = {"type","category"};
+							Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST, s_category};
+							
+							sendProtocol(Toolbox.createJSONProtocol(keys, values));
+							
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									CustomDialog.showMessageDialog("게시글이 등록됐습니다.", sManager.getStage());
+								}
+							});
 							
 						}
 						else if(type.equals(NetworkProtocols.EXIT_RESPOND))
@@ -287,6 +340,7 @@ public class StudentMain implements Initializable {
 	{
 		OVERNIGHT_MAIN_VIEW.setVisible(false);
 		MESSAGE_VIEW.setVisible(false);
+		BOARD_VIEW.setVisible(false);
 	}
 	
 	public void createMessageList(String string, JSONArray arr)
@@ -464,6 +518,7 @@ public class StudentMain implements Initializable {
 		}
 		
 		overnight_list_view.setItems(overnight_list_view_data);
+		shutdown();
 		OVERNIGHT_MAIN_VIEW.setVisible(true);
 		OVERNIGHT_REQUEST_VIEW.setVisible(false);
 		OVERNIGHT_INFO_VIEW.setVisible(true);
@@ -643,7 +698,140 @@ public class StudentMain implements Initializable {
 		}
 		
 		createReciverList(newList);
-		whole_reciever_list.refresh();		
+		whole_reciever_list.refresh();
+	}
+	
+	@FXML private void onBoardMainReq()
+	{
+		String[] keys = {"type","category"};
+		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "공지사항"};
+		sendProtocol(Toolbox.createJSONProtocol(keys, values));
+	}
+	
+	@FXML private void onBoardReqReq()
+	{
+		String[] keys = {"type","category"};
+		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "건의사항"};
+		sendProtocol(Toolbox.createJSONProtocol(keys, values));		
+	}
+	
+	@FXML private void onBoardFreeReq()
+	{
+		String[] keys = {"type","category"};
+		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "자유게시판"};
+		sendProtocol(Toolbox.createJSONProtocol(keys, values));		
+	}
+	
+	public void createBoardList(JSONArray data)
+	{
+		boardListData.removeAll(boardListData);
+	
+		JSONArray arr = data;
+		
+		for(Object o : arr)
+		{
+			JSONObject target = (JSONObject)o;
+
+			String name = target.get("이름").toString();
+			String title = target.get("게시글제목").toString();
+			Date create_at = (Date) target.get("작성일자");
+			
+			HBox item = new HBox();
+			Label ccLabel = new Label(target.get("카테고리").toString());
+			Label nLabel = new Label(name);
+			Label tLabel = new Label(title);
+			Label cLabel = new Label(create_at.toString());
+			Label hiddenContent = new Label(target.get("게시글본문").toString());
+			
+			ccLabel.setAlignment(Pos.CENTER);
+			ccLabel.setFont(Font.font("HYwulM",18));
+			ccLabel.setPrefWidth(192);
+			
+			nLabel.setAlignment(Pos.CENTER);
+			nLabel.setPrefWidth(186);
+			nLabel.setFont(Font.font("HYwulM",18));
+			
+			tLabel.setPrefWidth(697);
+			tLabel.setAlignment(Pos.CENTER);
+			tLabel.setFont(Font.font("HYwulM",18));
+			
+			cLabel.setFont(Font.font("HYwulM",18));
+			cLabel.setAlignment(Pos.CENTER);
+			cLabel.setPrefWidth(203);
+			hiddenContent.setVisible(false);
+			
+			Separator s0 = new Separator(Orientation.VERTICAL);
+			s0.setPrefWidth(6);
+			Separator s1 = new Separator(Orientation.VERTICAL);
+			s1.setPrefWidth(6);
+			Separator s2 = new Separator(Orientation.VERTICAL);
+			s2.setPrefWidth(6);
+			
+			item.getChildren().addAll(ccLabel, s2, nLabel, s0, tLabel, s1, cLabel, hiddenContent);
+			item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent event) {
+					if(event.getClickCount()==2)
+					{
+						board_c_title.setText(tLabel.getText());
+						board_c_creator.setText(nLabel.getText());
+						board_c_time.setText(cLabel.getText());
+						board_c_category.setText(ccLabel.getText());
+						board_c_content.setText(hiddenContent.getText());
+						
+						board_c_title.setEditable(false);
+						board_c_content.setEditable(false);
+						BOARD_SEE_VIEW.setVisible(false);
+						BOARD_CONTENT_VIEW.setVisible(true);
+					}
+				}
+			});
+			
+			boardListData.add(item);
+		}
+		board_list_view.setItems(boardListData);
+		shutdown();
+		BOARD_VIEW.setVisible(true);
+		BOARD_CONTENT_VIEW.setVisible(false);
+		BOARD_WRITE_VIEW.setVisible(false);
+		BOARD_SEE_VIEW.setVisible(true);
+	}
+	
+	@FXML private void onWriteBoard()
+	{
+		BOARD_CONTENT_VIEW.setVisible(false);
+		BOARD_SEE_VIEW.setVisible(false);
+		BOARD_WRITE_VIEW.setVisible(true);
+	}
+	
+	@FXML private void onWriteBoard_toServer()
+	{
+		s_category = board_category.getValue();
+		
+		String[] ks = {"작성자","게시글제목","게시글본문","카테고리"};
+		Object[] vs = {uID, board_title.getText(), board_content.getText(), s_category};
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_BOARD_REQUEST, ks, vs));
+		
+		board_category.getSelectionModel().select(0);
+		board_title.setText("");
+		board_content.setText("");
+	}
+	
+	@FXML private void onBackBoard()
+	{
+		board_title.setText("");
+		board_category.getSelectionModel().select(0);
+		board_content.setText("");
+		BOARD_WRITE_VIEW.setVisible(false);
+		BOARD_SEE_VIEW.setVisible(true);
+	}
+	
+	@FXML private void onBoardOK()
+	{
+		BOARD_CONTENT_VIEW.setVisible(false);
+		BOARD_WRITE_VIEW.setVisible(false);
+		BOARD_SEE_VIEW.setVisible(true);
 	}
 	
 	public void sendProtocol(JSONObject protocol)

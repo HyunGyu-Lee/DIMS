@@ -411,7 +411,6 @@ public class AdministratorMainController implements Initializable {
 						}
 						else if(type.equals(NetworkProtocols.ENROLL_BOARD_RESPOND))
 						{
-							System.out.println("게시글 등록 성공");
 							BOARD_WRITE.setVisible(false);
 							BOARD_LIST_VIEW.setVisible(true);
 

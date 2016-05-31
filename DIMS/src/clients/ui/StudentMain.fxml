@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
@@ -61,17 +63,17 @@
                   <content>
                     <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="138.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
                            <children>
-                              <Button alignment="CENTER" layoutX="20.0" layoutY="23.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="공 지 사 항">
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="23.0" mnemonicParsing="false" onAction="#onBoardMainReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="공 지 사 항">
                                  <font>
                                     <Font name="HYwulM" size="17.0" />
                                  </font>
                               </Button>
-                              <Button alignment="CENTER" layoutX="20.0" layoutY="87.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="건 의 사 항">
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="87.0" mnemonicParsing="false" onAction="#onBoardReqReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="건 의 사 항">
                                  <font>
                                     <Font name="HYwulM" size="17.0" />
                                  </font>
                               </Button>
-                              <Button alignment="CENTER" layoutX="20.0" layoutY="149.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="자유 게시판">
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="149.0" mnemonicParsing="false" onAction="#onBoardFreeReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="자유 게시판">
                                  <font>
                                     <Font name="HYwulM" size="17.0" />
                                  </font>
@@ -292,7 +294,7 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="MESSAGE_VIEW" prefHeight="150.0" prefWidth="200.0">
+                  <StackPane fx:id="MESSAGE_VIEW" prefHeight="150.0" prefWidth="200.0" visible="false">
                      <children>
                         <AnchorPane fx:id="message_re_view" prefHeight="200.0" prefWidth="200.0" visible="false">
                            <children>
@@ -447,6 +449,156 @@
                                  </font>
                               </TextArea>
                               <Button layoutX="627.0" layoutY="747.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="64.0" prefWidth="197.0" styleClass="add_btn" text="보내기">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="BOARD_VIEW" prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane fx:id="BOARD_SEE_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
+                           <children>
+                              <Label layoutX="75.0" layoutY="29.0" text="◎ 기숙사 게시판">
+                                 <font>
+                                    <Font name="HYwulM" size="60.0" />
+                                 </font>
+                              </Label>
+                              <VBox layoutX="75.0" layoutY="150.0" prefHeight="559.0" prefWidth="1280.0">
+                                 <children>
+                                    <HBox prefHeight="35.0" prefWidth="1054.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="203.0" text="카 테 고 리">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" minWidth="0.0" prefHeight="35.0" prefWidth="203.0" text="작 성 자">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" minWidth="0.0" prefHeight="35.0" prefWidth="708.0" text="제 목">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <Label alignment="CENTER" minWidth="0.0" prefHeight="35.0" prefWidth="203.0" text="작 성 일 자">
+                                             <font>
+                                                <Font name="HYwulM" size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <ListView fx:id="board_list_view" prefHeight="524.0" prefWidth="653.0" />
+                                 </children>
+                              </VBox>
+                              <Button layoutX="1162.0" layoutY="60.0" mnemonicParsing="false" onAction="#onWriteBoard" prefHeight="41.0" prefWidth="193.0" styleClass="add_btn" text="게시글 작성">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="BOARD_WRITE_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
+                           <children>
+                              <Label layoutX="75.0" layoutY="29.0" text="◎ 게시글 작성">
+                                 <font>
+                                    <Font name="HYwulM" size="60.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="90.0" layoutY="133.0" prefHeight="56.0" prefWidth="151.0" text="◎ 제      목">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="board_title" layoutX="275.0" layoutY="144.0" prefHeight="35.0" prefWidth="790.0" promptText="제목을 입력하세요">
+                                 <font>
+                                    <Font name="HYwulM" size="17.0" />
+                                 </font>
+                              </TextField>
+                              <Label layoutX="90.0" layoutY="200.0" prefHeight="56.0" prefWidth="149.0" text="◎ 카테고리">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <ComboBox fx:id="board_category" layoutX="275.0" layoutY="211.0" prefHeight="35.0" prefWidth="217.0" promptText="카테고리를 선택하세요" />
+                              <Label layoutX="89.0" layoutY="273.0" prefHeight="56.0" prefWidth="151.0" text="◎ 본      문">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextArea fx:id="board_content" layoutX="121.0" layoutY="336.0" prefHeight="342.0" prefWidth="948.0" promptText="200자 이내 내용을 입력하세요">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </TextArea>
+                              <Button layoutX="492.0" layoutY="744.0" mnemonicParsing="false" onAction="#onWriteBoard_toServer" prefHeight="46.0" prefWidth="206.0" styleClass="confirm_btn" text="작    성">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Button>
+                              <Button layoutX="947.0" layoutY="36.0" mnemonicParsing="false" onAction="#onBackBoard" prefHeight="49.0" prefWidth="118.0" styleClass="Back_btn" text="뒤로가기">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="BOARD_CONTENT_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
+                           <children>
+                              <Label layoutX="70.0" layoutY="85.0" prefHeight="44.0" prefWidth="167.0" text="◎ 제         목">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="board_c_title" layoutX="287.0" layoutY="90.0" prefHeight="35.0" prefWidth="665.0" />
+                              <Label layoutX="70.0" layoutY="231.0" prefHeight="44.0" prefWidth="170.0" text="◎ 작   성   자">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="board_c_creator" layoutX="287.0" layoutY="231.0" prefHeight="44.0" prefWidth="150.0" text="작 성 자" underline="true">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="board_c_category" layoutX="691.0" layoutY="231.0" prefHeight="44.0" prefWidth="261.0" text="작 성 자" underline="true">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="470.0" layoutY="231.0" prefHeight="44.0" prefWidth="176.0" text="◎ 카 테 고 리">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="70.0" layoutY="161.0" prefHeight="44.0" prefWidth="171.0" text="◎ 작 성 시 간">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="board_c_time" layoutX="287.0" layoutY="161.0" prefHeight="44.0" prefWidth="248.0" text="작 성 시 간" underline="true">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="70.0" layoutY="305.0" prefHeight="44.0" prefWidth="167.0" text="◎ 본         문">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextArea fx:id="board_c_content" layoutX="99.0" layoutY="366.0" prefHeight="330.0" prefWidth="851.0" promptText="ㅁ">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </TextArea>
+                              <Button layoutX="445.0" layoutY="750.0" mnemonicParsing="false" onAction="#onBoardOK" prefHeight="53.0" prefWidth="160.0" styleClass="confirm_btn" text="확 인">
                                  <font>
                                     <Font name="HYwulM" size="25.0" />
                                  </font>

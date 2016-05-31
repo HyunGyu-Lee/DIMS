@@ -68,3 +68,11 @@
 .add_btn:hover {
 	-fx-background-color : gray;
 }
+
+.confirm_btn {
+	-fx-background-color : linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(225,225,225,1) 51%,rgba(246,246,246,1) 100%);
+}
+
+.confirm_btn:hover {
+	-fx-background-color : gray;
+}
