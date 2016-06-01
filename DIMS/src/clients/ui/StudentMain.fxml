@@ -457,7 +457,7 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="BOARD_VIEW" prefHeight="150.0" prefWidth="200.0">
+                  <StackPane fx:id="BOARD_VIEW" prefHeight="150.0" prefWidth="200.0" visible="false">
                      <children>
                         <AnchorPane fx:id="BOARD_SEE_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
                            <children>
@@ -550,7 +550,7 @@
                               </Button>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="BOARD_CONTENT_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
+                        <AnchorPane fx:id="BOARD_CONTENT_VIEW" prefHeight="200.0" prefWidth="200.0">
                            <children>
                               <Label layoutX="70.0" layoutY="85.0" prefHeight="44.0" prefWidth="167.0" text="◎ 제         목">
                                  <font>
@@ -607,6 +607,7 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
+                  <AnchorPane fx:id="USER_INFO_VIEW" prefHeight="200.0" prefWidth="200.0" />
                </children>
             </StackPane>
          </content>

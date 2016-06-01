@@ -140,6 +140,8 @@ public class AdministratorMainController implements Initializable {
 	@FXML TextField BOARD_TITLE;					// 게시판 - 작성글 제목
 	@FXML TextArea	BOARD_CONTENT;					// 게시판 - 작성글 본문
 	@FXML ComboBox<String> BOARD_W_CSELECTOR;		// 게시판 - 작성 시 카테고리 선택할 콤보박스
+	@FXML HBox board_tab_btn_box;					// 게시판 - 카테고리 리스트
+	
 	// onNotice()	 : 공지사항 버튼 클릭
 	// onRequest()   : 건의사항 버튼 클릭
 	// onFree()		 : 자유게시판 버튼 클릭
@@ -422,6 +424,31 @@ public class AdministratorMainController implements Initializable {
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
+									
+									BOARD_W_CSELECTOR.getItems().clear();
+									BOARD_CATEGORY_SELECTOR.getItems().clear();
+									board_tab_btn_box.getChildren().clear();
+									
+									for(Object o :(JSONArray)line.get("category_list"))
+									{
+										String target = o.toString();
+										BOARD_W_CSELECTOR.getItems().add(target);
+										BOARD_CATEGORY_SELECTOR.getItems().add(target);
+										
+										Button tab = new Button(target);
+										tab.setOnAction(new EventHandler<ActionEvent>() {
+											
+											@Override
+											public void handle(ActionEvent event) {
+												JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+												o.put("category", target);
+												sendProtocol(o);
+												
+											}
+										});
+										tab.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";");
+										board_tab_btn_box.getChildren().add(tab);
+									}
 									createBoardList((JSONArray)line.get("board_list"));
 								}
 							});
@@ -581,6 +608,31 @@ public class AdministratorMainController implements Initializable {
 								
 								@Override
 								public void run() {
+									BOARD_W_CSELECTOR.getItems().clear();
+									BOARD_CATEGORY_SELECTOR.getItems().clear();
+									board_tab_btn_box.getChildren().clear();
+									
+									for(Object o :(JSONArray)line.get("category_list"))
+									{
+										String target = o.toString();
+										BOARD_W_CSELECTOR.getItems().add(target);
+										BOARD_CATEGORY_SELECTOR.getItems().add(target);
+										
+										Button tab = new Button(target);
+										tab.setOnAction(new EventHandler<ActionEvent>() {
+											
+											@Override
+											public void handle(ActionEvent event) {
+												JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+												o.put("category", target);
+												sendProtocol(o);
+												
+											}
+										});
+										tab.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";");
+										board_tab_btn_box.getChildren().add(tab);
+									}
+									
 									createBoardList((JSONArray)line.get("board_list"));
 									shutdown();
 									BOARD.setVisible(true);
@@ -1032,9 +1084,9 @@ public class AdministratorMainController implements Initializable {
 	@SuppressWarnings("unchecked")
 	@FXML private void onNotice()
 	{
-		JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-		o.put("category", "공지사항");
-		sendProtocol(o);	
+		//JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+		//o.put("category", "공지사항");
+		//sendProtocol(o);	
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -2156,6 +2208,12 @@ public class AdministratorMainController implements Initializable {
 			JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.WEABAK_INFO_TAP_REQUEST);
 			json.put("category", "비승인외박");
 			sendProtocol(json);
+		}
+		
+		@FXML private void onAddTab()
+		{
+			// 대화상자 띄워서 새로운 탭 추가
+			//sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_ADD_TAP_REQUEST));
 		}
 		
 		// 메세지 버튼 이벤트

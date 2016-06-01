@@ -283,6 +283,8 @@ public class DIMS_Server {
 						ResultSet rs = handler.excuteQuery("select G.게시글번호, S.이름, G.게시글제목, G.작성일자, G.게시글본문, G.카테고리 from 사용자 S, 게시글 G "
 								                         + "where S.학번=G.작성자 and G.카테고리='"+request.get("category").toString()+"';");
 						JSONArray arr = new JSONArray();
+						JSONArray arr2 = new JSONArray();
+						
 						String[] keys = {"No","이름", "게시글제목", "작성일자", "게시글본문", "카테고리"};
 						try
 						{
@@ -303,8 +305,26 @@ public class DIMS_Server {
 						{
 							e.printStackTrace();
 						}
+						
+						String qry2 = "select 카테고리이름 from 게시글_카테고리목록;";
+						
+						ResultSet rs2 = handler.excuteQuery(qry2);
+						
+						try
+						{
+							while(rs2.next())
+							{
+								arr2.add(rs2.getString(1));
+							}
+						}
+						catch(SQLException e)
+						{
+							e.printStackTrace();
+						}
+						
 						JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_RESPOND);
 						res.put("board_list", arr);
+						res.put("category_list", arr2);
 						sendProtocol(res);
 						System.out.println("응답");
 					}
@@ -423,8 +443,26 @@ public class DIMS_Server {
 							arr.add(Toolbox.createJSONProtocol(keys, values));
 						}
 						
+						JSONArray arr2 = new JSONArray();
+						String qry2 = "select 카테고리이름 from 게시글_카테고리목록;";
+						
+						ResultSet rs2 = handler.excuteQuery(qry2);
+						
+						try
+						{
+							while(rs2.next())
+							{
+								arr2.add(rs2.getString(1));
+							}
+						}
+						catch(SQLException e)
+						{
+							e.printStackTrace();
+						}
+						
 						JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_MAIN_RESPOND);
 						res.put("board_list", arr);
+						res.put("category_list", arr2);
 						sendProtocol(res);
 					}
 					else if(type.equals(NetworkProtocols.MESSAGE_RECIEVE_LIST_REQUEST))

@@ -157,9 +157,8 @@ public class NetworkProtocols {
 		public static final String STUDENT_SEND_MESSAGE_REQUEST = "ssmreq";
 		public static final String STUDENT_SEND_MESSAGE_RESPOND = "ssmres";
 		
-		// 학생 - 메세지 보내기 새로운거
-		
-		
+		public static final String ADMIN_ADD_TAP_REQUEST = "aatreq";
+		public static final String ADMIN_ADD_TAP_RESPOND = "aatres";		
 		
 		
 }
