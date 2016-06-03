@@ -2,16 +2,29 @@ package tools;
 
 
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 
 import com.orsoncharts.util.json.JSONObject;
+
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -19,6 +32,58 @@ import javafx.util.Duration;
 
 public class Toolbox {
 
+	public static WritableImage getWritableByArray(byte[] arr)
+    {
+		System.out.println("입력 데이터 길이 : "+arr.length);
+		BufferedImage bImg = null;
+    	WritableImage wr = null;
+    	bImg = convertArrayToBufferedImage(arr);
+    	System.out.println("변환된 BufferedImage : "+bImg);
+    	if (bImg != null)
+        {
+            wr = new WritableImage(bImg.getWidth(), bImg.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < bImg.getWidth(); x++)
+            {
+                for (int y = 0; y < bImg.getHeight(); y++)
+                {
+                    pw.setArgb(x, y, bImg.getRGB(x, y));
+                }
+            }
+        }
+    	else
+    	{
+    		System.out.println("bImg is null");
+    	}
+    	System.out.println("변환된 WritableImage : "+wr);
+        return wr;
+    }
+	
+	private static BufferedImage convertArrayToBufferedImage(byte[] arr)
+	{
+		InputStream in = new ByteArrayInputStream(arr);
+		BufferedImage bImg = null;
+		try
+		{
+			bImg = ImageIO.read(in);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		bImg = resize(bImg, 151, 175);
+		return bImg;
+	}
+	
+	public static BufferedImage resize(BufferedImage img, int newW, int newH) { 
+	    java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
+	    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+	    Graphics2D g2d = dimg.createGraphics();
+	    g2d.drawImage(tmp, 0, 0, null);
+	    g2d.dispose();
+
+	    return dimg;
+	}
+	
 	public static String getWhereStringBetweenDate(java.util.Date begin, java.util.Date end, String format)
 	{
 		StringBuilder wStr = new StringBuilder();

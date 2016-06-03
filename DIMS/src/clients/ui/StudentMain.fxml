@@ -21,7 +21,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
                            <children>
-                              <Button alignment="CENTER" layoutX="20.0" layoutY="20.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="개인정보조회">
+                              <Button alignment="CENTER" layoutX="20.0" layoutY="20.0" mnemonicParsing="false" onAction="#onUserInfoView" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="개인정보조회">
                                  <font>
                                     <Font name="HYwulM" size="17.0" />
                                  </font>
@@ -457,7 +457,7 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="BOARD_VIEW" prefHeight="150.0" prefWidth="200.0" visible="false">
+                  <StackPane fx:id="BOARD_VIEW" prefHeight="150.0" prefWidth="200.0">
                      <children>
                         <AnchorPane fx:id="BOARD_SEE_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
                            <children>
@@ -550,7 +550,7 @@
                               </Button>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="BOARD_CONTENT_VIEW" prefHeight="200.0" prefWidth="200.0">
+                        <AnchorPane fx:id="BOARD_CONTENT_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
                            <children>
                               <Label layoutX="70.0" layoutY="85.0" prefHeight="44.0" prefWidth="167.0" text="◎ 제         목">
                                  <font>
@@ -607,7 +607,240 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
-                  <AnchorPane fx:id="USER_INFO_VIEW" prefHeight="200.0" prefWidth="200.0" />
+                  <AnchorPane fx:id="USER_INFO_VIEW" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <Label alignment="CENTER" layoutX="34.0" layoutY="33.0" prefHeight="65.0" prefWidth="392.0" text="◎ 내 신상정보">
+                           <font>
+                              <Font name="HYwulM" size="44.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="139.0" layoutY="143.0" prefHeight="41.0" prefWidth="218.0" text="◎ 개  인  정  보">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <VBox layoutX="176.0" layoutY="205.0" style="-fx-border-color: gray; -fx-border-style: dotted;">
+                           <children>
+                              <ImageView fx:id="ui_profile_view" fitHeight="175.0" fitWidth="151.0" layoutX="142.0" layoutY="163.0" pickOnBounds="true" preserveRatio="true" />
+                              <Button mnemonicParsing="false" onAction="#changeProfileImage" prefWidth="151.0" styleClass="confirm_btn" text="이미지 변경" />
+                           </children>
+                        </VBox>
+                        <VBox layoutX="392.0" layoutY="205.0" prefHeight="200.0" prefWidth="800.0" styleClass="outterForm">
+                           <children>
+                              <HBox maxWidth="-Infinity" prefHeight="100.0" prefWidth="800.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="198.0" styleClass="desField" text="이            름">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font></Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_name" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="이현규" styleClass="valueField" text="이현규" />
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="성            별">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <ComboBox fx:id="ui_sex" prefHeight="100.0" prefWidth="200.0" styleClass="comboValueField" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="195.0" styleClass="desField" text="주민등록번호" HBox.hgrow="ALWAYS">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="100.0" prefWidth="6.0" />
+                                    <TextField fx:id="ui_ident" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" promptText="111111-1111111" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children></HBox>
+                              <Separator prefHeight="6.0" prefWidth="200.0" />
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="휴 대 폰 번호" HBox.hgrow="ALWAYS">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_phoneNum" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="010-1111-1111" styleClass="valueField" />
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="자택전화번호">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_homeNum" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="031-827-6564" styleClass="valueField" />
+                                 </children></HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="195.0" styleClass="desField" text="주            소" HBox.hgrow="ALWAYS">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="100.0" prefWidth="6.0" />
+                                    <TextField fx:id="ui_addr" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" promptText="경기도 의정부시 장암동 동아아파트 105동 1705호" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="392.0" layoutY="480.0" prefHeight="158.0" prefWidth="800.0" styleClass="outterForm">
+                           <children>
+                              <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="800.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="198.0" styleClass="desField" text="학            번">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_sId" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="1123056" styleClass="valueField" />
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="학            년">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <ComboBox fx:id="ui_grade" prefHeight="100.0" prefWidth="200.0" promptText="남" styleClass="comboValueField" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" prefHeight="48.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="195.0" styleClass="desField" text="소  속  학  과">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="100.0" prefWidth="6.0" />
+                                    <TextField fx:id="ui_major" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" promptText="컴퓨터정보공학과" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <Separator prefHeight="6.0" prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" prefHeight="48.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="방     번    호">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_roomNum" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="122" styleClass="valueField" />
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" styleClass="desField" text="상     벌    점">
+                                       <font>
+                                          <Font name="HYwulM" size="32.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_point" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" promptText="031-827-6564" styleClass="valueField" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                           </children>
+                        </VBox>
+                        <Label layoutX="136.0" layoutY="480.0" prefHeight="41.0" prefWidth="225.0" text="◎ 학  사  정  보">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="507.0" layoutY="930.0" mnemonicParsing="false" onAction="#onModifyUI" prefHeight="45.0" prefWidth="124.0" styleClass="confirm_btn" text="수    정">
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="732.0" layoutY="930.0" mnemonicParsing="false" onAction="#onSaveUI" prefHeight="45.0" prefWidth="124.0" styleClass="confirm_btn" text="저   장">
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="102.0" layoutY="655.0" prefHeight="41.0" prefWidth="225.0" text="◎ 비밀번호 설정">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <HBox alignment="CENTER" layoutX="392.0" layoutY="653.0" prefHeight="45.0" prefWidth="432.0">
+                           <children>
+                              <Label fx:id="isAuthed" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="223.0" text="비밀번호 설정을 위한 인증이 필요합니다. " textFill="#f80000" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="HYwulM" size="15.0" />
+                                 </font></Label>
+                              <Button layoutX="392.0" layoutY="653.0" mnemonicParsing="false" onAction="#onReAuth" prefHeight="27.0" prefWidth="86.0" styleClass="confirm_btn" text="재인증">
+                                 <font>
+                                    <Font name="HYwulM" size="18.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <VBox fx:id="passSetupBox" layoutX="392.0" layoutY="698.0" prefHeight="200.0" prefWidth="800.0" styleClass="outterForm">
+                           <children>
+                              <HBox alignment="CENTER_RIGHT">
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#onPassApp" prefHeight="31.0" prefWidth="91.0" styleClass="confirm_btn" text="적  용">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="800.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" styleClass="desField2" text="새 비밀번호">
+                                       <font>
+                                          <Font name="HYwulM" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_newPass" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="195.0" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" prefHeight="48.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="48.0" prefWidth="195.0" styleClass="desField2" text="비밀번호확인">
+                                       <font>
+                                          <Font name="HYwulM" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="100.0" prefWidth="6.0" />
+                                    <TextField fx:id="ui_newPassConfirm" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <Separator prefHeight="6.0" prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" prefHeight="48.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" text="비밀번호찾기 질문">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <ComboBox fx:id="ui_question" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="150.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox maxHeight="-Infinity" prefHeight="48.0" prefWidth="200.0">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="195.0" text="비밀번호찾기 답변">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <TextField fx:id="ui_answer" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="195.0" promptText="122" styleClass="valueField" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
                </children>
             </StackPane>
          </content>

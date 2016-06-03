@@ -1,14 +1,27 @@
 package clients.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.ResourceBundle;
+
+import javax.imageio.ImageIO;
 
 import com.orsoncharts.util.json.JSONArray;
 import com.orsoncharts.util.json.JSONObject;
@@ -19,31 +32,43 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import sun.misc.IOUtils;
 import tools.NetworkProtocols;
 import tools.Statics;
 import tools.Toolbox;
@@ -105,6 +130,16 @@ public class StudentMain implements Initializable {
 	@FXML Label board_c_time, board_c_creator, board_c_category;
 	@FXML TextArea board_c_content;
 	
+	
+	// 신상정보 조회
+	@FXML AnchorPane USER_INFO_VIEW;
+	@FXML TextField ui_name, ui_ident, ui_phoneNum, ui_homeNum, ui_addr, ui_sId, ui_major, ui_roomNum, ui_point, ui_newPass, ui_newPassConfirm, ui_answer;
+	@FXML ComboBox<String> ui_sex, ui_grade, ui_question;
+	@FXML ImageView ui_profile_view;
+	@FXML VBox passSetupBox;
+	@FXML Label isAuthed;
+	private boolean reAuth = false;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
@@ -133,9 +168,16 @@ public class StudentMain implements Initializable {
 		category.addAll("공지사항","건의사항","자유게시판");
 		board_category.setItems(category);
 		
+		ui_sex.setItems(FXCollections.observableArrayList());
+		ui_sex.getItems().addAll("남","여");
+
+		ui_grade.setItems(FXCollections.observableArrayList());
+		ui_grade.getItems().addAll("1","2","3","4");
+		
+		ui_roomNum.setEditable(false);
+		ui_point.setEditable(false);
+		
 		shutdown();
-		
-		
 	}
 	
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -316,6 +358,123 @@ public class StudentMain implements Initializable {
 							});
 							
 						}
+						else if(type.equals(NetworkProtocols.STUDENT_USER_INFO_RESPOND))
+						{
+							JSONObject data = line;
+							
+							Platform.runLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									
+									for(Object o : (JSONArray)data.get("질문목록"))
+									{
+										ui_question.getItems().add(o.toString());
+									}
+									
+									
+									shutdown();
+									
+									ui_name.setText(data.get("이름").toString());
+									ui_sex.getSelectionModel().select(data.get("성별").toString());
+									ui_ident.setText(data.get("주민등록번호").toString());
+									ui_phoneNum.setText(data.get("휴대폰번호").toString());
+									ui_homeNum.setText(data.get("자택전화번호").toString());
+									ui_addr.setText(data.get("주소").toString());
+									ui_sId.setText(data.get("학번").toString());
+									ui_grade.getSelectionModel().select(data.get("학년").toString());
+									ui_major.setText(data.get("소속학과").toString());
+									ui_roomNum.setText(data.get("방번호").toString());
+									ui_point.setText(data.get("상벌점").toString());
+									
+									ui_question.getSelectionModel().select(data.get("질문내용").toString());
+									ui_answer.setText(data.get("비밀번호찾기_답변").toString());
+									
+									if(!data.get("이미지데이터").equals("imageX"))
+									{
+										ui_profile_view.setImage(Toolbox.getWritableByArray((byte[])data.get("이미지데이터")));
+									}
+									
+									if(reAuth)
+									{
+										isAuthed.setTextFill(Paint.valueOf("green"));										
+										isAuthed.setText("인증성공 ");
+										passSetupBox.setDisable(false);
+									}
+									else
+									{
+										isAuthed.setTextFill(Paint.valueOf("red"));
+										isAuthed.setText("비밀번호 설정을 위한 인증이 필요합니다. ");
+										passSetupBox.setDisable(true);
+									}
+									
+									
+									setUINodesEditable(false);	
+									
+									USER_INFO_VIEW.setVisible(true);
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_UPLOAD_PROFILE_IMAGE_RESPOND))
+						{
+							byte[] data = (byte[])line.get("Image-data");
+							
+							Platform.runLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									ui_profile_view.setImage(Toolbox.getWritableByArray(data));									
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_MODIFY_USER_INFO_RESPOND))
+						{
+							Platform.runLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									userName.setText(ui_name.getText());
+									CustomDialog.showMessageDialog("신상정보가 수정됐습니다.", sManager.getStage());									
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_REAUTH_RESPOND))
+						{
+							if(line.get("accept").equals("Y"))
+							{
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										CustomDialog.showMessageDialog("인증에 성공하셨습니다.", sManager.getStage());
+										reAuth = true;
+										isAuthed.setTextFill(Paint.valueOf("green"));										
+										isAuthed.setText("인증성공 ");
+										passSetupBox.setDisable(false);										
+									}
+								});
+							}
+							else
+							{
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										CustomDialog.showMessageDialog("비밀번호가 달라 인증에 실패했습니다.", sManager.getStage());										
+									}
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_PASSWORD_SETUP_RESPOND))
+						{
+							Platform.runLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									CustomDialog.showMessageDialog("변경사항이 적용되었습니다.", sManager.getStage());										
+								}
+							});
+						}
 						else if(type.equals(NetworkProtocols.EXIT_RESPOND))
 						{
 							break;
@@ -336,11 +495,41 @@ public class StudentMain implements Initializable {
 		}
 	}
 	
+	public void setUINodesEditable(boolean value)
+	{
+		if(value)
+		{
+			ui_name.setEditable(true);
+			ui_sex.setDisable(false);
+			ui_ident.setEditable(true);
+			ui_phoneNum.setEditable(true);
+			ui_homeNum.setEditable(true);
+			ui_addr.setEditable(true);
+			ui_sId.setEditable(true);
+			ui_grade.setDisable(false);
+			ui_major.setEditable(true);
+		}
+		else
+		{
+			ui_name.setEditable(false);
+			ui_sex.setDisable(true);
+			ui_ident.setEditable(false);
+			ui_phoneNum.setEditable(false);
+			ui_homeNum.setEditable(false);
+			ui_addr.setEditable(false);
+			ui_sId.setEditable(false);
+			ui_grade.setDisable(true);
+			ui_major.setEditable(false);			
+		}
+	}
+	
 	public void shutdown()
 	{
+		reAuth = false;
 		OVERNIGHT_MAIN_VIEW.setVisible(false);
 		MESSAGE_VIEW.setVisible(false);
 		BOARD_VIEW.setVisible(false);
+		USER_INFO_VIEW.setVisible(false);
 	}
 	
 	public void createMessageList(String string, JSONArray arr)
@@ -832,6 +1021,86 @@ public class StudentMain implements Initializable {
 		BOARD_CONTENT_VIEW.setVisible(false);
 		BOARD_WRITE_VIEW.setVisible(false);
 		BOARD_SEE_VIEW.setVisible(true);
+	}
+	
+	@FXML private void onUserInfoView()
+	{
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_USER_INFO_REQUEST));
+	}
+	
+	@FXML private void onModifyUI()
+	{
+		setUINodesEditable(true);
+	}
+	
+	@FXML private void onSaveUI()
+	{
+		setUINodesEditable(false);
+		String[] keys = {"이름","성별","주민등록번호","휴대폰번호","자택전화번호","주소","학번","학년","소속학과"};
+		Object[] values = {ui_name.getText(), ui_sex.getValue(), ui_ident.getText(), ui_phoneNum.getText(), ui_homeNum.getText(), ui_addr.getText(), ui_sId.getText(), ui_grade.getValue(), ui_major.getText()};
+		
+		System.out.println(ui_sex.getValue());
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MODIFY_USER_INFO_REQUEST, keys, values));
+		
+	}
+	
+	@FXML private void onReAuth()
+	{
+		CustomDialog cDlg = new CustomDialog(Statics.STUDENT_REAUTH_DIALOG_FXML, Statics.STUDENT_REAUTH_DIALOG_TITLE, sManager.getStage());
+		ReAuthDialogController con = (ReAuthDialogController) cDlg.getController();
+		con.setProperty(uID);
+		con.setWindow(cDlg);
+		cDlg.showAndWait();
+		
+		JSONObject request = (JSONObject)cDlg.getUserData();
+		
+		if(request!=null)
+		{
+			sendProtocol(request);
+		}
+		
+	}
+	
+	@FXML private void onPassApp()
+	{
+		if(!ui_newPass.getText().equals(ui_newPassConfirm.getText()))
+		{
+			CustomDialog.showMessageDialog("입력한 새 비밀번호를 확인하세요", sManager.getStage());
+			return;
+		}
+		
+		String[] keys = {"새비밀번호","질문","답변"};
+		Object[] values = {ui_newPass.getText(), ui_question.getSelectionModel().getSelectedIndex(), ui_answer.getText()};
+		
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_PASSWORD_SETUP_REQUEST, keys, values));
+		
+	}
+	
+	@FXML private void changeProfileImage()
+	{
+		FileChooser fc = new FileChooser();
+		File selectedImage = fc.showOpenDialog(sManager.getStage());
+				
+		
+		if(selectedImage!=null)
+		{
+			String[] keys = {"fileName", "content"};
+			byte[] data = null;
+			try
+			{
+				data = Files.readAllBytes(selectedImage.toPath());
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+			Object[] values = {selectedImage.getName(), data};
+			
+			JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_UPLOAD_PROFILE_IMAGE_REQUEST, keys, values);
+			sendProtocol(request);
+		}
+		
 	}
 	
 	public void sendProtocol(JSONObject protocol)

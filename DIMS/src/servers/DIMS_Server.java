@@ -1,5 +1,6 @@
 package servers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +23,7 @@ import clients.customcontrols.CalendarObject;
 import clients.customcontrols.CalendarObject.CalendarDataManager;
 import databases.DatabaseHandler;
 import tools.NetworkProtocols;
+import tools.Statics;
 import tools.Toolbox;
 
 public class DIMS_Server {
@@ -1250,6 +1253,166 @@ public class DIMS_Server {
 						 
 						 JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.PLUS_MINUS_OVER_RESPOND);
 						 sendProtocol(json);
+					 }
+					 else if(type.equals(NetworkProtocols.STUDENT_USER_INFO_REQUEST))
+					 {
+						 String query = "select S.학번, "
+						 		+ "U.이름, "
+						 		+ "S.주소, "
+						 		+ "S.휴대폰번호, "
+						 		+ "S.자택전화번호, "
+						 		+ "S.주민등록번호, "
+						 		+ "S.성별, "
+						 		+ "S.방번호, "
+						 		+ "S.프로필사진URL, "
+						 		+ "S.학년, "
+						 		+ "S.소속학과,"
+						 		+ "Q.질문내용,"
+						 		+ "S.비밀번호찾기_답변 "
+						 		+ "from 학생 S, 사용자 U, 비밀번호찾기_질문목록 Q where S.학번=U.학번 and U.학번='"+userIdentify+"' and Q.질문번호=S.비밀번호찾기_질문;";
+						 // 꺼내온 URL을 통해 서버 피시에 저장된 이미지 파일을 가져와 JSON에 같이 담아줌
+						
+						 
+		    			ResultSet rs = handler.excuteQuery(query);
+						 
+		    			try
+		    			{
+		    				String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","이미지데이터","학년","소속학과","질문내용","비밀번호찾기_답변"};
+		    				JSONObject respond = null;
+		    				while(rs.next())
+		    				{
+		    					if(rs.getString("프로필사진URL")!=null)
+		    					{
+		    						byte[] iData = Files.readAllBytes(new File(rs.getString("프로필사진URL")).toPath());
+		    						Object[] values = {
+			    							rs.getString("학번"),
+			    							rs.getString("이름"),
+			    							rs.getString("주소"),
+			    							rs.getString("휴대폰번호"),
+			    							rs.getString("자택전화번호"),
+			    							rs.getString("주민등록번호"),
+			    							rs.getString("성별"),
+			    							rs.getString("방번호"),
+			    							iData,
+			    							rs.getInt("학년"),
+			    							rs.getString("소속학과"),
+			    							rs.getString("질문내용"),
+			    							rs.getString("비밀번호찾기_답변")
+			    					};
+			    					respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_USER_INFO_RESPOND, keys, values);
+		    					}
+		    					else
+		    					{
+		    						Object[] values = {
+			    							rs.getString("학번"),
+			    							rs.getString("이름"),
+			    							rs.getString("주소"),
+			    							rs.getString("휴대폰번호"),
+			    							rs.getString("자택전화번호"),
+			    							rs.getString("주민등록번호"),
+			    							rs.getString("성별"),
+			    							rs.getString("방번호"),
+			    							"imageX",
+			    							rs.getInt("학년"),
+			    							rs.getString("소속학과"),
+			    							rs.getString("질문내용"),
+			    							rs.getString("비밀번호찾기_답변")
+			    					};
+			    					respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_USER_INFO_RESPOND, keys, values);
+		    					}
+		    					
+
+		    				}
+		    				
+		    				String qry2 = "select sum(점수) AS 상벌점 from 상벌점부여목록 where 학번='"+userIdentify+"';";
+		    				
+		    				ResultSet rs2 = handler.excuteQuery(qry2);
+		    				
+		    				while(rs2.next())
+		    				{
+		    					respond.put("상벌점", rs2.getInt("상벌점"));
+		    				}
+		    				
+		    				String qry3 = "select 질문내용 from 비밀번호찾기_질문목록;";
+		    				ResultSet rs3 = handler.excuteQuery(qry3);
+		    				JSONArray qList = new JSONArray();
+		    				while(rs3.next())
+		    				{
+		    					qList.add(rs3.getString("질문내용"));
+		    				}
+	    					respond.put("질문목록", qList);	
+	    					System.out.println(respond.toJSONString());
+		    				sendProtocol(respond);
+		    			}
+		    			catch(SQLException e)
+		    			{
+		    				e.printStackTrace();
+		    			}
+					 }
+					 else if(type.equals(NetworkProtocols.STUDENT_UPLOAD_PROFILE_IMAGE_REQUEST))
+					 {
+						 String requestFileFormat = request.get("fileName").toString().split("\\.")[1];
+						 byte[] requestImageData = (byte[]) request.get("content");
+						 
+						 // 서버 로컬에 저장작업
+						 String savePath = Statics.DEFALUE_USER_DATA_DIRECTORY+userIdentify+"_profilePhoto."+requestFileFormat;
+						 String qry = "update 학생 set 프로필사진URL = '"+savePath+"' where 학번='"+userIdentify+"';";
+						 
+						 handler.excuteUpdate(qry);
+						 System.out.println("쿼리실행 : "+qry);
+						 Files.write(new File(savePath).toPath(), requestImageData);
+						 
+						 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_UPLOAD_PROFILE_IMAGE_RESPOND);
+						 respond.put("Image-data", Files.readAllBytes(new File(savePath).toPath()));
+						 sendProtocol(respond);
+					 }
+					 else if(type.equals(NetworkProtocols.STUDENT_MODIFY_USER_INFO_REQUEST))
+					 {
+						 String qry = "update 사용자 set 이름 = '"+request.get("이름")+"';";
+						 handler.excuteUpdate(qry);
+						 
+						 String qry2 = "update 학생 set 성별 = '"+request.get("성별")+"', 휴대폰번호 = '"+request.get("휴대폰번호")+"', 주민등록번호 = '"+request.get("주민등록번호")+"', 자택전화번호 = '"+request.get("자택전화번호")+"', 주소 = '"+request.get("주소")+"', 학년 = '"+request.get("학년")+"', 소속학과 = '"+request.get("소속학과")+"';";
+						 handler.excuteUpdate(qry2);
+						 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MODIFY_USER_INFO_RESPOND));
+					 }
+					 else if(type.equals(NetworkProtocols.STUDENT_REAUTH_REQUEST))
+					 {
+						 String qry = "select * from 사용자 where 학번 = '"+request.get("reqID")+"';";
+						 ResultSet rs = handler.excuteQuery(qry);
+						 
+						 try
+						 {
+							if(rs.next())
+							{
+								JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_REAUTH_RESPOND);
+								if(rs.getString("비밀번호").equals(request.get("reqPW")))
+								{
+									respond.put("accept", "Y");
+								}
+								else
+								{
+									respond.put("accept", "N");									
+								}
+								sendProtocol(respond);
+							}
+						 }
+						 catch(SQLException e)
+						 {
+							 e.printStackTrace();
+						 }
+						 
+					 }
+					 else if(type.equals(NetworkProtocols.STUDENT_PASSWORD_SETUP_REQUEST))
+					 {
+						 String qry = "update 학생 set 비밀번호찾기_질문 = "+request.get("질문")+", 비밀번호찾기_답변 = '"+request.get("답변")+"' where 학번 = '"+userIdentify+"';";
+						 handler.excuteUpdate(qry);
+						 
+						 if(request.get("새비밀번호").toString().length()!=0)
+						 {
+							 qry = "update 사용자 set 비밀번호 = '"+request.get("새비밀번호")+"' where 학번 = '"+userIdentify+"';";
+							 handler.excuteUpdate(qry);
+						 }
+						 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_PASSWORD_SETUP_RESPOND));
 					 }
 					 else
 					 {

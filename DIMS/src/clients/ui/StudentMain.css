@@ -40,7 +40,8 @@
 }
 
 .titled-pane > .title:hover {
-	-fx-background-color : gray;
+	-fx-background-color : linear-gradient(to bottom, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 36%,rgba(40,52,59,1) 100%);
+	-fx-text-fill : white;
 }
 
 /* 날짜 표시 라벨 */
@@ -66,7 +67,8 @@
 }
 
 .add_btn:hover {
-	-fx-background-color : gray;
+	-fx-background-color : linear-gradient(to bottom, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 36%,rgba(40,52,59,1) 100%);
+	-fx-text-fill : white;
 }
 
 .confirm_btn {
@@ -74,5 +76,41 @@
 }
 
 .confirm_btn:hover {
-	-fx-background-color : gray;
+	-fx-background-color : linear-gradient(to bottom, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 36%,rgba(40,52,59,1) 100%);
+	-fx-text-fill : white;
 }
+
+.desField {
+	-fx-font-family : HYwulM;
+	-fx-font-size : 30;
+	-fx-background-color : linear-gradient(to bottom, rgba(225,255,255,1) 0%,rgba(225,255,255,1) 7%,rgba(225,255,255,1) 12%,rgba(253,255,255,1) 12%,rgba(230,248,253,1) 30%,rgba(200,238,251,1) 54%,rgba(190,228,248,1) 75%,rgba(177,216,245,1) 100%);
+	-fx-text-fill : #555555;
+}
+
+.desField2 {
+	-fx-font-family : HYwulM;
+	-fx-font-size : 25;
+	-fx-background-color : linear-gradient(to bottom, rgba(225,255,255,1) 0%,rgba(225,255,255,1) 7%,rgba(225,255,255,1) 12%,rgba(253,255,255,1) 12%,rgba(230,248,253,1) 30%,rgba(200,238,251,1) 54%,rgba(190,228,248,1) 75%,rgba(177,216,245,1) 100%);
+	-fx-text-fill : #555555;
+}
+
+.valueField {
+	-fx-font-family : HYwulM;
+	-fx-font-size : 20;
+	-fx-background-color : linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+	-fx-text-fill : #555555;
+}
+
+.comboValueField {
+	-fx-font-family : HYwulM;
+	-fx-font-size : 20;
+}
+
+.valueField:hover {
+	-fx-background-color : white;
+}
+
+.outterForm {
+	-fx-border-width : 2px;
+}
+

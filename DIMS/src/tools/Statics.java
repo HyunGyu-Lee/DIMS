@@ -20,7 +20,8 @@ public class Statics {
 		public static final String PLUS_MINUS_ASSIGN_FXML ="../ui/PlusMinusAssignDialog.fxml"; //신상정보 부여 화면
 	    
 	    public static final String STUDENT_MAIN_FXML = "./ui/StudentMain.fxml";
-		
+		public static final String STUDENT_REAUTH_DIALOG_FXML = "../ui/ReAuthDialog.fxml";
+	    
 		
 		/* UI 윈도우 창 이름 목록 */
 		public static final String LOGIN_WINDOW_TITLE = "로 그 인";					
@@ -34,8 +35,8 @@ public class Statics {
 	    public static final String WEABAK_TITLE = "외박 승인 정보 페이지";
 	    public static final String PLUS_MINUS_ASSIGN_TITLE = "상벌점 부여 정보 페이지";
 		
-		
 		public static final String STUDENT_MAIN_TITLE = "학 생 메 인 페 이 지";
+		public static final String STUDENT_REAUTH_DIALOG_TITLE = "재인증 요청";		
 		
 	/* Network 설정 */
 	public static final String SERVER_ID_ADDRESS = "localhost";				// 서버 IP 주소
@@ -50,4 +51,6 @@ public class Statics {
 	public static final String DEFAULT_DATABASE_HOST_ID = "root";			// 기본 데이터베이스 접속 아이디
 	public static final String DEFAULT_DATABASE_HOST_PASSWORD = "1234";		// 기본 데이터베이스 접속 비밀번호
 	
+	/* User Data */
+	public static final String DEFALUE_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";
 }

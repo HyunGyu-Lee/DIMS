@@ -160,5 +160,24 @@ public class NetworkProtocols {
 		public static final String ADMIN_ADD_TAP_REQUEST = "aatreq";
 		public static final String ADMIN_ADD_TAP_RESPOND = "aatres";		
 		
+		// 학생 - 신상정보 조회 정보 오청
+		public static final String STUDENT_USER_INFO_REQUEST = "suireq";
+		public static final String STUDENT_USER_INFO_RESPOND = "suires";
+		
+		// 학생 - 이미지 업로드 요청
+		public static final String STUDENT_UPLOAD_PROFILE_IMAGE_REQUEST = "supireq";
+		public static final String STUDENT_UPLOAD_PROFILE_IMAGE_RESPOND = "supires";
+		
+		// 학생 - 신상정보 수정 요청
+		public static final String STUDENT_MODIFY_USER_INFO_REQUEST = "smuireq";
+		public static final String STUDENT_MODIFY_USER_INFO_RESPOND = "smuires";		
+		
+		// 학생 - 신상정보 비밀번호 재인증 요청
+		public static final String STUDENT_REAUTH_REQUEST = "srreq";
+		public static final String STUDENT_REAUTH_RESPOND = "srres";
+
+		// 학생 - 신상정보 - 비밀번호 재설정 요청
+		public static final String STUDENT_PASSWORD_SETUP_REQUEST = "spsreq2";
+		public static final String STUDENT_PASSWORD_SETUP_RESPOND = "spsres2";
 		
 }
