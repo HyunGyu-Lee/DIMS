@@ -607,7 +607,7 @@
                         </AnchorPane>
                      </children>
                   </StackPane>
-                  <AnchorPane fx:id="USER_INFO_VIEW" prefHeight="200.0" prefWidth="200.0">
+                  <AnchorPane fx:id="USER_INFO_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
                      <children>
                         <Label alignment="CENTER" layoutX="34.0" layoutY="33.0" prefHeight="65.0" prefWidth="392.0" text="◎ 내 신상정보">
                            <font>
@@ -841,6 +841,7 @@
                         </VBox>
                      </children>
                   </AnchorPane>
+                  <WebView fx:id="mainWeb" prefHeight="200.0" prefWidth="200.0" />
                </children>
             </StackPane>
          </content>

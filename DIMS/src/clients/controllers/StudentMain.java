@@ -1,27 +1,16 @@
 package clients.controllers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.ResourceBundle;
-
-import javax.imageio.ImageIO;
 
 import com.orsoncharts.util.json.JSONArray;
 import com.orsoncharts.util.json.JSONObject;
@@ -32,30 +21,21 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -63,12 +43,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import sun.misc.IOUtils;
 import tools.NetworkProtocols;
 import tools.Statics;
 import tools.Toolbox;
@@ -140,6 +120,9 @@ public class StudentMain implements Initializable {
 	@FXML Label isAuthed;
 	private boolean reAuth = false;
 	
+	// 메인화면
+	@FXML WebView mainWeb;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
@@ -178,6 +161,11 @@ public class StudentMain implements Initializable {
 		ui_point.setEditable(false);
 		
 		shutdown();
+		
+		WebEngine e = mainWeb.getEngine();
+		e.load("http://news.naver.com");
+		mainWeb.setVisible(true);
+		
 	}
 	
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -530,6 +518,7 @@ public class StudentMain implements Initializable {
 		MESSAGE_VIEW.setVisible(false);
 		BOARD_VIEW.setVisible(false);
 		USER_INFO_VIEW.setVisible(false);
+		mainWeb.setVisible(false);
 	}
 	
 	public void createMessageList(String string, JSONArray arr)
@@ -1070,7 +1059,7 @@ public class StudentMain implements Initializable {
 		}
 		
 		String[] keys = {"새비밀번호","질문","답변"};
-		Object[] values = {ui_newPass.getText(), ui_question.getSelectionModel().getSelectedIndex(), ui_answer.getText()};
+		Object[] values = {ui_newPass.getText(), ui_question.getSelectionModel().getSelectedIndex()+1, ui_answer.getText()};
 		
 		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_PASSWORD_SETUP_REQUEST, keys, values));
 		
