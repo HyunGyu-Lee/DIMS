@@ -26,7 +26,7 @@
 .Button_subItem {
 	
 	-fx-background-color : linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(225,225,225,1) 51%,rgba(246,246,246,1) 100%);
-	-fx-pref-width : 200px;
+	-fx-pref-width : 150px;
 	-fx-pref-height : 37px;
 }
 

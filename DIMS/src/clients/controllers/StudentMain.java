@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.Date;
+import java.sql.Savepoint;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,10 +20,14 @@ import com.orsoncharts.util.json.JSONObject;
 
 import clients.SceneManager;
 import clients.customcontrols.CustomDialog;
+import files.FileProtocol;
+import files.FileReciever;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,11 +36,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -43,11 +54,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 import tools.NetworkProtocols;
 import tools.Statics;
@@ -120,8 +133,19 @@ public class StudentMain implements Initializable {
 	@FXML Label isAuthed;
 	private boolean reAuth = false;
 	
+	// 시청각교육
+	@FXML AnchorPane MEDIA_VIEW;
+	MediaPlayer mvPlayer;
+	@FXML MediaView mvView;
+	@FXML ListView<HBox> mvListView;
+	ObservableList<HBox> mvListViewData;
+	@FXML Slider timeBar;
+	@FXML Label curT, maxT;
+	CustomDialog loadingDialog;
+	LoadingDialogController loadingController;
+	
 	// 메인화면
-	@FXML WebView mainWeb;
+	@FXML AnchorPane MAIN_VIEW;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -139,13 +163,8 @@ public class StudentMain implements Initializable {
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
 		
-		overnight_list_view_data = FXCollections.observableArrayList();
-		recieve_message_view_data = FXCollections.observableArrayList();
-		send_message_view_data = FXCollections.observableArrayList();
-		wholeRListData = FXCollections.observableArrayList();;
 		selectedRListData = FXCollections.observableArrayList();
 		selected_reciever_list.setItems(selectedRListData);
-		boardListData = FXCollections.observableArrayList();		
 		
 		ObservableList<String> category = FXCollections.observableArrayList();
 		category.addAll("공지사항","건의사항","자유게시판");
@@ -160,12 +179,11 @@ public class StudentMain implements Initializable {
 		ui_roomNum.setEditable(false);
 		ui_point.setEditable(false);
 		
+		recieve_message_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		send_message_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		
 		shutdown();
-		
-		WebEngine e = mainWeb.getEngine();
-		e.load("http://news.naver.com");
-		mainWeb.setVisible(true);
-		
+		MAIN_VIEW.setVisible(true);		
 	}
 	
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -261,6 +279,8 @@ public class StudentMain implements Initializable {
 								public void run() {
 									createMessageList("r", arr);
 									shutdown();
+									msgTitle.setText("");
+									msgContentArea.setText("");
 									MESSAGE_VIEW.setVisible(true);
 									message_re_view.setVisible(true);
 									message_se_view.setVisible(false);
@@ -277,6 +297,8 @@ public class StudentMain implements Initializable {
 								public void run() {
 									createMessageList("s", arr);
 									shutdown();
+									msgTitle.setText("");
+									msgContentArea.setText("");
 									MESSAGE_VIEW.setVisible(true);
 									message_se_view.setVisible(true);
 									message_re_view.setVisible(false);
@@ -290,6 +312,7 @@ public class StudentMain implements Initializable {
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
+									shutdown();
 									createReciverList(rcList);
 									MESSAGE_VIEW.setVisible(true);
 									message_se_view.setVisible(false);
@@ -463,6 +486,210 @@ public class StudentMain implements Initializable {
 								}
 							});
 						}
+						else if(type.equals(NetworkProtocols.STUDENT_MEDIA_LIST_RESPOND))
+						{
+							JSONObject respond = line;
+							Platform.runLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									
+									createMVList((JSONArray)respond.get("data"));
+									shutdown();
+									MEDIA_VIEW.setVisible(true);
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_MEDIA_CONTENT_RESPOND))
+						{
+							
+							
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_SEND_MEDIA_NOTIFICATION))
+						{
+							JSONObject notification = line;
+							
+							if(loadingDialog==null)
+							{
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										loadingDialog = new CustomDialog(Statics.LOADING_DIALOG_FXML, Statics.LOADING_DIALOG_TITLE, sManager.getStage(), Modality.NONE);
+										loadingController = (LoadingDialogController)loadingDialog.getController();
+										loadingController.setProperty(notification.get("name").toString(), (int)notification.get("size"));
+										loadingDialog.show();
+										String savePathVariable = "";
+										FileReciever re = new FileReciever(Statics.DIMS_FILE_SERVER_IP_ADDRESS, Statics.DIMS_FILE_SERVER_PORT_NUMBER);
+										re.setSavePathVariable(savePathVariable);
+										re.setUI(mvView, mvPlayer, curT, maxT, timeBar, loadingDialog, sManager.getStage());
+										
+										
+										
+										re.addDownloadFinishEventHandler(new Runnable() {
+											@Override
+											public void run() {
+												Platform.runLater(new Runnable() {
+													@Override
+													public void run() {
+														System.out.println(savePathVariable);
+														mvPlayer = new MediaPlayer(new Media(new File(re.getSavePath()).toURI().toString()));
+														mvView.setMediaPlayer(mvPlayer);
+														
+														mvPlayer.setOnReady(new Runnable() {
+															
+															@Override
+															public void run() {
+																maxT.setText(Toolbox.getFormattedDuration(mvPlayer.getTotalDuration()));
+																loadingDialog.close();
+																CustomDialog.showMessageDialog("교육영상 다운로드 성공!", sManager.getStage());
+																System.out.println("미디어셋팅 완료");
+															}
+														});
+
+														curT.setText("00:00");
+														timeBar.setValue(0);
+														timeBar.valueProperty().addListener(new InvalidationListener() {
+															@Override
+															public void invalidated(Observable observable) {
+																mvPlayer.seek(mvPlayer.getTotalDuration().multiply(timeBar.getValue() / 100.0));
+															}
+														});
+														mvPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+															
+															@Override
+															public void invalidated(Observable observable) {
+																curT.setText(Toolbox.getFormattedDuration(mvPlayer.getCurrentTime()));
+															}
+														});
+													}
+												});
+											}
+										});
+										re.openConnection();
+									}
+								});
+							}
+							else
+							{
+								loadingController.setProperty(notification.get("name").toString(), (int)notification.get("size"));
+
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										String savePathVariable = "";
+										FileReciever re = new FileReciever("localhost", 9090);
+										re.setSavePathVariable(savePathVariable);
+										re.setUI(mvView, mvPlayer, curT, maxT, timeBar, loadingDialog, sManager.getStage());
+										
+										re.addDownloadFinishEventHandler(()->{
+											
+											System.out.println(savePathVariable);
+											mvPlayer = new MediaPlayer(new Media(new File(re.getSavePath()).toURI().toString()));
+											mvView.setMediaPlayer(mvPlayer);
+											
+											mvPlayer.setOnReady(new Runnable() {
+												
+												@Override
+												public void run() {
+													maxT.setText(Toolbox.getFormattedDuration(mvPlayer.getTotalDuration()));
+													loadingDialog.close();
+													CustomDialog.showMessageDialog("교육영상 다운로드 성공!", sManager.getStage());
+													System.out.println("미디어셋팅 완료");
+												}
+											});
+
+											curT.setText("00:00");
+											timeBar.setValue(0);
+											timeBar.valueProperty().addListener(new InvalidationListener() {
+												@Override
+												public void invalidated(Observable observable) {
+													mvPlayer.seek(mvPlayer.getTotalDuration().multiply(timeBar.getValue() / 100.0));
+												}
+											});
+											mvPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+												
+												@Override
+												public void invalidated(Observable observable) {
+													curT.setText(Toolbox.getFormattedDuration(mvPlayer.getCurrentTime()));
+												}
+											});
+											
+											}
+										);
+										re.openConnection();
+										loadingDialog.show();
+									}
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND))
+						{
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									CustomDialog.showMessageDialog("전체삭제되었습니다.", sManager.getStage());
+								}
+							});
+							if(line.get("resType").equals("R"))
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_RECIEVE_MESSAGE_REQUEST));
+							}
+							else
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SEND_MESSAGE_REQUEST));
+							}
+						}
+						else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_RESPOND))
+						{
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									CustomDialog.showMessageDialog("선택한 메세지들이 삭제되었습니다.", sManager.getStage());
+								}
+							});
+							if(line.get("resType").equals("R"))
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_RECIEVE_MESSAGE_REQUEST));
+							}
+							else
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SEND_MESSAGE_REQUEST));
+							}
+						}
+						else if(type.equals(NetworkProtocols.MESSAGE_REPLY_RESPOND))
+						{
+							Label left = new Label(line.get("학번").toString());
+							Label right = new Label(line.get("이름").toString());
+							
+							left.setFont(Font.font("HYwulM",18));
+							left.setAlignment(Pos.CENTER);
+							right.setFont(Font.font("HYwulM",18));
+							right.setAlignment(Pos.CENTER);
+							left.setMaxWidth(Double.MAX_VALUE);
+							left.setMaxHeight(Double.MAX_VALUE);
+							right.setMaxWidth(Double.MAX_VALUE);
+							right.setMaxHeight(Double.MAX_VALUE);
+							Separator s0 = new Separator(Orientation.VERTICAL);
+							s0.setPrefWidth(6);
+							
+							HBox item = new HBox();
+							HBox.setHgrow(right, Priority.ALWAYS);
+							HBox.setHgrow(left, Priority.ALWAYS);
+							item.getChildren().addAll(left, s0, right);
+							
+							item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+								@Override
+								public void handle(MouseEvent event) {
+									if(event.getClickCount()==2)selectedRListData.remove(item);				
+								}
+							});
+
+							selectedRListData.add(item);
+							
+							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+						}
 						else if(type.equals(NetworkProtocols.EXIT_RESPOND))
 						{
 							break;
@@ -514,11 +741,13 @@ public class StudentMain implements Initializable {
 	public void shutdown()
 	{
 		reAuth = false;
+		if(mvPlayer!=null)mvPlayer.pause();
 		OVERNIGHT_MAIN_VIEW.setVisible(false);
 		MESSAGE_VIEW.setVisible(false);
 		BOARD_VIEW.setVisible(false);
 		USER_INFO_VIEW.setVisible(false);
-		mainWeb.setVisible(false);
+		MEDIA_VIEW.setVisible(false);
+		MAIN_VIEW.setVisible(false);
 	}
 	
 	public void createMessageList(String string, JSONArray arr)
@@ -527,6 +756,11 @@ public class StudentMain implements Initializable {
 		
 		if(key.equals("r"))
 		{
+			if(recieve_message_view_data==null)
+			{
+				recieve_message_view_data = FXCollections.observableArrayList();
+			}
+			
 			recieve_message_view_data.clear();
 			
 			for(Object o : arr)
@@ -534,9 +768,19 @@ public class StudentMain implements Initializable {
 				HBox item = new HBox();
 				JSONObject target = (JSONObject)o;
 				
-				Label refferKey = new Label(target.get("메세지본문").toString());
+				Label refferKey = new Label(target.get("메세지번호").toString());
 				refferKey.setPrefWidth(0);
 				refferKey.setVisible(false);
+				
+				Label refferContent = new Label(target.get("메세지본문").toString());
+				refferContent.setPrefWidth(0);
+				refferContent.setVisible(false);
+
+				Label refferUID = new Label(target.get("학번").toString());
+				refferUID.setPrefWidth(0);
+				refferUID.setVisible(false);
+
+				
 				Label rDate = new Label(Toolbox.getSQLDateToFormat((java.sql.Date)target.get("발신시각"), "yyyy년 MM월 dd일"));
 				Label sender = new Label(target.get("발신자").toString());
 				Label title = new Label(target.get("메세지제목").toString());
@@ -558,14 +802,14 @@ public class StudentMain implements Initializable {
 				title.setFont(Font.font("HYwulM",15));
 				title.setAlignment(Pos.CENTER);
 				
-				item.getChildren().addAll(refferKey, rDate, s0, sender, s1, title);
+				item.getChildren().addAll(refferKey, refferContent, refferUID, rDate, s0, sender, s1, title);
 				
 				item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					public void handle(MouseEvent event)
 					{
 						if(event.getClickCount()==2)
 						{
-							CustomDialog dlg = new CustomDialog(Statics.CHECK_MESSAGE_FXML, Statics.CHECK_MESSAGE_TITLE, sManager.getStage());
+							CustomDialog dlg = new CustomDialog(Statics.CHECK_MESSAGE_FXML, Statics.CHECK_MESSAGE_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
 							CheckMessageDialog_Controller con = (CheckMessageDialog_Controller)dlg.getController();
 							con.setWindow(dlg);
 							con.setProperty(target);
@@ -580,6 +824,11 @@ public class StudentMain implements Initializable {
 		}
 		else if(key.equals("s"))
 		{
+			if(send_message_view_data==null)
+			{
+				send_message_view_data = FXCollections.observableArrayList();
+			}
+			
 			send_message_view_data.clear();
 			
 			for(Object o : arr)
@@ -587,9 +836,18 @@ public class StudentMain implements Initializable {
 				HBox item = new HBox();
 				JSONObject target = (JSONObject)o;
 				
-				Label refferKey = new Label(target.get("메세지본문").toString());
+				Label refferKey = new Label(target.get("메세지번호").toString());
 				refferKey.setPrefWidth(0);
 				refferKey.setVisible(false);
+				
+				Label refferContent = new Label(target.get("메세지본문").toString());
+				refferContent.setPrefWidth(0);
+				refferContent.setVisible(false);
+				
+				Label refferUID = new Label(target.get("학번").toString());
+				refferUID.setPrefWidth(0);
+				refferUID.setVisible(false);
+				
 				Label rDate = new Label(Toolbox.getSQLDateToFormat((java.sql.Date)target.get("발신시각"), "yyyy년 MM월 dd일"));
 				Label sender = new Label(target.get("수신자").toString());
 				Label title = new Label(target.get("메세지제목").toString());
@@ -611,14 +869,14 @@ public class StudentMain implements Initializable {
 				title.setFont(Font.font("HYwulM",15));
 				title.setAlignment(Pos.CENTER);
 				
-				item.getChildren().addAll(refferKey, rDate, s0, sender, s1, title);
+				item.getChildren().addAll(refferKey, refferContent, refferUID, rDate, s0, sender, s1, title);
 				
 				item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					public void handle(MouseEvent event)
 					{
 						if(event.getClickCount()==2)
 						{
-							CustomDialog dlg = new CustomDialog(Statics.CHECK_MESSAGE_FXML, Statics.CHECK_MESSAGE_TITLE, sManager.getStage());
+							CustomDialog dlg = new CustomDialog(Statics.CHECK_MESSAGE_FXML, Statics.CHECK_MESSAGE_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
 							CheckMessageDialog_Controller con = (CheckMessageDialog_Controller)dlg.getController();
 							con.setWindow(dlg);
 							con.setProperty(target);
@@ -635,6 +893,11 @@ public class StudentMain implements Initializable {
 
 	public void createOvernightListView(JSONArray data)
 	{
+		if(overnight_list_view_data==null)
+		{
+			overnight_list_view_data = FXCollections.observableArrayList();
+		}
+		
 		overnight_list_view_data.clear();
 		for(Object obj : data)
 		{
@@ -691,7 +954,6 @@ public class StudentMain implements Initializable {
 			// 스타일 입혀야함
 			item.getChildren().addAll(reqDate, s0,reqOverDate, s1,destination, s2,reason, s3, isGrant);
 			
-			System.out.println(target.get("사유")+", "+target.get("신청일자"));
 			overnight_list_view_data.add(item);
 		}
 		
@@ -744,6 +1006,7 @@ public class StudentMain implements Initializable {
 	{
 		// 메인 로고 클릭시
 		shutdown();
+		MAIN_VIEW.setVisible(true);
 	}
 	
 	@FXML
@@ -752,6 +1015,7 @@ public class StudentMain implements Initializable {
 		sManager.doFullscreen(false);
 		sManager.changeListenController("STUDENT_MAIN");
 		sManager.changeScene(Statics.LOGIN_WINDOW_FXML);
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.LOGOUT_REQUESt));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -802,6 +1066,10 @@ public class StudentMain implements Initializable {
 	
 	private void createReciverList(ArrayList<String> data)
 	{
+		if(wholeRListData==null)
+		{
+			wholeRListData = FXCollections.observableArrayList();
+		}
 		wholeRListData.removeAll(wholeRListData);
 		for(String t : data)
 		{
@@ -902,6 +1170,11 @@ public class StudentMain implements Initializable {
 	
 	public void createBoardList(JSONArray data)
 	{
+		if(boardListData==null)
+		{
+			boardListData = FXCollections.observableArrayList();
+		}
+		
 		boardListData.removeAll(boardListData);
 	
 		JSONArray arr = data;
@@ -1028,14 +1301,13 @@ public class StudentMain implements Initializable {
 		String[] keys = {"이름","성별","주민등록번호","휴대폰번호","자택전화번호","주소","학번","학년","소속학과"};
 		Object[] values = {ui_name.getText(), ui_sex.getValue(), ui_ident.getText(), ui_phoneNum.getText(), ui_homeNum.getText(), ui_addr.getText(), ui_sId.getText(), ui_grade.getValue(), ui_major.getText()};
 		
-		System.out.println(ui_sex.getValue());
 		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MODIFY_USER_INFO_REQUEST, keys, values));
 		
 	}
 	
 	@FXML private void onReAuth()
 	{
-		CustomDialog cDlg = new CustomDialog(Statics.STUDENT_REAUTH_DIALOG_FXML, Statics.STUDENT_REAUTH_DIALOG_TITLE, sManager.getStage());
+		CustomDialog cDlg = new CustomDialog(Statics.STUDENT_REAUTH_DIALOG_FXML, Statics.STUDENT_REAUTH_DIALOG_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
 		ReAuthDialogController con = (ReAuthDialogController) cDlg.getController();
 		con.setProperty(uID);
 		con.setWindow(cDlg);
@@ -1090,6 +1362,214 @@ public class StudentMain implements Initializable {
 			sendProtocol(request);
 		}
 		
+	}
+	
+	@FXML private void onOpenMediaViewer()
+	{
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MEDIA_LIST_REQUEST));
+	}
+	
+	@FXML private void mvPlay()
+	{
+		System.out.println(mvPlayer);
+		if(mvPlayer!=null)
+		{
+			mvPlayer.play();
+		}
+	}
+	
+	@FXML private void mvPause()
+	{
+		if(mvPlayer!=null)
+		{
+			mvPlayer.pause();
+		}
+	}
+	
+	@FXML private void mvStop()
+	{
+		if(mvPlayer!=null)
+		{
+			mvPlayer.stop();
+		}
+	}
+	
+	private void createMVList(JSONArray data)
+	{
+		if(mvListViewData==null)
+		{
+			mvListViewData = FXCollections.observableArrayList();
+		}
+		
+		mvListViewData.clear();
+		
+		for(Object o : data)
+		{
+			JSONObject target = (JSONObject)o;
+			
+			Label mvKey = new Label(target.get("비디오번호").toString());
+			mvKey.setVisible(false);
+			mvKey.setPrefWidth(0);
+			Label mvName = new Label(target.get("비디오이름").toString());
+			mvName.setPrefSize(400, 35);
+			mvName.setFont(Font.font("HYWulM", 20));
+			mvName.setStyle("-fx-background-color : linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);");
+			
+			HBox item = new HBox();
+			
+			item.getChildren().addAll(mvName, mvKey);
+			
+			item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				
+				@SuppressWarnings("unchecked")
+				@Override
+				public void handle(MouseEvent event) {
+					if(event.getClickCount()==2)
+					{
+						JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MEDIA_CONTENT_REQUEST);
+						request.put("비디오번호", mvKey.getText());
+						sendProtocol(request);
+					}
+				}
+			});
+			
+			mvListViewData.add(item);
+		}
+		mvListView.setItems(mvListViewData);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML private void onReply()
+	{
+		if(recieve_message_view.getSelectionModel().getSelectedItem()==null)
+		{
+			CustomDialog.showMessageDialog("답장할 메세지를 먼저 선택하세요!", sManager.getStage());
+			return;
+		}
+		
+		if(recieve_message_view.getSelectionModel().getSelectedItems().size()!=1)
+		{
+			CustomDialog.showMessageDialog("답장할 메세지를 한 개만 선택하세요!", sManager.getStage());			
+			return;
+		}
+		
+		String reUID = ((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(2)).getText();
+		
+		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_REPLY_REQUEST);
+		request.put("reqID", reUID);
+
+		sendProtocol(request);
+	}
+	
+	@FXML private void onToss()
+	{
+		if(recieve_message_view.getSelectionModel().getSelectedItem()==null)
+		{
+			CustomDialog.showMessageDialog("전달할 메세지를 먼저 선택하세요!", sManager.getStage());
+			return;
+		}
+		
+		if(recieve_message_view.getSelectionModel().getSelectedItems().size()!=1)
+		{
+			CustomDialog.showMessageDialog("전달할 메세지를 한 개만 선택하세요!", sManager.getStage());			
+			return;
+		}
+		
+		msgTitle.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(7)).getText());
+		msgContentArea.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(1)).getText());
+		
+		message_re_view.setVisible(false);
+		message_write_view.setVisible(true);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML private void onSelectedDeleteMessage_R()
+	{
+		if(recieve_message_view.getSelectionModel().getSelectedItems()==null)
+		{
+			CustomDialog.showMessageDialog("삭제할 메세지를 먼저 선택하세요!", sManager.getStage());
+			return;
+		}
+		
+		JSONArray delete = new JSONArray();
+		
+		for(HBox target : recieve_message_view.getSelectionModel().getSelectedItems())
+		{
+			JSONObject addV = new JSONObject();
+			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(0)).getText()));
+			delete.add(addV);
+		}
+		
+		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
+		request.put("reqType", "R");
+		request.put("delete", delete);
+		sendProtocol(request);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML private void onAllDeleteMessage_R()
+	{
+		int selection = CustomDialog.showConfirmDialog("정말 모든 메세지를 삭제하시겠습니까?", sManager.getStage());
+		
+		if(selection==CustomDialog.OK_OPTION)
+		{
+			JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
+			request.put("reqType", "R");
+			sendProtocol(request);
+		}
+		else if(selection==CustomDialog.CANCEL_OPTION)
+		{
+			CustomDialog.showMessageDialog("전체삭제를 취소하셨습니다.", sManager.getStage());
+		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML private void onSelectedDeleteMessage_S()
+	{
+		if(send_message_view.getSelectionModel().getSelectedItems()==null)
+		{
+			CustomDialog.showMessageDialog("삭제할 메세지를 먼저 선택하세요!", sManager.getStage());
+			return;
+		}
+		
+		JSONArray delete = new JSONArray();
+		
+		for(HBox target : send_message_view.getSelectionModel().getSelectedItems())
+		{
+			JSONObject addV = new JSONObject();
+			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(0)).getText()));
+			delete.add(addV);
+		}
+		
+		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
+		request.put("reqType", "S");
+		request.put("delete", delete);
+		sendProtocol(request);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML private void onAllDeleteMessage_S()
+	{
+		int selection = CustomDialog.showConfirmDialog("정말 모든 메세지를 삭제하시겠습니까?", sManager.getStage());
+		
+		if(selection==CustomDialog.OK_OPTION)
+		{
+			JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
+			request.put("reqType", "S");
+			sendProtocol(request);
+		}
+		else if(selection==CustomDialog.CANCEL_OPTION)
+		{
+			CustomDialog.showMessageDialog("전체삭제를 취소하셨습니다.", sManager.getStage());
+		}
+		
+	}
+	
+	@FXML private void openDocument(ActionEvent e)
+	{
+		Hyperlink target = (Hyperlink)e.getSource();
+		sManager.getHost().getHostServices().showDocument(target.getText());
 	}
 	
 	public void sendProtocol(JSONObject protocol)

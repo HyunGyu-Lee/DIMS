@@ -9,19 +9,19 @@
    <children>
       <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ffffff;">
          <children>
-            <ImageView fitHeight="436.0" fitWidth="712.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="loading" fitHeight="436.0" fitWidth="712.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../bin/resources/Login.png" />
                </image>
             </ImageView>
          </children>
       </StackPane>
-      <TextField fx:id="idField" layoutX="433.0" layoutY="100.0" />
       <Label layoutX="331.0" layoutY="100.0" prefHeight="23.0" prefWidth="94.0" styleClass="desField" text="아    이    디" />
+      <TextField fx:id="idField" layoutX="433.0" layoutY="100.0" />
       <Label layoutX="331.0" layoutY="163.0" prefHeight="23.0" prefWidth="94.0" styleClass="desField" text="비  밀  번  호" />
       <PasswordField fx:id="passwordField" layoutX="433.0" layoutY="160.0" />
-      <Button fx:id="loginBtn" layoutX="435.0" layoutY="221.0" mnemonicParsing="false" onAction="#onLogin" prefHeight="30.0" prefWidth="138.0" styleClass="normalBtn" text="로그인" />
-      <Button layoutX="435.0" layoutY="270.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="30.0" prefWidth="138.0" styleClass="normalBtn" text="회원가입" />
       <Button layoutX="435.0" layoutY="317.0" mnemonicParsing="false" onAction="#onFindPassword" prefHeight="30.0" prefWidth="138.0" styleClass="normalBtn" text="비밀번호찾기" />
+      <Button layoutX="435.0" layoutY="270.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="30.0" prefWidth="138.0" styleClass="normalBtn" text="회원가입" />
+      <Button fx:id="loginBtn" layoutX="435.0" layoutY="221.0" mnemonicParsing="false" onAction="#onLogin" prefHeight="30.0" prefWidth="138.0" styleClass="normalBtn" text="로그인" />
    </children>
 </AnchorPane>

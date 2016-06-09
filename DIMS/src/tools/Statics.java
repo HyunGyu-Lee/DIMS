@@ -18,28 +18,35 @@ public class Statics {
 		public static final String CHECK_STUDENT_FXML = "../ui/StudentInfoDialog.fxml"; //신상정보 상세내용 화면
 	    public static final String CHECK_WEABAK_FXML = "../ui/CheckWeabakDialog.fxml"; //외박 정보 상세내용 화면
 		public static final String PLUS_MINUS_ASSIGN_FXML ="../ui/PlusMinusAssignDialog.fxml"; //신상정보 부여 화면
-	    
+	    public static final String OK_CANCLE_DIALOG = "../ui/OK_CANCEL_DialogUI.fxml";
+		
 	    public static final String STUDENT_MAIN_FXML = "./ui/StudentMain.fxml";
 		public static final String STUDENT_REAUTH_DIALOG_FXML = "../ui/ReAuthDialog.fxml";
-	    
+	    public static final String LOADING_DIALOG_FXML = "../ui/LoadingDialog.fxml";
 		
 		/* UI 윈도우 창 이름 목록 */
-		public static final String LOGIN_WINDOW_TITLE = "로 그 인";					
-		public static final String PASSWORD_FIND_TITLE = "비 밀 번 호 찾 기";			
-		public static final String ADMIN_MAIN_TITLE = "관 리 자 메 인 페 이 지";
-		public static final String REGISTER_TITLE = "회 원 가 입";  // 관리자 메인 페이지 화면
-		public static final String CHECK_MESSAGE_TITLE = "메 세 지 확 인";
-		public static final String ALERT_DIALOG_TITLE = "알 림";
-		public static final String SCHEDULE_CREATE_DIALOG_TITLE = "새 일정";
-		public static final String STUDENT_TITLE = "학생 신상 정보 페이지";
-	    public static final String WEABAK_TITLE = "외박 승인 정보 페이지";
-	    public static final String PLUS_MINUS_ASSIGN_TITLE = "상벌점 부여 정보 페이지";
-		
-		public static final String STUDENT_MAIN_TITLE = "학 생 메 인 페 이 지";
-		public static final String STUDENT_REAUTH_DIALOG_TITLE = "재인증 요청";		
+		public static final String LOGIN_WINDOW_TITLE = "DIMS - 로그인";					
+		public static final String PASSWORD_FIND_TITLE = "DIMS - 비밀번호 찾기";			
+		public static final String ADMIN_MAIN_TITLE = "DIMS - 관리자용 클라이언트";
+		public static final String REGISTER_TITLE = "DIMS - 회원가입";  // 관리자 메인 페이지 화면
+		public static final String CHECK_MESSAGE_TITLE = "DIMS - 메세지 확인";
+		public static final String ALERT_DIALOG_TITLE = "DIMS - 알림";
+		public static final String SCHEDULE_CREATE_DIALOG_TITLE = "DIMS - 새 일정";
+		public static final String STUDENT_TITLE = "DIMS - 학생 신상 정보 확인";
+	    public static final String WEABAK_TITLE = "DIMS - 외박 승인 정보 확인";
+	    public static final String PLUS_MINUS_ASSIGN_TITLE = "DIMS - 상벌점 부여 정보 확인";
+		public static final String OK_CANCEL_DAILOG_TITLE = "DIMS - 확인";
+	    
+		public static final String STUDENT_MAIN_TITLE = "DIMS - 학생용 클라이언트";
+		public static final String STUDENT_REAUTH_DIALOG_TITLE = "DIMS - 재인증 요청";
+		public static final String LOADING_DIALOG_TITLE = "DIMS - 파일 다운로드 진행중...";
 		
 	/* Network 설정 */
-	public static final String SERVER_ID_ADDRESS = "localhost";				// 서버 IP 주소
+	public static final String DIMS_SERVER_IP_ADDRESS = "localhost";				// 서버 IP 주소
+	public static final int DIMS_SERVER_PORT_NUMBER = 8080;
+	
+	public static final String DIMS_FILE_SERVER_IP_ADDRESS = "localhost";				// 서버 IP 주소
+	public static final int DIMS_FILE_SERVER_PORT_NUMBER = 9090;
 	
 		/* Networking - error */
 		public static final int CONNECT_ERROR = -1;							// 서버 접속 실패
@@ -52,5 +59,6 @@ public class Statics {
 	public static final String DEFAULT_DATABASE_HOST_PASSWORD = "1234";		// 기본 데이터베이스 접속 비밀번호
 	
 	/* User Data */
-	public static final String DEFALUE_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";
+	public static final String DEFALUE_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";	// 프로필이미지
+	public static final String DEFALUE_MOVIE_DATA_DIRECTORY = "C:\\\\DIMS\\\\Movie\\\\";	// 영상
 }

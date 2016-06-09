@@ -1,7 +1,5 @@
 package tools;
 
-
-
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -13,25 +11,40 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 
 import com.orsoncharts.util.json.JSONObject;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class Toolbox {
 
+	public static String getFormattedDuration(Duration mp)
+	{
+		Duration duration = mp;
+		
+		int intDuration = (int)Math.floor(duration.toSeconds());
+    	int durationHours = intDuration / (60 * 60);
+    	if (durationHours > 0)
+    	{
+    		intDuration -= durationHours * 60 * 60;
+    	}
+        
+    	int durationMinutes = intDuration / 60;
+        int durationSeconds = intDuration - durationHours * 60 * 60 - durationMinutes * 60;
+        
+        return String.format("%02d:%02d", durationMinutes, durationSeconds);
+	}
+	
 	public static WritableImage getWritableByArray(byte[] arr)
     {
 		System.out.println("입력 데이터 길이 : "+arr.length);

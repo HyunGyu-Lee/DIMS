@@ -20,6 +20,7 @@ public class MainApplication extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		sManager = new SceneManager(primaryStage);
+		sManager.setHost(this);
 		int c = sManager.connectToServer();
 		switch(c)
 		{

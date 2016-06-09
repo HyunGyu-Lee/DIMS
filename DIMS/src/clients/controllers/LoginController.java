@@ -10,12 +10,14 @@ import com.orsoncharts.util.json.JSONObject;
 import clients.SceneManager;
 import clients.customcontrols.CustomDialog;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -56,7 +58,6 @@ public class LoginController implements Initializable {
 				}
 			}
 		});
-		
 	}
 
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -104,7 +105,6 @@ public class LoginController implements Initializable {
 						else
 						{
 							Platform.runLater(new Runnable() {
-								
 								@Override
 								public void run() {
 									sManager.doFullscreen(true);
@@ -138,14 +138,11 @@ public class LoginController implements Initializable {
 			}
 			catch(IOException e)
 			{
-				e.printStackTrace();
+				System.out.println("로그아웃 처리된 스레드");
 			}
 			System.out.println("LoginController 스레드 종료");
 		}
 	}
-	
-
-	
 	
 	public void sendProtocol(JSONObject protocol)
 	{

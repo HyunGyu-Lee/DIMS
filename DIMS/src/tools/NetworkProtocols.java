@@ -139,7 +139,21 @@ public class NetworkProtocols {
 	    
 	    public static final String PLUS_MINUS_OVER_REQUEST = "pmoreq";
 	    public static final String PLUS_MINUS_OVER_RESPOND = "pmores";
-	    /*-----------------------------------------------------------------*/
+	    
+	    public static final String MESSAGE_RICIEVER_SELECT_DELETE_REQUEST = "mrsdreq";
+	    public static final String MESSAGE_RICIEVER_SELECT_DELETE_RESPOND = "mrsdres";
+	    
+	    public static final String MESSAGE_RICIEVER_ALL_DELETE_REQUEST = "mradreq";
+	    public static final String MESSAGE_RICIEVER_ALL_DELETE_RESPOND = "mradreq";
+	    
+	    // 신상정보 학과 콤보박스 선택시
+	    public static final String STUDENT_CLASS_SELECT_COMBOBOX_REQUEST = "sascreq";
+	    public static final String STUDENT_CLASS_SELECT_COMBOBOX_RESPOND = "sascres";
+	    
+	    // 신상정보 층 별 콤보박스 선택시
+	    public static final String STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST = "slscreq";
+	    
+	    /*-----------------------------------------------------------------*/	
 		
 		// 학생-외박 내역 리스트 요청
 		public static final String MY_OVERNIGHT_LIST_REQUEST = "myolreq";
@@ -180,4 +194,20 @@ public class NetworkProtocols {
 		public static final String STUDENT_PASSWORD_SETUP_REQUEST = "spsreq2";
 		public static final String STUDENT_PASSWORD_SETUP_RESPOND = "spsres2";
 		
+		// 학생 - 동영상 목록 요청 
+		public static final String STUDENT_MEDIA_LIST_REQUEST = "smlreq";
+		public static final String STUDENT_MEDIA_LIST_RESPOND = "smlres";
+		
+		// 학생 - 동영상 데이터 요청
+		public static final String STUDENT_MEDIA_CONTENT_REQUEST = "smcreq";
+		public static final String STUDENT_MEDIA_CONTENT_RESPOND = "smcres";
+		
+		// 학생 - 동영상 전송 시작 알림
+		public static final String STUDENT_SEND_MEDIA_NOTIFICATION = "ssmn";
+		
+		public static final String LOGOUT_REQUESt = "logout";
+		
+		public static final String MESSAGE_REPLY_REQUEST = "mrreq";
+		public static final String MESSAGE_REPLY_RESPOND = "mrres";
+
 }

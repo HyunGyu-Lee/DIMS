@@ -13,6 +13,7 @@ import clients.controllers.LoginController;
 import clients.controllers.MemberJoinController;
 import clients.controllers.PasswordFindController;
 import clients.controllers.StudentMain;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,6 +30,7 @@ public class SceneManager {
 	private ObjectInputStream fromServer;
 	private ObjectOutputStream toServer;
 	private boolean FULLSCREEN_MODE;
+	private Application clientHost;
 	
 	public SceneManager(Stage stage)
 	{
@@ -41,11 +43,21 @@ public class SceneManager {
 		return stage;
 	}
 	
+	public void setHost(Application host)
+	{
+		this.clientHost = host;
+	}
+	
+	public Application getHost()
+	{
+		return clientHost;
+	}
+	
 	public int connectToServer()
 	{
 		try
 		{
-			socket = new Socket(Statics.SERVER_ID_ADDRESS, 8080);
+			socket = new Socket(Statics.DIMS_SERVER_IP_ADDRESS, Statics.DIMS_SERVER_PORT_NUMBER);
 			toServer = new ObjectOutputStream(socket.getOutputStream());
 			fromServer = new ObjectInputStream(socket.getInputStream());
 		}

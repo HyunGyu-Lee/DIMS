@@ -27,7 +27,7 @@
                                  <children>
                                     <HBox prefHeight="16.0" prefWidth="600.0">
                                        <children>
-                                          <Button mnemonicParsing="false" text="답장" textAlignment="CENTER">
+                                          <Button fx:id="Answer_btn" mnemonicParsing="false" onAction="#onAnswer" text="답장" textAlignment="CENTER">
                                              <font>
                                                 <Font name="HYwulM" size="17.0" />
                                              </font>
@@ -35,7 +35,7 @@
                                                 <Insets right="5.0" />
                                              </HBox.margin>
                                           </Button>
-                                          <Button mnemonicParsing="false" text="전달">
+                                          <Button mnemonicParsing="false" onAction="#onRDelivery" text="전달">
                                              <font>
                                                 <Font name="HYwulM" size="17.0" />
                                              </font>
@@ -43,7 +43,7 @@
                                                 <Insets right="5.0" />
                                              </HBox.margin>
                                           </Button>
-                                          <Button mnemonicParsing="false" text="삭제">
+                                          <Button mnemonicParsing="false" onAction="#onRdelite" text="삭제">
                                              <font>
                                                 <Font name="HYwulM" size="17.0" />
                                              </font>
@@ -51,7 +51,7 @@
                                                 <Insets right="5.0" />
                                              </HBox.margin>
                                           </Button>
-                                          <Button mnemonicParsing="false" text="전체삭제" textAlignment="CENTER">
+                                          <Button mnemonicParsing="false" onAction="#onRallDelete" text="전체삭제" textAlignment="CENTER">
                                              <font>
                                                 <Font name="HYwulM" size="17.0" />
                                              </font>
@@ -62,7 +62,7 @@
                                           <Insets left="15.0" top="20.0" />
                                        </VBox.margin>
                                     </HBox>
-                                    <TextField promptText="검색">
+                                    <TextField fx:id="MsgRecieverField" onKeyReleased="#onRecieverMsgSearch" promptText="검색">
                                        <VBox.margin>
                                           <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
                                        </VBox.margin>
@@ -308,9 +308,9 @@
                 </Tab>
               </tabs>
             </TabPane>
-            <BorderPane fx:id="USERINFO" prefHeight="200.0" prefWidth="200.0" visible="false">
+            <BorderPane fx:id="USERINFO" prefHeight="200.0" prefWidth="200.0">
                <top>
-                  <VBox prefHeight="93.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="150.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                      <children>
                         <Label text="학생신상정보조회">
                            <font>
@@ -325,11 +325,56 @@
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </VBox.margin>
                         </TextField>
+                        <HBox prefHeight="150.0" prefWidth="200.0">
+                           <children>
+                              <ComboBox fx:id="select_find_mode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#onFindCombo" prefHeight="30.0" prefWidth="269.0" promptText="소속학과" styleClass="combo-box" />
+                              <ComboBox fx:id="select_room_mode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#onLevelCombo" prefHeight="30.0" prefWidth="166.0" promptText="층  별" styleClass="combo-box" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="26.0" prefWidth="118.0" text="방번호">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="26.0" prefWidth="353.0" text="학   과">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="26.0" prefWidth="180.0" text="학   년">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="26.0" prefWidth="250.0" text="학   번">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="26.0" prefWidth="323.0" text="이  름">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefWidth="200.0" text="성  별">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="26.0" prefWidth="452.0" text="휴대전화번호">
+                                 <font>
+                                    <Font name="HYwulB" size="24.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </top>
                <center>
-                  <ListView fx:id="StudentList" prefHeight="232.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+                  <ListView fx:id="StudentList" prefHeight="712.0" prefWidth="950.0" BorderPane.alignment="CENTER" />
                </center>
             </BorderPane>
             <TabPane fx:id="STUDNETMANAGER" onMouseClicked="#onWeabakTabClick" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" visible="false">
