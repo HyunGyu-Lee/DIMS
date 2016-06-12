@@ -308,7 +308,7 @@
                 </Tab>
               </tabs>
             </TabPane>
-            <BorderPane fx:id="USERINFO" prefHeight="200.0" prefWidth="200.0">
+            <BorderPane fx:id="USERINFO" prefHeight="200.0" prefWidth="200.0" visible="false">
                <top>
                   <VBox prefHeight="150.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                      <children>
@@ -610,26 +610,26 @@
 
             <BorderPane fx:id="BOARD" prefHeight="200.0" prefWidth="200.0">
                <top>
-                  <HBox fx:id="board_tab_btn_box" prefHeight="60.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                  <HBox>
                      <children>
-                        <Button contentDisplay="CENTER" maxHeight="50.0" maxWidth="200.0" mnemonicParsing="false" onAction="#onNotice" styleClass="btn" text="공지사항" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="board_tab_btn_box" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="200.0" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <BorderPane.margin>
+                              <Insets left="20.0" right="360.0" top="10.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                        <Button mnemonicParsing="false" onAction="#onAddTab" prefHeight="40.0" prefWidth="140.0" styleClass="btn" text="새 탭 추가">
                            <HBox.margin>
-                              <Insets left="20.0" top="10.0" />
+                              <Insets right="5.0" top="10.0" />
                            </HBox.margin>
                         </Button>
-                        <Button contentDisplay="CENTER" maxHeight="50.0" maxWidth="200.0" mnemonicParsing="false" onAction="#onRequest" styleClass="btn" text="건의사항" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets top="10.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button contentDisplay="CENTER" maxHeight="50.0" maxWidth="200.0" mnemonicParsing="false" onAction="#onFree" styleClass="btn" text="자유게시판" HBox.hgrow="ALWAYS">
+                        <Button mnemonicParsing="false" onAction="#onDeleteTab" prefHeight="40.0" prefWidth="140.0" styleClass="btn" text="탭 삭제">
                            <HBox.margin>
                               <Insets top="10.0" />
                            </HBox.margin>
                         </Button>
                      </children>
                      <BorderPane.margin>
-                        <Insets right="360.0" top="10.0" />
+                        <Insets left="20.0" top="20.0" />
                      </BorderPane.margin>
                   </HBox>
                </top>
@@ -645,11 +645,6 @@
                               </ListView>
                               <HBox alignment="TOP_RIGHT">
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#onAddTab" prefHeight="5.0" prefWidth="112.0" text="새 탭 추가">
-                                       <HBox.margin>
-                                          <Insets right="30.0" />
-                                       </HBox.margin>
-                                    </Button>
                                     <Button mnemonicParsing="false" onAction="#onCreateBoard" text="게시글 작성">
                                        <HBox.margin>
                                           <Insets right="10.0" />

@@ -19,11 +19,14 @@ public class Statics {
 	    public static final String CHECK_WEABAK_FXML = "../ui/CheckWeabakDialog.fxml"; //외박 정보 상세내용 화면
 		public static final String PLUS_MINUS_ASSIGN_FXML ="../ui/PlusMinusAssignDialog.fxml"; //신상정보 부여 화면
 	    public static final String OK_CANCLE_DIALOG = "../ui/OK_CANCEL_DialogUI.fxml";
-		
+		public static final String INPUT_DIALOG = "../ui/InputDialogUI.fxml";
+	    
 	    public static final String STUDENT_MAIN_FXML = "./ui/StudentMain.fxml";
 		public static final String STUDENT_REAUTH_DIALOG_FXML = "../ui/ReAuthDialog.fxml";
 	    public static final String LOADING_DIALOG_FXML = "../ui/LoadingDialog.fxml";
-		
+		public static final String CATEGORY_DELETE_DIALOG_FXML = "../ui/CategoryDeleteDialog.fxml";
+	    
+	    
 		/* UI 윈도우 창 이름 목록 */
 		public static final String LOGIN_WINDOW_TITLE = "DIMS - 로그인";					
 		public static final String PASSWORD_FIND_TITLE = "DIMS - 비밀번호 찾기";			
@@ -40,6 +43,9 @@ public class Statics {
 		public static final String STUDENT_MAIN_TITLE = "DIMS - 학생용 클라이언트";
 		public static final String STUDENT_REAUTH_DIALOG_TITLE = "DIMS - 재인증 요청";
 		public static final String LOADING_DIALOG_TITLE = "DIMS - 파일 다운로드 진행중...";
+		public static final String INPUT_DIALOG_TITLE = "DIMS - 입력하세요.";
+		
+		public static final String CATEGORY_DELETE_DIALOG_TITLE = "DIMS - 카테고리 삭제";
 		
 	/* Network 설정 */
 	public static final String DIMS_SERVER_IP_ADDRESS = "localhost";				// 서버 IP 주소

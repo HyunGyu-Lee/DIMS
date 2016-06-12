@@ -153,6 +153,22 @@ public class NetworkProtocols {
 	    // 신상정보 층 별 콤보박스 선택시
 	    public static final String STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST = "slscreq";
 	    
+	    // 관리자 게시글 삭제
+	    public static final String ADMIN_BOARD_DELETE_REQUEST = "abdreq";
+	    public static final String ADMIN_BOARD_DELETE_RESPOND = "abdres";
+	    
+	    // 관리자 카테고리 삭제 최초요청
+	    public static final String ADMIN_CATEGORY_DELETE_REQUEST = "acdreq";
+	    public static final String ADMIN_CATEGORY_DELETE_RESPOND = "acdres";	    
+	    
+	    // 관리자 카테고리 삭제될 카테고리 튜플수 요청
+	    public static final String ADMIN_DELETE_CATEGORY_COUNT_REQUEST = "adccreq";
+	    public static final String ADMIN_DELETE_CATEGORY_COUNT_RESPOND = "adccres";
+	    
+	    // 관리자 카테고리 삭제 최종 결정
+	    public static final String ADMIN_DELETE_FINAL_REQUEST = "adfreq";
+	    public static final String ADMIN_DELETE_FINAL_RESPOND = "adfres";
+	    
 	    /*-----------------------------------------------------------------*/	
 		
 		// 학생-외박 내역 리스트 요청

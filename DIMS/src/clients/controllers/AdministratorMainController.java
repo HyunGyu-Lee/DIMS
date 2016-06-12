@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,6 +22,8 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,7 +33,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -42,7 +42,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -177,8 +176,8 @@ public class AdministratorMainController implements Initializable {
 	 @FXML TextField studenttextField;           // 학생 신상정보조회 검색 필드
 	 ObservableList<String> alloption = FXCollections.observableArrayList("소속학과","컴퓨터정보공학과","철도경영물류학과 ","철도시설공학과 ","철도운전시스템공학과","철도전기전자공학과","철도차량시스템공학과");
 	 ObservableList<String> roomoption = FXCollections.observableArrayList("층   별","백인관 1층","백인관 2층","백인관 3층","백인관 4층"); 
-	 @FXML ComboBox select_find_mode;			//신상정보 모아보기 콤보 박스
-	 @FXML ComboBox select_room_mode;			//신상정보 방번호 기준으로 정렬하는 콤보박스
+	 @FXML ComboBox<String> select_find_mode;			//신상정보 모아보기 콤보 박스
+	 @FXML ComboBox<String> select_room_mode;			//신상정보 방번호 기준으로 정렬하는 콤보박스
 	 
 	 /* 외박 관리 메뉴 */
 	 private ObservableList<HBox> StudentMenagerListCheckData; // 상벌점 부여 리스트 데이터
@@ -305,8 +304,6 @@ public class AdministratorMainController implements Initializable {
 	    
 		
 		/* 게시판탭 초기화 */
-		BOARD_CATEGORY_SELECTOR.getItems().addAll("전체","공지사항", "건의사항", "자유게시판");
-		BOARD_W_CSELECTOR.getItems().addAll("공지사항", "건의사항", "자유게시판");
 		BOARD_WRITE.setVisible(false);
 		BOARD_LIST_VIEW.setVisible(true);
 		BOARD_CONTENT_VIEW.setVisible(false);
@@ -361,7 +358,7 @@ public class AdministratorMainController implements Initializable {
 			}
 			System.out.println("AdministratorMainController 스레드 시작");
 			JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-			o.put("category", "공지사항");
+			o.put("category", 1);
 			
 			try
 			{
@@ -437,26 +434,7 @@ public class AdministratorMainController implements Initializable {
 									BOARD_CATEGORY_SELECTOR.getItems().clear();
 									board_tab_btn_box.getChildren().clear();
 									
-									for(Object o :(JSONArray)line.get("category_list"))
-									{
-										String target = o.toString();
-										BOARD_W_CSELECTOR.getItems().add(target);
-										BOARD_CATEGORY_SELECTOR.getItems().add(target);
-										
-										Button tab = new Button(target);
-										tab.setOnAction(new EventHandler<ActionEvent>() {
-											
-											@Override
-											public void handle(ActionEvent event) {
-												JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-												o.put("category", target);
-												sendProtocol(o);
-												
-											}
-										});
-										tab.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";");
-										board_tab_btn_box.getChildren().add(tab);
-									}
+									createBoardCategoryList((JSONArray)line.get("category_list"));
 									createBoardList((JSONArray)line.get("board_list"));
 								}
 							});
@@ -620,32 +598,23 @@ public class AdministratorMainController implements Initializable {
 									BOARD_CATEGORY_SELECTOR.getItems().clear();
 									board_tab_btn_box.getChildren().clear();
 									
-									for(Object o :(JSONArray)line.get("category_list"))
-									{
-										String target = o.toString();
-										BOARD_W_CSELECTOR.getItems().add(target);
-										BOARD_CATEGORY_SELECTOR.getItems().add(target);
-										
-										Button tab = new Button(target);
-										tab.setOnAction(new EventHandler<ActionEvent>() {
-											
-											@Override
-											public void handle(ActionEvent event) {
-												JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-												o.put("category", target);
-												sendProtocol(o);
-												
-											}
-										});
-										tab.setStyle("-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";");
-										board_tab_btn_box.getChildren().add(tab);
-									}
+									createBoardCategoryList((JSONArray)line.get("category_list"));
 									
 									createBoardList((JSONArray)line.get("board_list"));
 									shutdown();
 									BOARD.setVisible(true);
 								}
 							});
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_BOARD_DELETE_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("게시글이 삭제되었습니다.", sManager.getStage());
+							});
+							JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+							json.put("category", line.get("show-category"));
+							sendProtocol(json);	
+
 						}
 						else if(type.equals(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_RESPOND))
 						{
@@ -806,6 +775,69 @@ public class AdministratorMainController implements Initializable {
 								}
 							});
 						}
+						else if(type.equals(NetworkProtocols.ADMIN_ADD_TAP_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("카테고리가 추가되었습니다.", sManager.getStage());
+							});
+							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_MAIN_REQUEST));
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_CATEGORY_DELETE_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog dlg = new CustomDialog(Statics.CATEGORY_DELETE_DIALOG_FXML, Statics.CATEGORY_DELETE_DIALOG_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
+								CategoryDeleteDialogController con = (CategoryDeleteDialogController)dlg.getController();
+								con.setWindow(dlg);
+								con.setProperty((JSONArray)line.get("category-list"));
+								dlg.showAndWait();
+								JSONObject action = (JSONObject)dlg.getUserData();
+								
+								if(action!=null)
+								{
+									JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_CATEGORY_COUNT_REQUEST);
+									request.put("category", (int)action.get("selected"));
+									sendProtocol(request);
+								}
+								
+							});
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_DELETE_CATEGORY_COUNT_RESPOND))
+						{
+							int cnt = (int)line.get("count");
+							
+							Platform.runLater(()->{
+								if(cnt==0)
+								{
+									//삭제
+									JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_FINAL_REQUEST);
+									request.put("category", line.get("category"));
+									sendProtocol(request);
+								}
+								else
+								{
+									// 물어보기
+									int option = CustomDialog.showConfirmDialog("선택한 카테고리를 삭제하면 해당 카테고리의 모든 글이 삭제됩니다.", sManager.getStage());
+									if(option==CustomDialog.OK_OPTION)
+									{
+										//삭제
+										JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_FINAL_REQUEST);
+										request.put("category", line.get("category"));
+										sendProtocol(request);
+									}
+									else
+									{
+										CustomDialog.showMessageDialog("카테고리 삭제를 취소하셨습니다.", sManager.getStage());
+									}
+								}
+							});
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_DELETE_FINAL_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showConfirmDialog("카테고리가 성공적으로 삭제되었습니다.", sManager.getStage());
+							});
+							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_MAIN_REQUEST));
+						}
 					}
 					catch(ClassNotFoundException e)
 					{
@@ -955,6 +987,7 @@ public class AdministratorMainController implements Initializable {
 	
 	public void createRecivermessage(ArrayList<String> data)
 	{
+		  @SuppressWarnings("unused")
 		  Boolean check ;
 	      recievermessageListData.removeAll(recievermessageListData);
 	      for(String t : data)
@@ -1098,40 +1131,20 @@ public class AdministratorMainController implements Initializable {
  
 		sendProtocol(msg);
 	}
-	
-	@SuppressWarnings("unchecked")
-	@FXML private void onNotice()
-	{
-		//JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-		//o.put("category", "공지사항");
-		//sendProtocol(o);	
-	}
-	
-	@SuppressWarnings("unchecked")
-	@FXML private void onRequest()
-	{
-		JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-		o.put("category", "건의사항");
-		sendProtocol(o);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@FXML private void onFree()
-	{
-		JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
-		o.put("category", "자유게시판");
-		sendProtocol(o);
-	}
-	
+
+	//JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+	//o.put("category", "공지사항");
+	//sendProtocol(o);	
+
 	@FXML private void onBoardSearch()
 	{
-		System.out.println("검색 카테고리 : "+BOARD_CATEGORY_SELECTOR.getValue());
+		System.out.println("검색 카테고리 : "+BOARD_CATEGORY_SELECTOR.getSelectionModel().getSelectedIndex());
 		System.out.println("검색 키워드    : "+BOARD_TITLE_FIELD.getText());
 		
 		if(BOARD_CATEGORY_SELECTOR.getValue()==null)return;
 		
 		String[] keys = {"category","search_key"};
-		Object[] values = {BOARD_CATEGORY_SELECTOR.getValue(),BOARD_TITLE_FIELD.getText()};
+		Object[] values = {BOARD_CATEGORY_SELECTOR.getSelectionModel().getSelectedIndex()+1,BOARD_TITLE_FIELD.getText()};
 		
 		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_SEARCH_REQUEST, keys, values));
 	}
@@ -1145,7 +1158,9 @@ public class AdministratorMainController implements Initializable {
 	@FXML private void onWrite()
 	{
 		String[] ks = {"작성자","게시글제목","게시글본문","카테고리"};
-		Object[] vs = {uID, BOARD_TITLE.getText(), BOARD_CONTENT.getText(), BOARD_W_CSELECTOR.getValue()};
+		Object[] vs = {uID, BOARD_TITLE.getText(), BOARD_CONTENT.getText(), BOARD_W_CSELECTOR.getSelectionModel().getSelectedIndex()+1};
+		
+		System.out.println(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_BOARD_REQUEST, ks, vs).toJSONString());
 		
 		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_BOARD_REQUEST, ks, vs));
 	}
@@ -1162,9 +1177,19 @@ public class AdministratorMainController implements Initializable {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@FXML private void onDeleteBoard()
 	{
 		
+		if(BOARD_LIST.getSelectionModel().getSelectedItem()==null)
+		{
+			CustomDialog.showMessageDialog("삭제할 게시글을 선택하세요!", sManager.getStage());
+			return;
+		}
+		
+		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_BOARD_DELETE_REQUEST);
+		request.put("게시글번호", ((Label)BOARD_LIST.getSelectionModel().getSelectedItem().getChildren().get(0)).getText());
+		sendProtocol(request);
 	}
 	
 	@FXML private void onBackToList()
@@ -1231,9 +1256,10 @@ public class AdministratorMainController implements Initializable {
 				 }
 			  }}); 
 	         left.setOnAction(new EventHandler<ActionEvent>() {
+
+	        	@SuppressWarnings("unchecked")
 				@Override
 				public void handle(ActionEvent event) {
-					// TODO Auto-generated method stub
 					checkjarray.add(tt);
 				}
 			});
@@ -1245,6 +1271,7 @@ public class AdministratorMainController implements Initializable {
 	 
 	   }
 	   
+	   @SuppressWarnings("unchecked")
 	   public void createStudentSearch(JSONArray arr) // 영훈
 	   {
 		   StudentListData.removeAll(StudentListData);
@@ -1304,7 +1331,7 @@ public class AdministratorMainController implements Initializable {
 
 						@Override
 						public void handle(MouseEvent event) {
-							// TODO Auto-generated method stub
+
 							if(event.getClickCount() == 2)
 							{
 								System.out.println("신상정보 탭 더블 클릭 ");
@@ -1382,9 +1409,11 @@ public class AdministratorMainController implements Initializable {
 	   }
 	   
 	   
+	   @SuppressWarnings("unchecked")
 	   @FXML public void onTimerClick()
 	   {
 		   JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.SHOW_SCHEDULE_MANAGER_TAB_REQUEST);
+		   req.put("viewtype", SCHEDULE_DISPLAY_MODE);
 		   sendProtocol(req);
 	   }
 	   
@@ -2035,9 +2064,10 @@ public class AdministratorMainController implements Initializable {
 	        item.setAlignment(Pos.CENTER);
 	        StudentManagerListData.add(item);
 	        EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
+				@SuppressWarnings("unchecked")
 				@Override
 				public void handle(MouseEvent event) {
-					// TODO Auto-generated method stub
+
 					if(event.getClickCount()==2)
 					{
 						JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.PLUS_MINUS_ASSIGN_REQUEST);
@@ -2122,6 +2152,7 @@ public class AdministratorMainController implements Initializable {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@FXML private void onSearch1()
 	{
 		String searchKey = studenttextField.getText();
@@ -2142,6 +2173,7 @@ public class AdministratorMainController implements Initializable {
 	}
 	
 	//영훈 추가
+	@SuppressWarnings("unchecked")
 	@FXML private void onSearch2()
 	{
 		String searchKey = WeabakField.getText();
@@ -2160,6 +2192,8 @@ public class AdministratorMainController implements Initializable {
 		StudentWeabakList.refresh();
 		
 	}
+	
+	@SuppressWarnings("unchecked")
 	@FXML private void onSearch3()
 	{
 		String searchKey = PMField.getText();
@@ -2176,6 +2210,7 @@ public class AdministratorMainController implements Initializable {
 		StudentManagerList.refresh();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@FXML public void onSearch4()
 	{
 		String searchKey = PMListField.getText();
@@ -2192,6 +2227,7 @@ public class AdministratorMainController implements Initializable {
 		StudentMenagerListCheck.refresh();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@FXML public void onRecieverMsgSearch()
 	{
 		String searchKey = MsgRecieverField.getText();
@@ -2284,10 +2320,30 @@ public class AdministratorMainController implements Initializable {
 			sendProtocol(json);
 		}
 		
+		@SuppressWarnings("unchecked")
 		@FXML private void onAddTab()
 		{
 			// 대화상자 띄워서 새로운 탭 추가
-			//sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_ADD_TAP_REQUEST));
+			String categoryName = CustomDialog.showInputDialog("추가할 카테고리를 입력하세요", sManager.getStage());
+			
+			if(categoryName.length()==0)
+			{
+				CustomDialog.showMessageDialog("카테고리명을 1글자 이상 입력하세요.", sManager.getStage());
+				return;
+			}
+			
+			if(categoryName!=null)
+			{
+				JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_ADD_TAP_REQUEST);
+				request.put("name", categoryName);
+				sendProtocol(request);
+			}
+		}
+		
+		@FXML private void onDeleteTab()
+		{
+			// 탭 삭제
+			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_CATEGORY_DELETE_REQUEST));
 		}
 		
 		// 메세지 버튼 이벤트
@@ -2300,7 +2356,7 @@ public class AdministratorMainController implements Initializable {
 			MESSAGE.getSelectionModel().select(2);
 			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
 			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
-			JSONArray arr = new JSONArray();
+			
 			for(Object a : checkjarray)
 			{
 				JSONObject aa = (JSONObject)a;
@@ -2473,6 +2529,34 @@ public class AdministratorMainController implements Initializable {
 			 }
 		}
 		
-		
+		private void createBoardCategoryList(JSONArray data)
+		{
+			for(int i = 0; i < data.size() ; i++)
+			{
+				final int category = i;
+				String target = data.get(i).toString();
+				BOARD_W_CSELECTOR.getItems().add(target);
+				BOARD_CATEGORY_SELECTOR.getItems().add(target);
+				
+				Button tab = new Button(target);
+				
+				tab.styleProperty().bind(Bindings.when(tab.hoverProperty())
+						 .then(new SimpleStringProperty("-fx-background-color: gray; -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";"))
+						 .otherwise(new SimpleStringProperty("-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); -fx-text-fill: -fx-text-base-color; -fx-font: 17pt \"HYwulM\";")));
+				tab.setOnAction(new EventHandler<ActionEvent>() {
+					
+					@SuppressWarnings("unchecked")
+					@Override
+					public void handle(ActionEvent event) {
+						JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+						o.put("category", category+1);
+						sendProtocol(o);
+						
+					}
+				});
+
+				board_tab_btn_box.getChildren().add(tab);
+			}
+		}
 		
 }

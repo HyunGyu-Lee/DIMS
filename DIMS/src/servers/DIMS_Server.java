@@ -272,9 +272,9 @@ public class DIMS_Server {
 						String creator = (String)request.get("작성자");
 						String title = (String)request.get("게시글제목");
 						String content = (String)request.get("게시글본문");
-						String category = (String)request.get("카테고리");
+						int category = (int)request.get("카테고리");
 						
-						if(creator==null||title.length()==0||content.length()==0||category==null)
+						if(creator==null||title.length()==0||content.length()==0||request.get("카테고리")==null)
 						{
 							toClient.writeObject(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_BOARD_ERROR));
 							toClient.flush();
@@ -288,10 +288,39 @@ public class DIMS_Server {
 						
 						sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_BOARD_RESPOND));
 					}
+					else if(type.equals(NetworkProtocols.ADMIN_ADD_TAP_REQUEST))
+					{
+						String qry = "select count(*) from 게시글_카테고리목록;";
+						ResultSet rs = handler.excuteQuery(qry);
+						rs.next();
+						int cnt = rs.getInt("count(*)");
+						
+						qry = "insert into 게시글_카테고리목록(카테고리번호,카테고리이름) values("+(cnt+1)+",'"+request.get("name")+"')";
+						
+						handler.excuteUpdate(qry);
+						
+						sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_ADD_TAP_RESPOND));
+						
+					}
+					else if(type.equals(NetworkProtocols.ADMIN_BOARD_DELETE_REQUEST))
+					{
+						JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_BOARD_DELETE_RESPOND);
+						String qry2 = "select 카테고리 from 게시글 where 게시글번호="+request.get("게시글번호")+";";
+						
+						ResultSet rs = handler.excuteQuery(qry2);
+						
+						rs.next();
+						respond.put("show-category", rs.getInt("카테고리"));
+						
+						String qry = "delete from 게시글 where 게시글번호="+request.get("게시글번호")+";";
+						handler.excuteUpdate(qry);
+						
+						sendProtocol(respond);
+					}
 					else if(type.equals(NetworkProtocols.BOARD_LIST_REQUEST))
 					{
-						ResultSet rs = handler.excuteQuery("select G.게시글번호, S.이름, G.게시글제목, G.작성일자, G.게시글본문, G.카테고리 from 사용자 S, 게시글 G "
-								                         + "where S.학번=G.작성자 and G.카테고리='"+request.get("category").toString()+"';");
+						ResultSet rs = handler.excuteQuery("select G.게시글번호, S.이름, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from 사용자 S, 게시글 G, 게시글_카테고리목록 M "
+								                         + "where S.학번=G.작성자 and G.카테고리='"+request.get("category").toString()+"' and M.카테고리번호=G.카테고리;");
 						JSONArray arr = new JSONArray();
 						JSONArray arr2 = new JSONArray();
 						
@@ -305,7 +334,7 @@ public class DIMS_Server {
 										      rs.getString("게시글제목"),
 										      rs.getDate("작성일자"),
 										      rs.getString("게시글본문"),
-										      rs.getString("카테고리")}; 
+										      rs.getString("카테고리이름")}; 
 								
 								JSONObject n = Toolbox.createJSONProtocol(keys, o);
 								arr.add(n);								
@@ -341,13 +370,13 @@ public class DIMS_Server {
 					else if(type.equals(NetworkProtocols.BOARD_CONTENT_REQUEST))
 					{
 						int reqno = (int)request.get("No");
-						String qry = "select S.이름, G.게시글제목, G.게시글본문, G.카테고리, G.작성일자 from 사용자 S, 게시글 G"
-								+    " where S.학번=G.작성자 and G.게시글번호="+reqno+";";
+						String qry = "select S.이름, G.게시글제목, G.게시글본문, M.카테고리이름, G.작성일자 from 사용자 S, 게시글 G, 게시글_카테고리목록 M"
+								+    " where S.학번=G.작성자 and G.게시글번호="+reqno+" and G.카테고리=M.카테고리번호; ";
 						ResultSet rs = handler.excuteQuery(qry);
 						while(rs.next())
 						{
 							String[] keys = {"이름","게시글제목","게시글본문","카테고리","작성일자"};
-							Object[] values = {rs.getString("이름"),rs.getString("게시글제목"),rs.getString("게시글본문"),rs.getString("카테고리"),rs.getDate("작성일자")};
+							Object[] values = {rs.getString("이름"),rs.getString("게시글제목"),rs.getString("게시글본문"),rs.getString("카테고리이름"),rs.getDate("작성일자")};
 							
 							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_CONTENT_RESPOND, keys, values));
 						}
@@ -441,7 +470,7 @@ public class DIMS_Server {
 					else if(type.equals(NetworkProtocols.BOARD_MAIN_REQUEST))
 					{
 						ResultSet rs = handler.excuteQuery("select G.게시글번호, S.이름, G.게시글제목, G.작성일자 from 사용자 S, 게시글 G "
-		                         + "where S.학번=G.작성자 and G.카테고리='공지사항';");
+		                         + "where S.학번=G.작성자 and G.카테고리=1;");
 						JSONArray arr = new JSONArray();
 						
 						String[] keys = {"No","이름","게시글제목","작성일자"};
@@ -1989,6 +2018,49 @@ public class DIMS_Server {
 				                     res.put("user_list", mArr);
 				                     sendProtocol(res);	
 							 }
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_CATEGORY_DELETE_REQUEST))
+						 {
+							 String qry = "select 카테고리이름 from 게시글_카테고리목록;";
+							 ResultSet rs = handler.excuteQuery(qry);
+							 JSONArray data = new JSONArray();
+							 while(rs.next())
+							 {
+								 data.add(rs.getString("카테고리이름"));
+							 }
+							 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_CATEGORY_DELETE_RESPOND);
+							 respond.put("category-list", data);
+							 sendProtocol(respond);
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_DELETE_CATEGORY_COUNT_REQUEST))
+						 {
+							 String qry = "select count(*) from 게시글 where 카테고리="+request.get("category")+";";
+							 ResultSet rs = handler.excuteQuery(qry);
+							 try
+							 {
+								 rs.next();
+								 
+								 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_CATEGORY_COUNT_RESPOND);
+								 respond.put("count", rs.getInt("count(*)"));
+								 respond.put("category", request.get("category"));
+								 sendProtocol(respond);
+							 }
+							 catch(SQLException e)
+							 {
+								 e.printStackTrace();
+							 }
+							 
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_DELETE_FINAL_REQUEST))
+						 {
+							 String qry = "delete from 게시글 where 카테고리 = "+request.get("category")+";";
+							 System.out.println();
+							 handler.excuteUpdate(qry);
+							 
+							 qry = "delete from 게시글_카테고리목록 where 카테고리번호 = "+request.get("category")+";";
+							 handler.excuteUpdate(qry);
+							 
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_FINAL_RESPOND));
 						 }
 		                else
 						{

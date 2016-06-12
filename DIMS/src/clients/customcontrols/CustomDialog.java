@@ -2,6 +2,7 @@ package clients.customcontrols;
 
 import java.io.IOException;
 
+import clients.controllers.InputDialogController;
 import clients.controllers.MessageDialogController;
 import clients.controllers.OK_CANCEL_DialogController;
 import javafx.fxml.FXMLLoader;
@@ -65,6 +66,24 @@ public class CustomDialog extends Stage{
 		con.setMessage(msg);
 		dlg.showAndWait();
 		return (int)dlg.getUserData();
+	}
+	
+	public static String showInputDialog(String msg, Stage owner)
+	{
+		CustomDialog dlg = new CustomDialog(Statics.INPUT_DIALOG, Statics.INPUT_DIALOG_TITLE, owner, Modality.WINDOW_MODAL);
+		InputDialogController con = (InputDialogController)dlg.getController();
+		con.setWindow(dlg);
+		con.setMessage(msg);
+		dlg.showAndWait();
+		
+		if((int)dlg.getUserData()==OK_OPTION)
+		{
+			return con.input();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 }
