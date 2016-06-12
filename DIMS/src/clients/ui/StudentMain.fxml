@@ -74,27 +74,13 @@
                         </ImageView>
                      </graphic>
                 </TitledPane>
-                <TitledPane alignment="CENTER" animated="false" prefWidth="241.0" text="  게   시   판 ">
+                <TitledPane alignment="CENTER" animated="false" onMouseClicked="#onClickBoard" prefWidth="241.0" text="  게   시   판 ">
                   <content>
-                    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="138.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
-                           <children>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="23.0" mnemonicParsing="false" onAction="#onBoardMainReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="공 지 사 항">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="87.0" mnemonicParsing="false" onAction="#onBoardReqReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="건 의 사 항">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="149.0" mnemonicParsing="false" onAction="#onBoardFreeReq" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="자유 게시판">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
+                        <ScrollPane prefViewportHeight="200.0" prefViewportWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+                           <content>
+                          <AnchorPane fx:id="category_list" minHeight="-Infinity" minWidth="-Infinity" prefHeight="345.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" />
+                           </content>
+                        </ScrollPane>
                   </content>
                      <font>
                         <Font name="HYwulM" size="18.0" />
@@ -220,7 +206,7 @@
    <center>
       <ScrollPane prefViewportHeight="859.0" prefViewportWidth="1559.0">
          <content>
-            <StackPane prefHeight="1000.0" prefWidth="1450.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" BorderPane.alignment="CENTER">
+            <StackPane prefHeight="1000.0" prefWidth="1450.0" style="-fx-background-color: linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%);;" BorderPane.alignment="CENTER">
                <children>
                   <ImageView fitHeight="560.0" fitWidth="844.0" opacity="0.12" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
@@ -603,6 +589,13 @@
                                     <Font name="HYwulM" size="20.0" />
                                  </font>
                               </Button>
+                              <TextField fx:id="qry_keyword" layoutX="509.0" layoutY="740.0" prefHeight="27.0" prefWidth="433.0" />
+                              <Button layoutX="974.0" layoutY="733.0" mnemonicParsing="false" onAction="#onSearchBoard" prefHeight="41.0" prefWidth="118.0" styleClass="add_btn" text="검   색">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </Button>
+                              <ComboBox fx:id="qry_type" layoutX="330.0" layoutY="742.0" prefWidth="150.0" promptText="검색조건" />
                            </children>
                         </AnchorPane>
                         <AnchorPane fx:id="BOARD_WRITE_VIEW" prefHeight="200.0" prefWidth="200.0" visible="false">
@@ -1073,7 +1066,7 @@
                   </AnchorPane>
                   <AnchorPane fx:id="MAIN_VIEW" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="43.0" layoutY="152.0" prefHeight="55.0" prefWidth="154.0" text="  공지사항">
+                        <Label layoutX="43.0" layoutY="113.0" prefHeight="55.0" prefWidth="154.0" text="  공지사항">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
@@ -1085,7 +1078,7 @@
                               </ImageView>
                            </graphic>
                         </Label>
-                        <HBox layoutX="43.0" layoutY="207.0" prefHeight="35.0" prefWidth="616.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                        <HBox layoutX="43.0" layoutY="177.0" prefHeight="35.0" prefWidth="616.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
                            <children>
                               <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="35.0" prefWidth="136.0" text="작 성 자">
                                  <font>
@@ -1100,9 +1093,9 @@
                               </Label>
                            </children>
                         </HBox>
-                        <ListView fx:id="summary_board_view" layoutX="43.0" layoutY="242.0" prefHeight="322.0" prefWidth="616.0" />
-                        <ListView fx:id="summary_board_view1" layoutX="736.0" layoutY="242.0" prefHeight="322.0" prefWidth="616.0" />
-                        <HBox layoutX="736.0" layoutY="207.0" prefHeight="35.0" prefWidth="616.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                        <ListView fx:id="summary_board_view" layoutX="43.0" layoutY="212.0" prefHeight="263.0" prefWidth="616.0" />
+                        <ListView fx:id="summary_rm_view" layoutX="736.0" layoutY="212.0" prefHeight="261.0" prefWidth="616.0" />
+                        <HBox layoutX="736.0" layoutY="177.0" prefHeight="35.0" prefWidth="616.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
                            <children>
                               <Label alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="35.0" prefWidth="136.0" text="발 신 자">
                                  <font>
@@ -1117,7 +1110,7 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Label layoutX="736.0" layoutY="152.0" prefHeight="55.0" prefWidth="186.0" text="  받은 메세지">
+                        <Label layoutX="736.0" layoutY="113.0" prefHeight="55.0" prefWidth="186.0" text="  받은 메세지">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
@@ -1129,17 +1122,12 @@
                               </ImageView>
                            </graphic>
                         </Label>
-                        <ImageView fitHeight="69.0" fitWidth="442.0" layoutX="43.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/deep.gif" />
-                           </image>
-                        </ImageView>
-                        <Hyperlink layoutX="336.0" layoutY="701.0" onAction="#openDocument" prefHeight="15.0" prefWidth="206.0" text="http://www.ut.ac.kr">
+                        <Hyperlink layoutX="974.0" layoutY="591.0" onAction="#openDocument" prefHeight="15.0" prefWidth="206.0" text="http://www.ut.ac.kr">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Hyperlink>
-                        <Label layoutX="43.0" layoutY="669.0" text="  바로가기">
+                        <Label layoutX="736.0" layoutY="536.0" text="  바로가기">
                            <graphic>
                               <ImageView fitHeight="150.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -1151,36 +1139,53 @@
                               <Font name="HYwulM" size="27.0" />
                            </font>
                         </Label>
-                        <Label layoutX="95.0" layoutY="706.0" text="교통대 메인 홈페이지">
+                        <Label layoutX="736.0" layoutY="594.0" text="교통대 메인 홈페이지">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Label>
-                        <Label layoutX="95.0" layoutY="735.0" text="종합 정보 시스템">
+                        <Label layoutX="736.0" layoutY="623.0" text="종합 정보 시스템">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Label>
-                        <Hyperlink layoutX="336.0" layoutY="730.0" onAction="#openDocument" prefHeight="31.0" prefWidth="177.0" text="http://is.ut.ac.kr">
+                        <Hyperlink layoutX="974.0" layoutY="620.0" onAction="#openDocument" prefHeight="31.0" prefWidth="177.0" text="http://is.ut.ac.kr">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Hyperlink>
-                        <Label layoutX="95.0" layoutY="761.0" text="도서관">
+                        <Label layoutX="736.0" layoutY="649.0" text="도서관">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Label>
-                        <Hyperlink layoutX="336.0" layoutY="756.0" onAction="#openDocument" prefHeight="31.0" prefWidth="323.0" text="http://chains.ut.ac.kr/index.ax">
+                        <Hyperlink layoutX="974.0" layoutY="646.0" onAction="#openDocument" prefHeight="31.0" prefWidth="323.0" text="http://chains.ut.ac.kr/index.ax">
                            <font>
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Hyperlink>
-                        <ImageView fitHeight="540.0" fitWidth="720.0" layoutX="55.0" layoutY="830.0" pickOnBounds="true">
+                        <ImageView fitHeight="327.0" fitWidth="615.0" layoutX="44.0" layoutY="583.0" pickOnBounds="true">
                            <image>
                               <Image url="@../../resources/약도.png" />
                            </image>
                         </ImageView>
+                        <Label layoutX="43.0" layoutY="536.0" text="  찾아오시는길">
+                           <font>
+                              <Font name="HYwulM" size="27.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="150.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/map-location.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Label>
+                        <Label fx:id="mainString" layoutX="43.0" layoutY="23.0" prefHeight="82.0" prefWidth="1133.0">
+                           <font>
+                              <Font name="HYwulM" size="50.0" />
+                           </font>
+                        </Label>
                      </children>
                   </AnchorPane>
                </children>

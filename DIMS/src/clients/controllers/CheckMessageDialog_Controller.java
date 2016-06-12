@@ -33,7 +33,18 @@ public class CheckMessageDialog_Controller implements Initializable{
 	
 	public void setProperty(JSONObject obj)
 	{
-		sender.setText(obj.get("발신자").toString());
+		String name = "";
+		
+		if(obj.get("발신자")==null)
+		{
+			name = obj.get("수신자").toString();
+		}
+		else
+		{
+			name = obj.get("발신자").toString();
+		}
+		
+		sender.setText(name);
 		sendTime.setText(obj.get("발신시각").toString());
 		title.setText(obj.get("메세지제목").toString());
 		title.setEditable(false);
@@ -46,11 +57,6 @@ public class CheckMessageDialog_Controller implements Initializable{
 		window.setUserData("confirm");
 		window.close();		
 	}
-	
-	@FXML public void onReply()
-	{
-		window.setUserData("reply");
-		window.close();
-	}
+
 	
 }

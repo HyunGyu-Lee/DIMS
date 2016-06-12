@@ -39,7 +39,6 @@ public class LoadingDialogController implements Initializable {
 	public void updateProgress(long cur)
 	{
 		download_progress.setProgress(((double)cur/(double)size));
-		System.out.println(((double)cur/(double)size));
 	}
 	
 	

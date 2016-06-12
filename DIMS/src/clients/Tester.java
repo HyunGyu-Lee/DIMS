@@ -8,7 +8,6 @@ public class Tester {
 	
 		Application.launch(MainApplication.class);
 		
-		
 	}
 	
 

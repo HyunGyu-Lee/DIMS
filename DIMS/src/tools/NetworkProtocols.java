@@ -225,5 +225,12 @@ public class NetworkProtocols {
 		
 		public static final String MESSAGE_REPLY_REQUEST = "mrreq";
 		public static final String MESSAGE_REPLY_RESPOND = "mrres";
-
+		
+		// 학생 - 카테고리 리스트 요청
+		public static final String STUDENT_CATEGORY_LIST_REQUEST = "sclreq";
+		public static final String STUDENT_CATEGORY_LIST_RESPOND = "sclres";
+		
+		// 학생 - 게시판 검색 요청
+		public static final String STUDENT_BOARD_SEARCH_REQUEST = "sbsreq";
+		public static final String STUDENT_BOARD_SEARCH_RESPOND = "sbsres";		
 }

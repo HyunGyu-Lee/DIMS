@@ -8,11 +8,7 @@
 
 <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.CheckMessageDialog_Controller">
    <children>
-      <Button layoutX="187.0" layoutY="511.0" mnemonicParsing="false" onAction="#onConfirm" prefHeight="40.0" prefWidth="96.0" styleClass="btn" stylesheets="@CheckMessageDialog.css" text="확 인">
-         <font>
-            <Font name="HYwulM" size="20.0" />
-         </font></Button>
-      <Button layoutX="322.0" layoutY="511.0" mnemonicParsing="false" onAction="#onReply" prefHeight="40.0" prefWidth="96.0" styleClass="btn" stylesheets="@CheckMessageDialog.css" text="답 장">
+      <Button layoutX="252.0" layoutY="513.0" mnemonicParsing="false" onAction="#onConfirm" prefHeight="40.0" prefWidth="96.0" styleClass="btn" text="확 인">
          <font>
             <Font name="HYwulM" size="20.0" />
          </font></Button>

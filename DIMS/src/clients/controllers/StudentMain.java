@@ -25,6 +25,7 @@ import files.FileReciever;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -112,17 +113,22 @@ public class StudentMain implements Initializable {
 	@FXML StackPane BOARD_VIEW;							// 메인
 	@FXML AnchorPane BOARD_SEE_VIEW, BOARD_WRITE_VIEW, BOARD_CONTENT_VIEW;	// 글 확인, 글 작성
 	@FXML ListView<HBox> board_list_view;				// 게시글 리스트
+	@FXML AnchorPane category_list;						// 아코디언 내 카테고리 목록
 	private ObservableList<HBox> boardListData;			// 게시글 리스트 데이터
+	private boolean isMainFlow = true;
 	
 	@FXML TextField board_title;						// 작성 - 제목
 	@FXML ComboBox<String> board_category;				// 작성 - 카테고리선택
 	@FXML TextArea board_content;						// 작성 - 본문
-	String s_category = "";
+	int s_category = 0;
+	int current_view_category = 0;
 	
 	@FXML TextField board_c_title;
 	@FXML Label board_c_time, board_c_creator, board_c_category;
 	@FXML TextArea board_c_content;
 	
+	@FXML ComboBox<String> qry_type;
+	@FXML TextField qry_keyword;
 	
 	// 신상정보 조회
 	@FXML AnchorPane USER_INFO_VIEW;
@@ -146,10 +152,26 @@ public class StudentMain implements Initializable {
 	
 	// 메인화면
 	@FXML AnchorPane MAIN_VIEW;
+	@FXML ListView<HBox> summary_rm_view, summary_board_view;
+	@FXML Label mainString;
+	private ObservableList<HBox> rm_data, board_data;
+	Animation animation;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+		final String content = "한국교통대학교 기숙사 정보 관리 시스템";
+		animation = new Transition() {
+			{
+				setCycleDuration(Duration.millis(8000));
+			}
+			@Override
+			protected void interpolate(double frac) {
+				final int length = content.length();
+				final int n = Math.round(length * (float)frac);
+				mainString.setText(content.substring(0, n));
+			}
+		};
+
 		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>(){
 
 			@Override
@@ -166,9 +188,7 @@ public class StudentMain implements Initializable {
 		selectedRListData = FXCollections.observableArrayList();
 		selected_reciever_list.setItems(selectedRListData);
 		
-		ObservableList<String> category = FXCollections.observableArrayList();
-		category.addAll("공지사항","건의사항","자유게시판");
-		board_category.setItems(category);
+		qry_type.getItems().addAll("작성자","제목","내용");
 		
 		ui_sex.setItems(FXCollections.observableArrayList());
 		ui_sex.getItems().addAll("남","여");
@@ -183,7 +203,10 @@ public class StudentMain implements Initializable {
 		send_message_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
 		shutdown();
-		MAIN_VIEW.setVisible(true);		
+		
+		animation.play();
+		
+		MAIN_VIEW.setVisible(true);
 	}
 	
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -206,9 +229,9 @@ public class StudentMain implements Initializable {
 		{
 			System.out.println("StudentMainController 리스너 스레드 시작");
 			
-			while(true)
+			try
 			{
-				try
+				while(true)
 				{
 					JSONObject line = null;
 					try
@@ -222,17 +245,22 @@ public class StudentMain implements Initializable {
 						{
 							uName = line.get("uName").toString();
 							uID = line.get("uID").toString();
+							JSONArray data = (JSONArray)line.get("board-data");
+							JSONArray data2 = (JSONArray)line.get("message-data");
 							Platform.runLater(new Runnable() {
-								
 								@Override
 								public void run() {
 									userName.setText(uName);
+									createMainBoard(data);
+									createMainMessage(data2);
 								}
 							});
 						}
 						else if(type.equals(NetworkProtocols.PLZ_REQUEST))
 						{
-							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.WINDOW_INIT_PROPERTY));							
+							JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.WINDOW_INIT_PROPERTY);
+							request.put("client-type", "student");
+							sendProtocol(request);							
 						}
 						else if(type.equals(NetworkProtocols.RECIEVE_READY))
 						{
@@ -326,6 +354,9 @@ public class StudentMain implements Initializable {
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
+									msgTitle.setText("");
+									msgContentArea.setText("");
+									selected_reciever_list.getItems().clear();
 									CustomDialog.showMessageDialog("메세지 발송 성공!", sManager.getStage());
 								}
 							});
@@ -533,6 +564,11 @@ public class StudentMain implements Initializable {
 													@Override
 													public void run() {
 														System.out.println(savePathVariable);
+														if(mvPlayer!=null)
+														{
+															System.out.println("현재 비디오재생중");
+															mvPlayer.dispose();
+														}
 														mvPlayer = new MediaPlayer(new Media(new File(re.getSavePath()).toURI().toString()));
 														mvView.setMediaPlayer(mvPlayer);
 														
@@ -584,7 +620,11 @@ public class StudentMain implements Initializable {
 										re.setUI(mvView, mvPlayer, curT, maxT, timeBar, loadingDialog, sManager.getStage());
 										
 										re.addDownloadFinishEventHandler(()->{
-											
+											if(mvPlayer!=null)
+											{
+												System.out.println("현재 비디오재생중");
+												mvPlayer.dispose();
+											}
 											System.out.println(savePathVariable);
 											mvPlayer = new MediaPlayer(new Media(new File(re.getSavePath()).toURI().toString()));
 											mvView.setMediaPlayer(mvPlayer);
@@ -690,6 +730,35 @@ public class StudentMain implements Initializable {
 							
 							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
 						}
+						else if(type.equals(NetworkProtocols.STUDENT_CATEGORY_LIST_RESPOND))
+						{
+							JSONArray data = (JSONArray)line.get("category-list");
+							Platform.runLater(()->{
+								createCategoryList(data);
+							});
+						}
+						else if(type.equals(NetworkProtocols.STUDENT_BOARD_SEARCH_RESPOND))
+						{
+							JSONArray data = (JSONArray)line.get("data");
+							if(data==null)
+							{
+								Platform.runLater(()->{
+									CustomDialog.showMessageDialog("검색결과가 없습니다.", sManager.getStage());
+								});
+							}
+							else
+							{
+								Platform.runLater(()->{
+									createBoardList(data);
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.BOARD_NO_SEARCH_RESULT))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("검색결과가 없습니다.", sManager.getStage());
+							});
+						}
 						else if(type.equals(NetworkProtocols.EXIT_RESPOND))
 						{
 							break;
@@ -700,12 +769,15 @@ public class StudentMain implements Initializable {
 					{
 						e.printStackTrace();
 					}
-					
 				}
-				catch(IOException e)
-				{
-					e.printStackTrace();
-				}
+			}
+			catch(IOException e)
+			{
+				Platform.runLater(()->{
+					CustomDialog.showConfirmDialog("서버와 연결이 끊어져 프로그램을 강제로 종료합니다.", sManager.getStage());
+					System.exit(-1);
+				});
+				
 			}
 		}
 	}
@@ -801,8 +873,8 @@ public class StudentMain implements Initializable {
 				title.setPrefSize(708, 35);
 				title.setFont(Font.font("HYwulM",15));
 				title.setAlignment(Pos.CENTER);
-				
-				item.getChildren().addAll(refferKey, refferContent, refferUID, rDate, s0, sender, s1, title);
+				//5,6,7
+				item.getChildren().addAll(rDate, s0, sender, s1, title, refferKey, refferContent, refferUID);
 				
 				item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					public void handle(MouseEvent event)
@@ -869,8 +941,7 @@ public class StudentMain implements Initializable {
 				title.setFont(Font.font("HYwulM",15));
 				title.setAlignment(Pos.CENTER);
 				
-				item.getChildren().addAll(refferKey, refferContent, refferUID, rDate, s0, sender, s1, title);
-				
+				item.getChildren().addAll(rDate, s0, sender, s1, title,refferKey, refferContent, refferUID);
 				item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					public void handle(MouseEvent event)
 					{
@@ -1004,9 +1075,10 @@ public class StudentMain implements Initializable {
 	@FXML
 	public void onMainLogoClicked()
 	{
-		// 메인 로고 클릭시
+		isMainFlow = true;
 		shutdown();
 		MAIN_VIEW.setVisible(true);
+		animation.play();
 	}
 	
 	@FXML
@@ -1147,27 +1219,6 @@ public class StudentMain implements Initializable {
 		whole_reciever_list.refresh();
 	}
 	
-	@FXML private void onBoardMainReq()
-	{
-		String[] keys = {"type","category"};
-		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "공지사항"};
-		sendProtocol(Toolbox.createJSONProtocol(keys, values));
-	}
-	
-	@FXML private void onBoardReqReq()
-	{
-		String[] keys = {"type","category"};
-		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "건의사항"};
-		sendProtocol(Toolbox.createJSONProtocol(keys, values));		
-	}
-	
-	@FXML private void onBoardFreeReq()
-	{
-		String[] keys = {"type","category"};
-		Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , "자유게시판"};
-		sendProtocol(Toolbox.createJSONProtocol(keys, values));		
-	}
-	
 	public void createBoardList(JSONArray data)
 	{
 		if(boardListData==null)
@@ -1258,7 +1309,7 @@ public class StudentMain implements Initializable {
 	
 	@FXML private void onWriteBoard_toServer()
 	{
-		s_category = board_category.getValue();
+		s_category = board_category.getSelectionModel().getSelectedIndex()+1;
 		
 		String[] ks = {"작성자","게시글제목","게시글본문","카테고리"};
 		Object[] vs = {uID, board_title.getText(), board_content.getText(), s_category};
@@ -1280,9 +1331,18 @@ public class StudentMain implements Initializable {
 	
 	@FXML private void onBoardOK()
 	{
-		BOARD_CONTENT_VIEW.setVisible(false);
-		BOARD_WRITE_VIEW.setVisible(false);
-		BOARD_SEE_VIEW.setVisible(true);
+		if(isMainFlow==true)
+		{
+			JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
+			request.put("category", 1);
+			sendProtocol(request);
+		}
+		else
+		{
+			BOARD_CONTENT_VIEW.setVisible(false);
+			BOARD_WRITE_VIEW.setVisible(false);
+			BOARD_SEE_VIEW.setVisible(true);			
+		}
 	}
 	
 	@FXML private void onUserInfoView()
@@ -1452,8 +1512,7 @@ public class StudentMain implements Initializable {
 			CustomDialog.showMessageDialog("답장할 메세지를 한 개만 선택하세요!", sManager.getStage());			
 			return;
 		}
-		
-		String reUID = ((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(2)).getText();
+		String reUID = ((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(7)).getText();
 		
 		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_REPLY_REQUEST);
 		request.put("reqID", reUID);
@@ -1475,8 +1534,8 @@ public class StudentMain implements Initializable {
 			return;
 		}
 		
-		msgTitle.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(7)).getText());
-		msgContentArea.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(1)).getText());
+		msgTitle.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(4)).getText());
+		msgContentArea.setText(((Label)recieve_message_view.getSelectionModel().getSelectedItem().getChildren().get(6)).getText());
 		
 		message_re_view.setVisible(false);
 		message_write_view.setVisible(true);
@@ -1496,7 +1555,7 @@ public class StudentMain implements Initializable {
 		for(HBox target : recieve_message_view.getSelectionModel().getSelectedItems())
 		{
 			JSONObject addV = new JSONObject();
-			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(0)).getText()));
+			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(5)).getText()));
 			delete.add(addV);
 		}
 		
@@ -1538,7 +1597,7 @@ public class StudentMain implements Initializable {
 		for(HBox target : send_message_view.getSelectionModel().getSelectedItems())
 		{
 			JSONObject addV = new JSONObject();
-			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(0)).getText()));
+			addV.put("No", Integer.parseInt(((Label)target.getChildren().get(5)).getText()));
 			delete.add(addV);
 		}
 		
@@ -1570,6 +1629,206 @@ public class StudentMain implements Initializable {
 	{
 		Hyperlink target = (Hyperlink)e.getSource();
 		sManager.getHost().getHostServices().showDocument(target.getText());
+	}
+	
+	private void createCategoryList(JSONArray data)
+	{
+		category_list.getChildren().clear();
+		board_category.getItems().clear();
+		ObservableList<String> category = FXCollections.observableArrayList();
+		
+		double yPosi = 23;
+		
+		for(int i=0;i<data.size();i++)
+		{
+			String target = data.get(i).toString();
+			Button add = new Button(target);
+			add.getStyleClass().add("Button_subItem");
+			add.setLayoutX(45);
+			add.setLayoutY(yPosi);
+			yPosi+=60;
+			category.add(target);
+			category_list.getChildren().add(add);
+			int cateIdx = i+1;
+			add.setOnAction((e)->{
+				isMainFlow = false;
+				String[] keys = {"type","category"};
+				Object[] values = {NetworkProtocols.BOARD_LIST_REQUEST , cateIdx};
+				current_view_category = cateIdx;
+				sendProtocol(Toolbox.createJSONProtocol(keys, values));
+			});
+		}
+		
+		board_category.setItems(category);
+	}
+	
+	@FXML private void onClickBoard()
+	{
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CATEGORY_LIST_REQUEST));
+	}
+	
+	@FXML private void onSearchBoard()
+	{
+		if(qry_type.getValue()==null)
+		{
+			CustomDialog.showMessageDialog("검색 조건을 선택하세요.", sManager.getStage());
+			return;
+		}
+		
+		if(qry_keyword.getText().length()==0)
+		{
+			CustomDialog.showMessageDialog("검색어를 한 글자 이상 입력하세요.", sManager.getStage());
+			return;
+		}
+		// 작성자 제목 내용
+		String[] keys = {"카테고리","검색조건","검색어"};
+		Object[] values = {current_view_category,qry_type.getValue(),qry_keyword.getText()};
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_BOARD_SEARCH_REQUEST, keys, values));
+	}
+	
+	private void createMainBoard(JSONArray data)
+	{
+		if(board_data==null)
+		{
+			board_data = FXCollections.observableArrayList();
+		}
+		
+		board_data.removeAll(board_data);
+	
+		for(Object o : data)
+		{
+			JSONObject target = (JSONObject)o;
+
+			String name = target.get("이름").toString();
+			String title = target.get("게시글제목").toString();
+			Date create_at = (Date) target.get("작성일자");
+			
+			HBox item = new HBox();
+			Label ccLabel = new Label(target.get("카테고리").toString());
+			ccLabel.setVisible(false);
+			ccLabel.setPrefWidth(0);
+			Label nLabel = new Label(name);
+			Label tLabel = new Label(title);
+			Label cLabel = new Label(create_at.toString());
+			cLabel.setVisible(false);
+			cLabel.setPrefWidth(0);
+			Label hiddenContent = new Label(target.get("게시글본문").toString());
+			
+			ccLabel.setAlignment(Pos.CENTER);
+			ccLabel.setFont(Font.font("HYwulM",18));
+			
+			nLabel.setAlignment(Pos.CENTER);
+			nLabel.setMinWidth(0);
+			nLabel.setPrefSize(129,30);
+			nLabel.setFont(Font.font("HYwulM",18));
+			
+			tLabel.setPrefSize(470,30);
+			tLabel.setAlignment(Pos.CENTER);
+			tLabel.setFont(Font.font("HYwulM",18));
+			
+			cLabel.setFont(Font.font("HYwulM",18));
+			cLabel.setAlignment(Pos.CENTER);
+			hiddenContent.setVisible(false);
+			hiddenContent.setPrefWidth(0);
+			
+			Separator s0 = new Separator(Orientation.VERTICAL);
+			s0.setPrefWidth(6);
+			Separator s1 = new Separator(Orientation.VERTICAL);
+			s1.setPrefWidth(6);
+			
+			item.getChildren().addAll(nLabel, s0, tLabel, s1, cLabel, hiddenContent, ccLabel);
+			item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent event) {
+					if(event.getClickCount()==2)
+					{
+						board_c_title.setText(tLabel.getText());
+						board_c_creator.setText(nLabel.getText());
+						board_c_time.setText(cLabel.getText());
+						board_c_category.setText(ccLabel.getText());
+						board_c_content.setText(hiddenContent.getText());
+						
+						board_c_title.setEditable(false);
+						board_c_content.setEditable(false);
+						shutdown();
+						BOARD_VIEW.setVisible(true);
+						BOARD_SEE_VIEW.setVisible(false);
+						BOARD_CONTENT_VIEW.setVisible(true);
+					}
+				}
+			});
+			
+			board_data.add(item);
+		}
+		summary_board_view.setItems(board_data);
+	}
+	
+	private void createMainMessage(JSONArray data)
+	{
+		if(rm_data==null)
+		{
+			rm_data = FXCollections.observableArrayList();
+		}
+		
+		rm_data.clear();
+		
+		for(Object o : data)
+		{
+			HBox item = new HBox();
+			JSONObject target = (JSONObject)o;
+			
+			Label refferKey = new Label(target.get("메세지번호").toString());
+			refferKey.setPrefWidth(0);
+			refferKey.setVisible(false);
+			
+			Label refferContent = new Label(target.get("메세지본문").toString());
+			refferContent.setPrefWidth(0);
+			refferContent.setVisible(false);
+
+			Label refferUID = new Label(target.get("학번").toString());
+			refferUID.setPrefWidth(0);
+			refferUID.setVisible(false);
+			
+			Label rDate = new Label(Toolbox.getSQLDateToFormat((java.sql.Date)target.get("발신시각"), "yyyy년 MM월 dd일"));
+			rDate.setVisible(false);
+			rDate.setPrefWidth(0);
+			Label sender = new Label(target.get("발신자").toString());
+			sender.setMinWidth(0);
+			Label title = new Label(target.get("메세지제목").toString());
+			
+			Separator s0 = new Separator(Orientation.VERTICAL);
+			s0.setPrefWidth(6);
+			Separator s1 = new Separator(Orientation.VERTICAL);
+			s1.setPrefWidth(6);
+			
+			sender.setPrefSize(128, 30);
+			sender.setFont(Font.font("HYwulM",15));
+			sender.setAlignment(Pos.CENTER);
+			
+			title.setPrefSize(470, 30);
+			title.setFont(Font.font("HYwulM",15));
+			title.setAlignment(Pos.CENTER);
+			
+			item.getChildren().addAll(sender, s1, title);
+			
+			item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				public void handle(MouseEvent event)
+				{
+					if(event.getClickCount()==2)
+					{
+						CustomDialog dlg = new CustomDialog(Statics.CHECK_MESSAGE_FXML, Statics.CHECK_MESSAGE_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
+						CheckMessageDialog_Controller con = (CheckMessageDialog_Controller)dlg.getController();
+						con.setWindow(dlg);
+						con.setProperty(target);
+						dlg.show();
+					}
+				};
+			});
+			
+			rm_data.add(item);
+		}
+		summary_rm_view.setItems(rm_data);
 	}
 	
 	public void sendProtocol(JSONObject protocol)
