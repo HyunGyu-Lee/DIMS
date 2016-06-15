@@ -169,7 +169,7 @@ public class FileReciever {
 									synchronized (this) {
 										try
 										{
-											this.wait(500);
+											this.wait(100);
 										}
 										catch(InterruptedException e)
 										{

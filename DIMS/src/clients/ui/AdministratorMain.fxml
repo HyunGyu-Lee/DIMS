@@ -129,7 +129,7 @@
                   </AnchorPane>
                </children>
             </AnchorPane>
-            <TabPane fx:id="MESSAGE" onMouseClicked="#onMSGTabClick" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="MESSAGE" onMouseClicked="#onMSGTabClick" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" visible="false">
               <tabs>
       <Tab styleClass="tap" text="받은메세지함">
          <content>
@@ -975,64 +975,6 @@
                   </HBox>
                </bottom>
             </BorderPane>
-            <BorderPane fx:id="MEDIA" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" visible="false">
-               <top>
-                  <HBox>
-                     <children>
-                        <Label fx:id="MEDIA_TITLE" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="30.0" />
-                           </font>
-                        </Label>
-                        <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" onAction="#playTest" text="SELECT" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS" />
-                     </children>
-                  </HBox>
-               </top>
-               <center>
-                  <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-                     <children>
-                        <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
-                           <children>
-                              <MediaView fx:id="MEDIA_VIEW" fitHeight="768.0" fitWidth="1024.0" style="-fx-border-color: black; -fx-border-width: 1px;" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </HBox>
-                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="200.0">
-                           <children>
-                              <HBox alignment="CENTER" style="-fx-background-color: black;" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Slider fx:id="TIME_SLIDER" maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets top="15.0" />
-                                       </HBox.margin>
-                                    </Slider>
-                                 </children>
-                              </HBox>
-                              <Label fx:id="TIME_TEXT" maxHeight="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets top="15.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPlay" text="PLAY" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets top="15.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPause" text="PAUSE" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets top="15.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStop" text="STOP" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets top="15.0" />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </center>
-            </BorderPane>
             <BorderPane fx:id="Schedule_Main" prefHeight="200.0" prefWidth="200.0" visible="false">
                <right>
                   <VBox prefHeight="842.0" prefWidth="362.0" BorderPane.alignment="CENTER">
@@ -1260,6 +1202,96 @@
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                </top>
             </BorderPane>
+            <AnchorPane fx:id="MEDIA" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <VBox layoutX="90.0" layoutY="150.0">
+                     <children>
+                        <HBox prefHeight="40.0" prefWidth="200.0">
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: linear-gradient(to bottom, rgba(236,242,246,1) 0%,rgba(190,200,204,1) 100%);" text="교  육  명" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Separator orientation="VERTICAL" prefHeight="40.0" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" style="-fx-background-color: linear-gradient(to bottom, rgba(236,242,246,1) 0%,rgba(190,200,204,1) 100%);" text="비디오 크기">
+                                 <font>
+                                    <Font name="HYwulM" size="25.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <ListView fx:id="VEDIO_LIST" layoutX="90.0" layoutY="150.0" prefHeight="600.0" prefWidth="800.0" />
+                     </children>
+                  </VBox>
+                  <Label layoutX="90.0" layoutY="67.0" prefHeight="59.0" prefWidth="568.0" text="  업로드된 교육영상 목록">
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/learning.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <font>
+                        <Font name="HYwulM" size="34.0" />
+                     </font>
+                  </Label>
+                  <Button layoutX="1268.0" layoutY="288.0" mnemonicParsing="false" onAction="#onSelectFile" prefHeight="39.0" prefWidth="124.0" styleClass="btn" text="파일선택" />
+                  <ProgressIndicator fx:id="uploadProgress" layoutX="1294.0" layoutY="445.0" prefHeight="200.0" prefWidth="200.0" progress="0.0" />
+                  <Label layoutX="1110.0" layoutY="67.0" prefHeight="59.0" prefWidth="568.0" text="  업로드하기">
+                     <font>
+                        <Font name="HYwulM" size="34.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/learning.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Label>
+                  <Label layoutX="1110.0" layoutY="364.0" prefHeight="59.0" prefWidth="568.0" text="  업로드 진행상황">
+                     <font>
+                        <Font name="HYwulM" size="34.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/learning.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Label>
+                  <Label fx:id="currentProg" alignment="CENTER" layoutX="1060.0" layoutY="704.0" prefHeight="59.0" prefWidth="300.0" text="0">
+                     <font>
+                        <Font name="HYwulM" size="19.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="maxProg" alignment="CENTER" layoutX="1424.0" layoutY="704.0" prefHeight="59.0" prefWidth="300.0" text="10000000000000">
+                     <font>
+                        <Font name="HYwulM" size="19.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="1375.0" layoutY="704.0" prefHeight="59.0" prefWidth="23.0" text="/">
+                     <font>
+                        <Font name="HYwulM" size="19.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="1110.0" layoutY="150.0" prefHeight="59.0" prefWidth="151.0" text="교육명">
+                     <font>
+                        <Font name="HYwulM" size="23.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="uploadName" layoutX="1268.0" layoutY="168.0" prefHeight="23.0" prefWidth="313.0" />
+                  <Label layoutX="1110.0" layoutY="201.0" prefHeight="59.0" prefWidth="151.0" text="업로드 파일">
+                     <font>
+                        <Font name="HYwulM" size="23.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="uploadFile" layoutX="1268.0" layoutY="220.0" prefHeight="23.0" prefWidth="313.0" />
+                  <Button layoutX="1470.0" layoutY="288.0" mnemonicParsing="false" onAction="#onVideoUpload" prefHeight="34.0" prefWidth="112.0" styleClass="btn" text="업로드" />
+               </children>
+            </AnchorPane>
          </children>
       </StackPane>
    </center>

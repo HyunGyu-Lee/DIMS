@@ -61,6 +61,18 @@ public class DIMS_Server {
 			if(PRINT_LOG)
 			{
 				System.out.println("[Server] 서버 오픈");
+				if(new File(Statics.DEFAULT_DIMS_DIRECTORY).exists()==false)
+				{
+					System.out.println("[Server] 디렉토리를 자동으로 생성합니다.");
+					System.out.println("[Server] 생성 : "+Statics.DEFAULT_DIMS_DIRECTORY);
+					new File(Statics.DEFAULT_DIMS_DIRECTORY).mkdir();
+					System.out.println("[Server] 생성 : "+Statics.DEFAULT_MOVIE_DATA_DIRECTORY);
+					new File(Statics.DEFAULT_MOVIE_DATA_DIRECTORY).mkdir();
+					System.out.println("[Server] 생성 : "+Statics.DEFAULT_USER_DATA_DIRECTORY);
+					new File(Statics.DEFAULT_USER_DATA_DIRECTORY).mkdir();
+					System.out.println("[Server] 생성 : "+Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY);
+					new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).mkdir();
+				}
 			}
 			handler = new DatabaseHandler();
 			if(PRINT_LOG) System.out.println("[Server] 데이터베이스와 연결 시도...");
@@ -2597,7 +2609,7 @@ public class DIMS_Server {
 												 .addProperty(MailProperty.ATTACHED_FILE, files);
 										 System.out.println("전송중...");
 										 MailingService.sendMail(m, mailData.get("받을사람").toString());
-										 System.out.println("전송완료");									 
+										 System.out.println("전송완료");
 										 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.EMAIL_SEND_RESPOND));
 									 }
 									 catch(IOException e)
@@ -2607,12 +2619,6 @@ public class DIMS_Server {
 									 
 								 }).start();
 							 }
-							 
-							 
-							 
-							 
-							 
-							 
 						 }
 						 else if(type.equals(NetworkProtocols.PASSWORD_FIND_IDENTIFY_REQUEST))
 						 {
@@ -2651,6 +2657,11 @@ public class DIMS_Server {
 						 {
 							 handler.excuteUpdate("update 사용자 set 비밀번호 = '"+request.get("request-pw")+"' where 학번 = '"+request.get("request-id")+"';");
 							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_MODIFY_RESPOND));
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_VIDEO_UPLOAD_REQUEST))
+						 {
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.VIDEO_DATA_SEND_NOTIFICATION));
+							 fileServer.handleUploadClient(request, handler);
 						 }
 		                else
 						{

@@ -71,5 +71,6 @@ public class Statics {
 	public static final String DEFAULT_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";	// 프로필이미지
 	public static final String DEFAULT_MOVIE_DATA_DIRECTORY = "C:\\\\DIMS\\\\Movie\\\\";	// 영상
 	public static final String DEFAULT_SUBMITTED_DATA_DIRECTORY = "C:\\\\DIMS\\\\SubmittedData\\\\";	// 제출데이터
+	public static final String DEFAULT_DIMS_DIRECTORY = "C:\\\\DIMS\\\\";
 	public static final String DEFAULT_DOWNLOAD_DIRECTORY = "C:\\DIMS Download\\";
 }

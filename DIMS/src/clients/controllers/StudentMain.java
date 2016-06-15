@@ -269,6 +269,12 @@ public class StudentMain implements Initializable {
 									}
 									shutdown();
 									MAIN_VIEW.setVisible(true);
+									
+									if(new File(Statics.DEFAULT_DOWNLOAD_DIRECTORY).exists()==false)
+									{
+										CustomDialog.showMessageDialog("다운로드 디렉토리가 자동 생성되었습니다.", sManager.getStage());
+										new File(Statics.DEFAULT_DOWNLOAD_DIRECTORY).mkdir();
+									}
 								}
 							});
 						}

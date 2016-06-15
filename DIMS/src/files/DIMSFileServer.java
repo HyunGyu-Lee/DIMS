@@ -1,14 +1,19 @@
 package files;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.concurrent.Executor;
 
 import com.orsoncharts.util.json.JSONObject;
 
+import databases.DatabaseHandler;
+import tools.Statics;
 import tools.Toolbox;
 
 public class DIMSFileServer {
@@ -40,6 +45,39 @@ public class DIMSFileServer {
 				System.out.println("클라이언트 접속, 전송 스레드 시작");
 				System.out.println(userName+"에게 "+sendData.toJSONString());
 				new Connection(c, sendData).transmitFile();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}			
+		}).start();
+	}
+	
+	public void handleUploadClient(JSONObject info, DatabaseHandler handler)
+	{
+		byte[] recieve = new byte[(int)info.get("파일크기")];
+		new Thread(()->{
+			
+			Socket c = null;
+			try
+			{
+				System.out.println("파일 요청 감시, 클라이언트 접속 대기중");
+				c = fileSender.accept();
+				System.out.println("클라이언트 접속, 전송 스레드 시작");
+				
+				ObjectInputStream is = new ObjectInputStream(c.getInputStream());
+				
+				for(int i=0;i<recieve.length;i++)
+				{
+					recieve[i] = (byte) is.read();
+				}
+				
+				int vCnt = Toolbox.getResultSetSize(handler.excuteQuery("select * from 비디오목록"));
+				
+				String savePath = Statics.DEFAULT_MOVIE_DATA_DIRECTORY+info.get("파일이름");
+				
+				handler.excuteUpdate("insert into 비디오목록 values("+(vCnt+1)+",'"+info.get("이름")+"','"+savePath+"',"+recieve.length+");");
+				Files.write(new File(savePath).toPath(), recieve);
 			}
 			catch (Exception e)
 			{

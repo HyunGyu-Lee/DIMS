@@ -290,4 +290,8 @@ public class NetworkProtocols {
 		
 		public static final String MEMBER_JOIN_REQUEST = "mjreq";
 		public static final String MEMBER_JOIN_RESPOND = "mjres";
+		
+		public static final String ADMIN_VIDEO_UPLOAD_REQUEST = "avureq";
+		public static final String VIDEO_DATA_SEND_NOTIFICATION = "vdsnoti";
+		
 }

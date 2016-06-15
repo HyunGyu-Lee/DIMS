@@ -1,9 +1,12 @@
 package clients.controllers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -58,6 +61,7 @@ import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.util.Duration;
 import clients.SceneManager;
@@ -78,9 +82,10 @@ public class AdministratorMainController implements Initializable {
 	boolean isDraging = false;
 	boolean classcheck = false;
 	boolean levelcheck = false;
+	boolean taskFinish = false;
 	int check_class;
 	int check_level;
-	
+	int progressCnt = 0;
 	AdministratorMainController me;
 	SceneManager sManager;
 	CustomDialog loadingDialog;
@@ -135,16 +140,13 @@ public class AdministratorMainController implements Initializable {
 		
 		
 	/* 미디어 플레이어 메뉴 */
-	@FXML BorderPane MEDIA;							// 미디어 탭
-	@FXML MediaView MEDIA_VIEW;						// 미디어 출력 영역
-	@FXML Slider TIME_SLIDER;						// 동영상 타임 슬라이더
-	@FXML Label TIME_TEXT;							// 동영상 시간 출력 - 현재 / 총
-	@FXML Label MEDIA_TITLE;						// 동영상 제목 출력
-	private MediaPlayer player;
-	// playTest()	: 동영상 올리기 테스트 버튼
-	// onPlay()		: 재생하기
-	// onPause()	: 일시정지하기
-	// onStop()		: 중지하기
+	@FXML AnchorPane MEDIA;							// 미디어 탭
+	@FXML ListView<HBox> VEDIO_LIST;
+	@FXML TextField uploadName, uploadFile;
+	private File selectedFile;
+	private byte[] sendableFileBytes;
+	@FXML ProgressIndicator uploadProgress;
+	@FXML Label currentProg, maxProg;
 	
 	
 	/* 게시판 메뉴 */
@@ -539,38 +541,7 @@ public class AdministratorMainController implements Initializable {
 						}
 						else if(type.equals(NetworkProtocols.VIDIO_RESPOND))
 						{
-							byte[] videoData = (byte[])line.get("vdata");
-							Files.write(Paths.get("./tmp.mp4"), videoData);
 							
-							File file = new File("./tmp.mp4");
-							
-							MEDIA_TITLE.setText(file.getName());
-							
-							Media me = new Media(file.toURI().toString());
-							player = new MediaPlayer(me);
-
-							player.currentTimeProperty().addListener(new InvalidationListener() {
-								
-								@Override
-								public void invalidated(Observable observable) {
-									TIME_TEXT.setText(Toolbox.formatTime(player.getCurrentTime(), player.getTotalDuration()));
-								}
-							});	
-							
-							TIME_SLIDER.valueProperty().addListener(new InvalidationListener() {
-								
-								@Override
-								public void invalidated(Observable observable) {
-									player.seek(player.getTotalDuration().multiply(TIME_SLIDER.getValue() / 100.0));
-									
-								}
-							});
-							
-							double w=1024,h=768;
-							
-							MEDIA_VIEW.setFitWidth(w);
-							MEDIA_VIEW.setFitHeight(h);
-							MEDIA_VIEW.setMediaPlayer(player);
 						}
 						else if(type.equals(NetworkProtocols.MESSAGE_CONTENT_RESPOND))
 						{
@@ -1092,6 +1063,57 @@ public class AdministratorMainController implements Initializable {
 		                        }
 		                     });
 		                  }
+		                  else if(type.equals(NetworkProtocols.VIDEO_DATA_SEND_NOTIFICATION))
+		                  {
+		                	  new Thread(()->{
+		                		  
+		                		  try
+		                		  {
+									Socket s = new Socket(Statics.DIMS_FILE_SERVER_IP_ADDRESS, Statics.DIMS_FILE_SERVER_PORT_NUMBER);
+
+									ObjectOutputStream os = new ObjectOutputStream(s.getOutputStream());
+
+									progressCnt = 0;
+									
+									for(progressCnt = 0;progressCnt<sendableFileBytes.length;progressCnt++)
+									{
+										os.write(sendableFileBytes[progressCnt]);
+									}
+									os.flush();
+		                		  }
+		                		  catch (Exception e)
+		                		  {
+									e.printStackTrace();
+		                		  }
+		                		  
+		                	  }).start();
+		                	  
+		                	  new Thread(()->{
+		                		  
+		                		  while(!taskFinish)
+		                		  {
+		                			  Platform.runLater(()->{
+		                				  uploadProgress.setProgress((double)progressCnt / (double)sendableFileBytes.length);
+			                			  currentProg.setText(progressCnt+"");
+		                			  });
+		                			  
+		                			  synchronized (this) {
+										try
+										{
+											this.wait(100);
+										}
+										catch(InterruptedException e)
+										{
+											e.printStackTrace();
+										}
+		                			  }
+		                			  
+		                		  }
+		                	  }).start();
+		                	  
+		                	  
+		                	  
+		                  }
 					}
 					catch(ClassNotFoundException e)
 					{
@@ -1332,22 +1354,6 @@ public class AdministratorMainController implements Initializable {
 	@FXML private void playTest()
 	{
 
-	}
-	
-	@FXML private void onPlay()
-	{
-		player.play();
-	}
-	
-	@FXML private void onPause()
-	{
-		player.pause();
-	}
-	
-	@FXML private void onStop()
-	{
-		TIME_SLIDER.setValue(0.0);
-		player.stop();
 	}
 	
 	@FXML private void onLogout()
@@ -3105,4 +3111,40 @@ public class AdministratorMainController implements Initializable {
 	      sendmessageList.refresh();
 	   }
 		
+	   @FXML private void onVideoUpload()
+	   {
+		   if(uploadName.getText().length()==0||selectedFile==null)
+		   {
+			   CustomDialog.showMessageDialog("업로드 정보를 확인하세요.", sManager.getStage());
+			   return;
+		   }
+		   
+		   String[] keys = {"이름","파일크기","파일이름"};
+		   Object[] values = {uploadName.getText(), sendableFileBytes.length,selectedFile.getName()};
+		   
+		   sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_VIDEO_UPLOAD_REQUEST, keys, values));
+	   }
+
+	   @FXML private void onSelectFile()
+	   {
+		   FileChooser fc =  new FileChooser();
+		   selectedFile = fc.showOpenDialog(sManager.getStage());
+		   
+		   if(selectedFile!=null)
+		   {
+			   uploadFile.setText(selectedFile.getName());
+			   
+			   try
+			   {
+				   sendableFileBytes = Files.readAllBytes(selectedFile.toPath());
+			   }
+			   catch (IOException e)
+			   {
+				e.printStackTrace();
+			   }
+			   
+			   maxProg.setText(sendableFileBytes.length+"");
+		   }
+	   }
+	   
 }
