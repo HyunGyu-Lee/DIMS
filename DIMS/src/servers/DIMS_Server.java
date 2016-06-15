@@ -1,6 +1,8 @@
 package servers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,21 +10,27 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.orsoncharts.util.json.JSONArray;
 import com.orsoncharts.util.json.JSONObject;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import clients.customcontrols.CalendarObject;
 import clients.customcontrols.CalendarObject.CalendarDataManager;
 import databases.DatabaseHandler;
 import files.DIMSFileServer;
+import tools.MailProperties;
+import tools.MailProperty;
+import tools.MailingService;
 import tools.NetworkProtocols;
 import tools.Statics;
 import tools.Toolbox;
@@ -240,6 +248,7 @@ public class DIMS_Server {
 							try
 							{
 								r = (JSONObject)fromClient.readObject();
+								System.out.println(r);
 							}
 							catch (ClassNotFoundException e)
 							{
@@ -248,7 +257,22 @@ public class DIMS_Server {
 							
 							if(r.get("type").equals(NetworkProtocols.RECIEVE_READY_OK))
 							{
-								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.PLZ_REQUEST));
+								if(r.get("request-view")!=null)
+								{
+									JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_QUESTION_LIST);
+									ResultSet rs = handler.excuteQuery("select 질문내용 from 비밀번호찾기_질문목록");
+									JSONArray data = new JSONArray();
+									while(rs.next())
+									{
+										data.add(rs.getString("질문내용"));
+									}
+									respond.put("data", data);
+									sendProtocol(respond);
+								}
+								else
+								{
+									sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.PLZ_REQUEST));
+								}
 								break;
 							}
 						}
@@ -300,8 +324,47 @@ public class DIMS_Server {
 									};
 									mArr.add(Toolbox.createJSONProtocol(keys2, values));
 								}
+								
+								ResultSet rs3 = handler.excuteQuery("select * from 제출서류목록");
+
+								JSONObject dataBundle = null;
+								if(Toolbox.getResultSetSize(rs3)!=0)
+								{
+									try
+									{
+										dataBundle = new JSONObject();
+										rs3.next();
+										dataBundle.put("제출분류명", rs3.getString("제출분류명"));
+										dataBundle.put("마감시간", rs3.getDate("마감시간"));
+										
+										ResultSet rs4 = handler.excuteQuery("select M.서류번호,M.제출자,S.이름,M.제출서류저장URL,M.제출시간 from 제출서류함 M, 사용자 S where M.제출자=S.학번 and M.제출자 = '"+userIdentify+"';");
+										rs4.next();
+										dataBundle.put("서류번호", rs4.getInt("서류번호"));
+										
+										if(rs4.getString("제출서류저장URL")!=null)
+										{
+											dataBundle.put("제출여부", "제출완료");
+											dataBundle.put("제출시각", rs4.getTimestamp("제출시간"));
+											dataBundle.put("데이터", Files.readAllBytes(new File(rs4.getString("제출서류저장URL")).toPath()));
+											dataBundle.put("확장자", rs4.getString("제출서류저장URL").split("\\.")[1]);
+										}
+										else
+										{
+											dataBundle.put("제출여부", "미제출");
+											dataBundle.put("제출시각", "-----------");									
+										}
+										
+									}
+									catch(SQLException e)
+									{
+										e.printStackTrace();
+									}
+									
+								}
+								
 								respond.put("board-data", data);
 								respond.put("message-data", mArr);
+								respond.put("submit-data", dataBundle);
 							}
 							catch(SQLException e)
 							{
@@ -1016,20 +1079,41 @@ public class DIMS_Server {
 	                     String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","소속학과","이미지데이터"};
 	                     while(rs.next())
 	                     {
-	                     	Object[] values = {
-	                            rs.getString("학번"),
-	                            rs.getString("이름"),
-	                            rs.getString("주소"),
-	                            rs.getString("휴대폰번호"),
-	                            rs.getString("자택전화번호"),
-	                            rs.getString("주민등록번호"),
-	                            rs.getString("성별"),
-	                            rs.getString("방번호"),
-	                            rs.getInt("학년"),
-	                            rs.getString("학과이름"),
-	                            Files.readAllBytes(new File(rs.getString("프로필사진URL")).toPath())
-	                            };
+	                     	if(rs.getString("프로필사진URL")!=null)
+	                     	{
+	                     		Object[] values = {
+	    	                            rs.getString("학번"),
+	    	                            rs.getString("이름"),
+	    	                            rs.getString("주소"),
+	    	                            rs.getString("휴대폰번호"),
+	    	                            rs.getString("자택전화번호"),
+	    	                            rs.getString("주민등록번호"),
+	    	                            rs.getString("성별"),
+	    	                            rs.getString("방번호"),
+	    	                            rs.getInt("학년"),
+	    	                            rs.getString("학과이름"),
+	    	                            Files.readAllBytes(new File(rs.getString("프로필사진URL")).toPath())
+	    	                            };
 	                            mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
+	                     	}
+	                     	else
+	                     	{
+	                     		Object[] values = {
+	    	                            rs.getString("학번"),
+	    	                            rs.getString("이름"),
+	    	                            rs.getString("주소"),
+	    	                            rs.getString("휴대폰번호"),
+	    	                            rs.getString("자택전화번호"),
+	    	                            rs.getString("주민등록번호"),
+	    	                            rs.getString("성별"),
+	    	                            rs.getString("방번호"),
+	    	                            rs.getInt("학년"),
+	    	                            rs.getString("학과이름"),
+	    	                            "no-image"
+	    	                            };
+	                            mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
+	                     	}
+
 	                        }
 	                       sendProtocol(mArr);   
 	                   }
@@ -1351,7 +1435,6 @@ public class DIMS_Server {
 					 }
 					 else if(type.equals(NetworkProtocols.PLUS_MINUS_OVER_REQUEST))
 					 {
-						 String name = request.get("이름").toString();
 						 String num = request.get("학번").toString();
 						 String content = request.get("내용").toString();
 						 String choice = request.get("상벌점타입").toString();
@@ -1473,7 +1556,7 @@ public class DIMS_Server {
 						 byte[] requestImageData = (byte[]) request.get("content");
 						 
 						 // 서버 로컬에 저장작업
-						 String savePath = Statics.DEFALUE_USER_DATA_DIRECTORY+userIdentify+"_profilePhoto."+requestFileFormat;
+						 String savePath = Statics.DEFAULT_USER_DATA_DIRECTORY+userIdentify+"_profilePhoto."+requestFileFormat;
 						 String qry = "update 학생 set 프로필사진URL = '"+savePath+"' where 학번='"+userIdentify+"';";
 						 
 						 handler.excuteUpdate(qry);
@@ -1577,8 +1660,7 @@ public class DIMS_Server {
 						 {
 							 rs.next();
 							 String openPath = rs.getString("비디오경로");
-							 int size = rs.getInt("비디오크기");
-							
+							 
 							 byte[] data = Files.readAllBytes(new File(openPath).toPath());
 							 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MEDIA_CONTENT_RESPOND);
 							 respond.put("data", data);
@@ -1641,7 +1723,7 @@ public class DIMS_Server {
 		                   
 		                   sendProtocol(json);
 		                }
-		                else if(type.equals(NetworkProtocols.LOGOUT_REQUESt))
+		                else if(type.equals(NetworkProtocols.LOGOUT_REQUEST))
 		                {
 		                	System.out.println("로그아웃");
 		                	break;
@@ -2135,7 +2217,6 @@ public class DIMS_Server {
 						 {
 							 String qType = request.get("검색조건").toString();
 							 String qWord = request.get("검색어").toString();
-							 int qCate = (int)request.get("카테고리");
 							 
 							 String qry = "";
 							 
@@ -2210,6 +2291,270 @@ public class DIMS_Server {
 								System.out.println("응답");
 							}
 						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_SUBMIN_MAIN_REQUEST))
+						 {
+							 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_RESPOND);
+							 
+							 // 진행중인 서류가 없는 경우
+							 if(Toolbox.getResultSetSize(handler.excuteQuery("select * from 제출서류목록"))==0)
+							 {
+								 respond.put("submit-process", "no-data");
+							 }
+							 // 있는경우
+							 else
+							 {
+								 respond.put("submit-process", "exist-data");
+								 
+								 ResultSet rs = handler.excuteQuery("select 제출분류명, 마감시간 from 제출서류목록;");
+								 rs.next();
+								 respond.put("제출분류명", rs.getString("제출분류명"));
+								 respond.put("마감시간", rs.getDate("마감시간"));
+								 
+								 ResultSet rs2 = handler.excuteQuery("select M.서류번호,M.제출자,S.이름,M.제출서류저장URL,M.제출시간 from 제출서류함 M, 사용자 S where M.제출자=S.학번;");					 
+								 JSONArray data = new JSONArray();
+								 try
+								 {
+									 while(rs2.next())
+									 {
+										 JSONObject rawData = null;
+										 String[] keys = {"서류번호","학번","이름","제출여부","제출시간"};
+										 
+										 if(rs2.getString("제출서류저장URL")==null)
+										 {
+											 Object[] values = {rs2.getInt("서류번호"),
+													 			rs2.getString("제출자"),
+													 			rs2.getString("이름"),
+													 			"미제출",
+													 			"-------"};
+											 rawData = Toolbox.createJSONProtocol(keys,values);
+										 }
+										 else
+										 {
+											 Object[] values = {rs2.getInt("서류번호"),
+													 			rs2.getString("제출자"),
+											 					rs2.getString("이름"),
+											 					"제출",
+											 					rs2.getTimestamp("제출시간")};
+											 rawData = Toolbox.createJSONProtocol(keys,values);
+										 }
+										 data.add(rawData);
+									 }
+								 }
+								 catch(SQLException e)
+								 {
+									 e.printStackTrace();
+								 }
+								 respond.put("data-bundle", data);
+								 System.out.println(respond.toJSONString());
+							 }
+							 
+							 sendProtocol(respond);
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_ENROLL_REQUEST))
+						 {
+							 JSONObject data = (JSONObject)request.get("data");
+							 String title = data.get("title").toString();
+							 Date date = (Date)data.get("date");
+							 
+							 SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+							 String dateString = d.format(date);
+							 
+							 String qry = "insert into 제출서류목록(분류번호,제출분류명,마감시간) values(1,'"+title+"','"+dateString+"');";
+							 handler.excuteUpdate(qry);
+							 
+							 ResultSet rs = handler.excuteQuery("select 학번 from 학생;");
+							 int count = 0;
+							 while(rs.next())
+							 {
+								 handler.excuteUpdate("insert into 제출서류함(서류번호,제출자,분류) values("+count+",'"+rs.getString("학번")+"',1);");
+								 count++;
+							 }
+							 
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_ENROLL_RESPOND));
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_REQEUST))
+						 {
+							 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_RESPOND);
+							 if(Toolbox.getResultSetSize(handler.excuteQuery("select * from 제출서류함 where 제출서류저장URL is NULL;"))!=0)
+							 {
+								 respond.put("result", "re-ask");
+							 }
+							 else
+							 {
+								 respond.put("result", "ok");
+							 }
+							 sendProtocol(respond);
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_REQEUST))
+						 {
+							 handler.excuteUpdate("delete from 제출서류함;");
+							 handler.excuteUpdate("delete from 제출서류목록;");
+							 // C:\DIMS\SubmittedData 폴더 파일들 다 지워함
+							 
+							 for(File target : new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).listFiles())
+							 {
+								 target.delete();
+							 }
+							 
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_RESPOND));
+						 }
+						 else if(type.equals(NetworkProtocols.STUDENT_SUBMIT_REQUEST))
+						 {
+							 String filename = Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY+userIdentify+"_submitted."+request.get("확장자");
+							 byte[] data = (byte[])request.get("데이터");
+							 ResultSet rs = handler.excuteQuery("select 제출서류저장URL from 제출서류함 where 제출자 = '"+userIdentify+"';");
+							 rs.next();
+							 if(rs.getString("제출서류저장URL")!=null)
+							 {
+								 File deleteTarget = new File(rs.getString("제출서류저장URL"));
+								 deleteTarget.delete();
+							 }
+							 
+							 Files.write(new File(filename).toPath(), data);
+							 
+							 handler.excuteUpdate("update 제출서류함 set 제출서류저장URL = '"+filename+"' where 제출자 = '"+userIdentify+"';");
+							 handler.excuteUpdate("update 제출서류함 set 제출시간 = now() where 제출자 = '"+userIdentify+"';");							 
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SUBMIT_RESPOND));
+						 }
+						 else if(type.equals(NetworkProtocols.ADMIN_LOCAL_SAVE_REQUEST))
+						 {
+							 new Thread(()->{
+								 try
+								 {
+									 ByteArrayOutputStream bos = new ByteArrayOutputStream();
+									 String zipFileName = Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY+"submitted_data.zip";
+									 ZipOutputStream zos = new ZipOutputStream(bos);
+									 File[] fList = new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).listFiles();
+									 for(int i=0;i<fList.length;i++)
+									 {
+										 ZipEntry zipHandle = new ZipEntry(fList[i].toPath().getFileName().toString());
+										 zos.putNextEntry(zipHandle);
+										 System.out.println("압축중...."+(i+1)+"/"+(fList.length));
+										 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_LOCAL_SAVE_RESPOND);
+										 respond.put("progress-current", (i+1));
+										 respond.put("progress-max", fList.length);
+										 sendProtocol(respond);
+										 zos.write(Files.readAllBytes(fList[i].toPath()));
+									 }
+									 bos.close();
+									 zos.close();
+									 
+									 byte[] sendable = bos.toByteArray();
+									 
+									 JSONObject notification = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_LOCAL_SAVE_NOTIFICATION);
+									 notification.put("name", zipFileName);
+									 notification.put("size", sendable.length);
+									 sendProtocol(notification);
+									 
+									 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MEDIA_CONTENT_RESPOND);
+									 respond.put("data", sendable);
+									 respond.put("fileName", zipFileName.split("\\\\")[3]);
+									 respond.put("format", zipFileName.split("\\.")[1]);
+									 
+									 fileServer.handleFileClient(respond, userName);
+								 }
+								 catch(IOException e)
+								 {
+									 e.printStackTrace();
+								 }
+							 }).start();
+						 }
+						 else if(type.equals(NetworkProtocols.EMAIL_SEND_REQUEST))
+						 {
+							 JSONObject mailData = request;
+							 System.out.println(mailData.toJSONString());
+							 
+							 boolean constraint = true;
+							 
+							 ArrayList<File> attached = new ArrayList<File>();
+							 for(File target : new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).listFiles())
+							 {
+								 if(Files.readAllBytes(target.toPath()).length>1024*1024*10)
+								 {
+									 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.EMAIL_FILE_SIZE_LIMIT));
+									 constraint = false;
+									 break;
+								 }
+								 attached.add(target);
+							 }
+							 
+							 if(attached.size()>10)
+							 {
+								 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.EMAIL_MAX_COUNT_EXCEED));
+								 constraint = false;
+							 }
+							 
+							 if(constraint)
+							 {
+								 new Thread(()->{
+									 
+									 try
+									 {
+										 File[] files = new File[attached.size()];
+										 files = attached.toArray(files);
+										 
+										 MailProperties m = MailProperties.createNaverMailProperty()
+							  					 .addProperty(MailProperty.PORT, 465)
+												 .addProperty(MailProperty.TITLE, mailData.get("메일제목"))
+												 .addProperty(MailProperty.CONTENT, mailData.get("메일본문"))
+												 .addProperty(MailProperty.ATTACHED_FILE, files);
+										 System.out.println("전송중...");
+										 MailingService.sendMail(m, mailData.get("받을사람").toString());
+										 System.out.println("전송완료");									 
+										 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.EMAIL_SEND_RESPOND));
+									 }
+									 catch(IOException e)
+									 {
+										 e.printStackTrace();
+									 }
+									 
+								 }).start();
+							 }
+							 
+							 
+							 
+							 
+							 
+							 
+						 }
+						 else if(type.equals(NetworkProtocols.PASSWORD_FIND_IDENTIFY_REQUEST))
+						 {
+							 ResultSet rs = handler.excuteQuery("select 비밀번호찾기_질문 as 질, 비밀번호찾기_답변 as 답 from 학생 where 학번 = '"+request.get("학번")+"';");
+				
+							 JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_IDENTIFY_RESPOND); 
+							 
+							 if(Toolbox.getResultSetSize(rs)==0)
+							 {
+								 // 학번이 잘못된 경우
+								 respond.put("identify-result", "fault");
+							 }
+							 else
+							 {
+								 // 질, 답  = 질문, 답변
+								 rs.next();
+								 if(rs.getInt("질")==(int)request.get("질문"))
+								 {
+									 if(rs.getString("답").equals(request.get("답변").toString()))
+									 {
+										 respond.put("identify-result", "commit");
+									 }
+									 else
+									 {
+										 respond.put("identify-result", "fault");								 										 
+									 }
+								 }
+								 else
+								 {
+									 respond.put("identify-result", "fault");								 
+								 }
+							 }
+							 sendProtocol(respond);
+						 }
+						 else if(type.equals(NetworkProtocols.PASSWORD_FIND_MODIFY_REQUEST))
+						 {
+							 handler.excuteUpdate("update 사용자 set 비밀번호 = '"+request.get("request-pw")+"' where 학번 = '"+request.get("request-id")+"';");
+							 sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_MODIFY_RESPOND));
+						 }
 		                else
 						{
 		                	if(PRINT_LOG)System.out.println("\t\t\t잘못된 요청");
@@ -2220,6 +2565,7 @@ public class DIMS_Server {
 			catch (IOException|SQLException e)
 			{
 				/* 사용자가 종료한거임 */
+				e.printStackTrace();
 				if(PRINT_LOG)System.out.println("\t\t[Connector-"+userName+"] 사용자 접속 종료, 스레드 종료");
 			}
 			finally

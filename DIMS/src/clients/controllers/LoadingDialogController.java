@@ -10,7 +10,7 @@ import javafx.scene.control.ProgressBar;
 
 public class LoadingDialogController implements Initializable {
 	
-	@FXML Label fNameView, fSizeView;
+	@FXML Label fNameView, fSizeView, messageArea;
 	@FXML ProgressBar download_progress;
 	int size;
 	
@@ -19,6 +19,11 @@ public class LoadingDialogController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void setMessage(String s)
+	{
+		messageArea.setText(s);
 	}
 	
 	public void setProperty(String name, int size)

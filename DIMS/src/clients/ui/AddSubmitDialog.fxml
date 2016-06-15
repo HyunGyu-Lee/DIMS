@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="435.0" prefWidth="400.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="clients.controllers.AddSubmitDialogController">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="35.0" prefWidth="256.0" text="새 제출서류를 등록합니다.">
+         <font>
+            <Font name="HYwulM" size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="71.0" prefHeight="35.0" prefWidth="278.0" text="1. 등록할 제출서류 이름 입력">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="subTitle" layoutX="14.0" layoutY="116.0" prefHeight="23.0" prefWidth="366.0" />
+      <Label layoutX="14.0" layoutY="193.0" prefHeight="35.0" prefWidth="278.0" text="2. 마감기한 설정">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="subDate" layoutX="14.0" layoutY="239.0" prefHeight="23.0" prefWidth="366.0" />
+      <Button layoutX="137.0" layoutY="364.0" mnemonicParsing="false" onAction="#onSubmit" prefHeight="35.0" prefWidth="126.0" text="등   록" />
+      <Label layoutX="14.0" layoutY="309.0" prefHeight="35.0" prefWidth="278.0" text="3. 등록">
+         <font>
+            <Font name="HYwulM" size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

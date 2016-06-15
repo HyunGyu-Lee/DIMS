@@ -12,201 +12,210 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="1050.0" prefWidth="1900.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" stylesheets="@StudentMain.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.StudentMain">
+<BorderPane prefHeight="1050.0" prefWidth="1900.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" stylesheets="@StudentMain.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.StudentMain">
    <left>
-      <VBox>
+      <HBox>
          <children>
-            <Accordion minHeight="-Infinity" prefHeight="421.0" prefWidth="241.0" BorderPane.alignment="CENTER">
-              <panes>
-                  <TitledPane alignment="CENTER" animated="false" text="  개 인 정 보 ">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
-                           <children>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="20.0" mnemonicParsing="false" onAction="#onUserInfoView" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="개인정보조회">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                     <font>
-                        <Font name="HYwulM" size="18.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/id-card.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </TitledPane>
-                <TitledPane alignment="CENTER" animated="false" prefHeight="42.0" prefWidth="241.0" text="  메   세   지 ">
-                     <font>
-                        <Font name="HYwulM" size="18.0" />
-                     </font>
-                     <content>
-                        <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
-                           <children>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="70.0" mnemonicParsing="false" onAction="#onRMessage" prefHeight="37.0" prefWidth="199.0" styleClass="Button_subItem" text="받은메세지함">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="119.0" mnemonicParsing="false" onAction="#onSMessage" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="보낸메세지함">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="21.0" mnemonicParsing="false" onAction="#onWriteMessage" prefHeight="37.0" prefWidth="201.0" styleClass="Button_subItem" text="메 세 지 작 성">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
-                     </content>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/letter.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                </TitledPane>
-                <TitledPane alignment="CENTER" animated="false" onMouseClicked="#onClickBoard" prefWidth="241.0" text="  게   시   판 ">
-                  <content>
-                        <ScrollPane prefViewportHeight="200.0" prefViewportWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
+            <VBox>
+               <children>
+                  <Accordion minHeight="-Infinity" prefHeight="421.0" prefWidth="241.0" BorderPane.alignment="CENTER">
+                    <panes>
+                        <TitledPane alignment="CENTER" animated="false" text="  개 인 정 보 ">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;">
+                                 <children>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="20.0" mnemonicParsing="false" onAction="#onUserInfoView" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="개인정보조회">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/id-card.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </TitledPane>
+                      <TitledPane alignment="CENTER" animated="false" prefHeight="42.0" prefWidth="241.0" text="  메   세   지 ">
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
                            <content>
-                          <AnchorPane fx:id="category_list" minHeight="-Infinity" minWidth="-Infinity" prefHeight="345.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" />
+                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="201.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;">
+                                 <children>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="70.0" mnemonicParsing="false" onAction="#onRMessage" prefHeight="37.0" prefWidth="199.0" styleClass="Button_subItem" text="받은메세지함">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="119.0" mnemonicParsing="false" onAction="#onSMessage" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="보낸메세지함">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="21.0" mnemonicParsing="false" onAction="#onWriteMessage" prefHeight="37.0" prefWidth="201.0" styleClass="Button_subItem" text="메 세 지 작 성">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
                            </content>
-                        </ScrollPane>
-                  </content>
-                     <font>
-                        <Font name="HYwulM" size="18.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/graphic.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                </TitledPane>
-                <TitledPane alignment="CENTER" animated="false" prefWidth="241.0" text="  외         박 ">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="131.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);">
-                           <children>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="23.0" mnemonicParsing="false" onAction="#onShowEnrollOvernight" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신      청">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                              <Button alignment="CENTER" layoutX="45.0" layoutY="78.0" mnemonicParsing="false" onAction="#onOvernightListRequest" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신청내역">
-                                 <font>
-                                    <Font name="HYwulM" size="17.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                     <font>
-                        <Font name="HYwulM" size="18.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/cabin.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                </TitledPane>
-                  <TitledPane alignment="CENTER" animated="false" maxWidth="1.7976931348623157E308" onMouseClicked="#onOpenMediaViewer" prefWidth="241.0" text="  시청각 교육 ">
-                    <content>
-                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="397.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" />
-                    </content>
-                     <font>
-                        <Font name="HYwulM" size="18.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/laptop.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </TitledPane>
-              </panes>
-            </Accordion>
-         </children>
-      </VBox>
-   </left>
-   <top>
-      <HBox prefHeight="91.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" BorderPane.alignment="CENTER">
-         <children>
-            <AnchorPane prefHeight="100.0" prefWidth="241.0">
-               <children>
-                  <Button id="Button_Logout" layoutX="64.0" layoutY="79.0" mnemonicParsing="false" onAction="#onLogOut" prefHeight="23.0" prefWidth="112.0" text="로그아웃">
-                     <font>
-                        <Font name="HYwulM" size="14.0" />
-                     </font></Button>
-                  <Label alignment="CENTER" layoutY="-1.0" prefHeight="27.0" prefWidth="240.0" text="환영합니다">
-                     <font>
-                        <Font name="HYwulM" size="21.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="userName" alignment="CENTER" layoutX="41.0" layoutY="31.0" prefHeight="39.0" prefWidth="159.0">
-                     <font>
-                        <Font name="HYwulM" size="36.0" />
-                     </font>
-                  </Label>
-                  <Label alignment="CENTER" layoutX="188.0" layoutY="50.0" prefHeight="20.0" prefWidth="24.0" text="님">
-                     <font>
-                        <Font name="HYwulM" size="16.0" />
-                     </font>
-                  </Label>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/letter.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                      </TitledPane>
+                      <TitledPane alignment="CENTER" animated="false" onMouseClicked="#onClickBoard" prefWidth="241.0" text="  게   시   판 ">
+                        <content>
+                              <ScrollPane prefViewportHeight="200.0" prefViewportWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;">
+                                 <content>
+                                <AnchorPane fx:id="category_list" minHeight="-Infinity" minWidth="-Infinity" prefHeight="345.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;" />
+                                 </content>
+                              </ScrollPane>
+                        </content>
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/graphic.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                      </TitledPane>
+                      <TitledPane alignment="CENTER" animated="false" prefWidth="241.0" text="  외         박 ">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="131.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;">
+                                 <children>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="23.0" mnemonicParsing="false" onAction="#onShowEnrollOvernight" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신      청">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                    <Button alignment="CENTER" layoutX="45.0" layoutY="78.0" mnemonicParsing="false" onAction="#onOvernightListRequest" prefHeight="37.0" prefWidth="239.0" styleClass="Button_subItem" text="신청내역">
+                                       <font>
+                                          <Font name="HYwulM" size="17.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/cabin.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                      </TitledPane>
+                        <TitledPane alignment="CENTER" animated="false" maxWidth="1.7976931348623157E308" onMouseClicked="#onOpenMediaViewer" prefWidth="241.0" text="  시청각 교육 ">
+                          <content>
+                            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="397.0" prefWidth="239.0" style="-fx-background-color: linear-gradient(to bottom, rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%);;" />
+                          </content>
+                           <font>
+                              <Font name="HYwulM" size="18.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/laptop.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </TitledPane>
+                    </panes>
+                  </Accordion>
                </children>
-            </AnchorPane>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <ImageView fx:id="image" fitHeight="113.0" fitWidth="702.0" onMouseClicked="#onMainLogoClicked" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-               <HBox.margin>
-                  <Insets left="400.0" right="385.0" />
-               </HBox.margin>
-               <image>
-                  <Image url="@../../resources/_ai%20(2).png" />
-               </image>
-            </ImageView>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label id="dateLabel" fx:id="dateText" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="2016-05-25 (수)" VBox.vgrow="ALWAYS">
-                     <font>
-                        <Font name="HYwulM" size="20.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Label>
-                  <Label id="timeLabel" fx:id="dateTime" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="오후 4:35:35" VBox.vgrow="ALWAYS">
-                     <font>
-                        <Font name="HYwulM" size="30.0" />
-                     </font>
-                  </Label>
-               </children>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-               <padding>
-                  <Insets bottom="20.0" left="5.0" right="5.0" top="20.0" />
-               </padding>
             </VBox>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
          </children>
       </HBox>
+   </left>
+   <top>
+      <VBox>
+         <children>
+            <HBox prefHeight="91.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" BorderPane.alignment="CENTER">
+               <children>
+                  <AnchorPane prefHeight="100.0" prefWidth="241.0">
+                     <children>
+                        <Button id="Button_Logout" layoutX="64.0" layoutY="79.0" mnemonicParsing="false" onAction="#onLogOut" prefHeight="23.0" prefWidth="112.0" text="로그아웃">
+                           <font>
+                              <Font name="HYwulM" size="14.0" />
+                           </font>
+                        </Button>
+                        <Label alignment="CENTER" layoutY="-1.0" prefHeight="27.0" prefWidth="240.0" text="환영합니다">
+                           <font>
+                              <Font name="HYwulM" size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="userName" alignment="CENTER" layoutX="41.0" layoutY="31.0" prefHeight="39.0" prefWidth="159.0">
+                           <font>
+                              <Font name="HYwulM" size="36.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="CENTER" layoutX="188.0" layoutY="50.0" prefHeight="20.0" prefWidth="24.0" text="님">
+                           <font>
+                              <Font name="HYwulM" size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <ImageView fx:id="image" fitHeight="113.0" fitWidth="702.0" onMouseClicked="#onMainLogoClicked" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="400.0" right="385.0" />
+                     </HBox.margin>
+                     <image>
+                        <Image url="@../../resources/_ai%20(2).png" />
+                     </image>
+                  </ImageView>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label id="dateLabel" fx:id="dateText" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="2016-05-25 (수)" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="HYwulM" size="20.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <Label id="timeLabel" fx:id="dateTime" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="오후 4:35:35" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="HYwulM" size="30.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <padding>
+                        <Insets bottom="20.0" left="5.0" right="5.0" top="20.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+         </children>
+      </VBox>
    </top>
    <center>
-      <ScrollPane prefViewportHeight="859.0" prefViewportWidth="1559.0">
+      <ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="2000.0" prefViewportHeight="859.0" prefViewportWidth="2000.0" vmax="3.0">
          <content>
-            <StackPane prefHeight="1000.0" prefWidth="1450.0" style="-fx-background-color: linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%);;" BorderPane.alignment="CENTER">
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1515.0" prefWidth="1446.0" BorderPane.alignment="CENTER">
                <children>
                   <ImageView fitHeight="560.0" fitWidth="844.0" opacity="0.12" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
@@ -1066,9 +1075,9 @@
                   </AnchorPane>
                   <AnchorPane fx:id="MAIN_VIEW" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="43.0" layoutY="113.0" prefHeight="55.0" prefWidth="154.0" text="  공지사항">
+                        <Label layoutX="43.0" layoutY="113.0" prefHeight="55.0" prefWidth="174.0" text="  공지사항">
                            <font>
-                              <Font name="HYwulM" size="20.0" />
+                              <Font name="HYwulM" size="27.0" />
                            </font>
                            <graphic>
                               <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
@@ -1110,9 +1119,9 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Label layoutX="736.0" layoutY="113.0" prefHeight="55.0" prefWidth="186.0" text="  받은 메세지">
+                        <Label layoutX="736.0" layoutY="113.0" prefHeight="55.0" prefWidth="208.0" text="  받은 메세지">
                            <font>
-                              <Font name="HYwulM" size="20.0" />
+                              <Font name="HYwulM" size="27.0" />
                            </font>
                            <graphic>
                               <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
@@ -1164,12 +1173,12 @@
                               <Font name="HYwulM" size="20.0" />
                            </font>
                         </Hyperlink>
-                        <ImageView fitHeight="327.0" fitWidth="615.0" layoutX="44.0" layoutY="583.0" pickOnBounds="true">
+                        <ImageView fitHeight="600.0" fitWidth="800.0" layoutX="41.0" layoutY="858.0" pickOnBounds="true">
                            <image>
                               <Image url="@../../resources/약도.png" />
                            </image>
                         </ImageView>
-                        <Label layoutX="43.0" layoutY="536.0" text="  찾아오시는길">
+                        <Label layoutX="43.0" layoutY="810.0" text="  찾아오시는길">
                            <font>
                               <Font name="HYwulM" size="27.0" />
                            </font>
@@ -1186,6 +1195,101 @@
                               <Font name="HYwulM" size="50.0" />
                            </font>
                         </Label>
+                        <Label layoutX="41.0" layoutY="525.0" prefHeight="55.0" prefWidth="178.0" text="  서류제출">
+                           <font>
+                              <Font name="HYwulM" size="27.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/archive.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Label>
+                        <VBox fx:id="submitInfoBox" layoutX="43.0" layoutY="599.0">
+                           <children>
+                              <HBox layoutX="43.0" layoutY="599.0">
+                                 <children>
+                                    <Label alignment="CENTER" layoutX="43.0" layoutY="599.0" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" text="제출명">
+                                       <font>
+                                          <Font name="HYwulM" size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="35.0" />
+                                    <Label fx:id="submitTitle" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="503.0" style="-fx-background-color: white;">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox>
+                                 <children>
+                                    <Label alignment="CENTER" layoutX="43.0" layoutY="599.0" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" text="마감시간">
+                                       <font>
+                                          <Font name="HYwulM" size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="35.0" />
+                                    <Label fx:id="submitDeadLine" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="503.0" style="-fx-background-color: white;">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox>
+                                 <children>
+                                    <Label alignment="CENTER" layoutX="43.0" layoutY="599.0" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" text="제출여부">
+                                       <font>
+                                          <Font name="HYwulM" size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="35.0" />
+                                    <Label fx:id="submitExist" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="503.0" style="-fx-background-color: white;">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <HBox>
+                                 <children>
+                                    <Label alignment="CENTER" layoutX="43.0" layoutY="599.0" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" text="제출시간">
+                                       <font>
+                                          <Font name="HYwulM" size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator orientation="VERTICAL" prefHeight="35.0" />
+                                    <Label fx:id="submitTime" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="503.0" style="-fx-background-color: white;">
+                                       <font>
+                                          <Font name="HYwulM" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <Label layoutX="929.0" layoutY="1500.0" />
+                        <HBox alignment="CENTER_RIGHT" layoutX="250.0" layoutY="532.0" prefHeight="40.0" prefWidth="402.0">
+                           <children>
+                              <Label fx:id="processArea" alignment="CENTER" layoutX="246.0" layoutY="525.0" prefHeight="40.0" prefWidth="290.0" style="-fx-background-color: white;" text="진행중인 서류제출 없음">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </Label>
+                              <Separator orientation="VERTICAL" prefHeight="40.0" />
+                              <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#onSubmitStudent" prefHeight="40.0" prefWidth="105.0" styleClass="confirm_btn" text="제출">
+                                 <font>
+                                    <Font name="HYwulM" size="20.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
                      </children>
                   </AnchorPane>
                </children>
@@ -1194,14 +1298,24 @@
       </ScrollPane>
    </center>
    <bottom>
-      <AnchorPane prefHeight="77.0" prefWidth="1900.0" BorderPane.alignment="CENTER">
+      <VBox>
          <children>
-            <Label layoutX="572.0" layoutY="14.0" prefHeight="23.0" prefWidth="965.0" text="[437-763] 경기도 의왕시 월암동 374-18  한국교통대학교 의왕캠퍼스 / TEL :  070-8855-1699 / FAX : 031-462-2944 / 야간전화 :  031-461-1681" textFill="#949191" />
-            <Label layoutX="572.0" layoutY="39.0" prefHeight="15.0" prefWidth="839.0" text="COPYRIGHT(C) KOREA NATIONAL UNIVERSITY OF TRANSFORTATION. ALL RIGHT RESERVED" textFill="#949191" />
+            <Separator prefWidth="200.0" />
+            <AnchorPane prefHeight="77.0" prefWidth="1900.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="572.0" layoutY="14.0" prefHeight="23.0" prefWidth="965.0" text="[437-763] 경기도 의왕시 월암동 374-18  한국교통대학교 의왕캠퍼스 / TEL :  070-8855-1699 / FAX : 031-462-2944 / 야간전화 :  031-461-1681" textFill="#949191" />
+                  <Label layoutX="572.0" layoutY="39.0" prefHeight="15.0" prefWidth="839.0" text="COPYRIGHT(C) KOREA NATIONAL UNIVERSITY OF TRANSFORTATION. ALL RIGHT RESERVED" textFill="#949191" />
+               </children>
+            </AnchorPane>
          </children>
-      </AnchorPane>
+      </VBox>
    </bottom>
    <right>
-      <VBox prefHeight="859.0" prefWidth="225.0" BorderPane.alignment="CENTER" />
+      <HBox>
+         <children>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <VBox prefHeight="859.0" prefWidth="225.0" BorderPane.alignment="CENTER" />
+         </children>
+      </HBox>
    </right>
 </BorderPane>

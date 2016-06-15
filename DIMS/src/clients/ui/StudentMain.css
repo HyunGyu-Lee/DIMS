@@ -14,7 +14,7 @@
 
 /* 로그아웃 버튼  */
 #Button_Logout {
-	-fx-background-color : white;		
+	-fx-background-color : linear-gradient(to bottom, rgba(236,242,246,1) 0%,rgba(190,200,204,1) 100%);		
 }
 
 #Button_Logout:hover {
@@ -38,7 +38,7 @@
 
 /* 아코디언 메인 아이템 */
 .titled-pane > .title {
-	-fx-background-color : linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+	-fx-background-color :  linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);
 }
 
 .titled-pane > .title:hover {
@@ -74,7 +74,7 @@
 }
 
 .confirm_btn {
-	-fx-background-color : linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(225,225,225,1) 51%,rgba(246,246,246,1) 100%);
+	-fx-background-color : linear-gradient(to bottom, rgba(236,242,246,1) 0%,rgba(190,200,204,1) 100%);
 }
 
 .confirm_btn:hover {

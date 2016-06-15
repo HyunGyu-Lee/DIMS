@@ -30,6 +30,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -37,6 +38,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -61,6 +64,7 @@ import clients.SceneManager;
 import clients.customcontrols.CalendarObject;
 import clients.customcontrols.CustomDialog;
 import clients.customcontrols.ScheduleObject;
+import files.FileReciever;
 import tools.NetworkProtocols;
 import tools.Statics;
 import tools.Toolbox;
@@ -75,7 +79,8 @@ public class AdministratorMainController implements Initializable {
 	
 	AdministratorMainController me;
 	SceneManager sManager;
-	
+	CustomDialog loadingDialog;
+	LoadingDialogController loadingController;
 	private ObjectInputStream fromServer;
 	private ObjectOutputStream toServer;
 	private ArrayList<String> rList;
@@ -88,6 +93,16 @@ public class AdministratorMainController implements Initializable {
 	@FXML StackPane stack;
 	@FXML Label idField;
 	@FXML Label dateText, dateTime;
+	
+	/* 제출서류 관리 */
+	@FXML AnchorPane SUBMIT_VIEW;
+	@FXML Label submitTitle, submitDeadLine, processArea;
+	@FXML ListView<HBox> submitListView;
+	private ObservableList<HBox> submitListViewData;
+	@FXML Button addSubmitBtn, disSubmitBtn, emailSubmitBtn, saveSubmitBtn;
+	@FXML AnchorPane processBox;
+	@FXML Label currentProcess, maxProcess;
+	@FXML ProgressIndicator indicator;
 	
 	/* 일정 관리 메뉴 */
 	@FXML BorderPane Schedule_Main;
@@ -191,10 +206,7 @@ public class AdministratorMainController implements Initializable {
 	 @FXML ListView<HBox> StudentMenagerListCheck; // 학생 상벌점 부여 목록 리스트;
 	 @FXML ListView<HBox> StudentManagerList;    // 학생 상벌점 관리 조회 목록
 	 
-	 
-	
-	 
-	@Override
+	 @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
 		/* 일정관리탭 초기화 */
@@ -323,6 +335,7 @@ public class AdministratorMainController implements Initializable {
 
 	public void shutdown()
 	{
+		SUBMIT_VIEW.setVisible(false);
 		BOARD.setVisible(false);
 		MESSAGE.setVisible(false);
 		MEDIA.setVisible(false);
@@ -367,7 +380,7 @@ public class AdministratorMainController implements Initializable {
 					try
 					{
 						JSONObject line = (JSONObject)fromServer.readObject();
-						
+						System.out.println(line.toJSONString());
 						String type = line.get("type").toString();
 						
 						if(type.equals(NetworkProtocols.EXIT_RESPOND))
@@ -838,6 +851,178 @@ public class AdministratorMainController implements Initializable {
 							});
 							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_MAIN_REQUEST));
 						}
+						else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showConfirmDialog("메세지가 삭제되었습니다.", sManager.getStage());
+							});
+							
+							if(line.get("resType").equals("R"))
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RECIEVE_LIST_REQUEST));
+							}
+							else
+							{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST));								
+							}
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_SUBMIN_MAIN_RESPOND))
+						{
+							// 없는 경우
+							if(line.get("submit-process").equals("no-data"))
+							{
+								Platform.runLater(()->{
+									createNoSubmitUI();
+								});
+							}
+							// 있는 경우
+							else
+							{
+								Platform.runLater(()->{
+									createExistedSubmitUI(line);
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_ENROLL_RESPOND))
+						{
+							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_REQUEST));
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_RESPOND))
+						{
+							if(line.get("result").equals("re-ask"))
+							{
+								Platform.runLater(()->{
+									int re = CustomDialog.showConfirmDialog("미제출서류가 있습니다. 마감하시겠습니까?", sManager.getStage());
+									if(re==CustomDialog.OK_OPTION)
+									{
+										sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_REQEUST));
+									}
+									else
+									{
+										CustomDialog.showMessageDialog("마감을 취소하셨습니다.", sManager.getStage());
+									}
+								});
+							}
+							else
+							{
+								Platform.runLater(()->{
+									sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_REQEUST));
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_RESPOND))
+						{
+							Platform.runLater(()->{
+								sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_REQUEST));
+								CustomDialog.showMessageDialog("마감처리 됐습니다.", sManager.getStage());
+							});							
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_LOCAL_SAVE_NOTIFICATION))
+						{
+							JSONObject notification = line;
+							
+							if(loadingDialog==null)
+							{
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										processBox.setVisible(false);
+										currentProcess.setText("0");
+										maxProcess.setText("0");
+										indicator.setProgress(0);
+										loadingDialog = new CustomDialog(Statics.LOADING_DIALOG_FXML, Statics.LOADING_DIALOG_TITLE, sManager.getStage(), Modality.NONE);
+										loadingController = (LoadingDialogController)loadingDialog.getController();
+										loadingController.setMessage("서버로부터 제출자료 내려받는중...");
+										loadingController.setProperty(notification.get("name").toString(), (int)notification.get("size"));
+										loadingDialog.show();
+
+										FileReciever re = new FileReciever(Statics.DIMS_FILE_SERVER_IP_ADDRESS, Statics.DIMS_FILE_SERVER_PORT_NUMBER);
+										re.setSavePathVariable(Statics.DEFAULT_DOWNLOAD_DIRECTORY+"submitted_data.zip");
+										re.setUI(loadingDialog, sManager.getStage());
+										
+										
+										
+										re.addDownloadFinishEventHandler(new Runnable() {
+											@Override
+											public void run() {
+												try {
+													Runtime.getRuntime().exec("explorer.exe /select,"+Statics.DEFAULT_DOWNLOAD_DIRECTORY+"submitted_data.zip");
+												} catch (IOException e) {
+													e.printStackTrace();
+												}
+												Platform.runLater(()->{
+													loadingDialog.close();
+												});
+											}
+										});
+										re.openConnection();
+									}
+								});
+							}
+							else
+							{
+								loadingController.setProperty(notification.get("name").toString(), (int)notification.get("size"));
+
+								Platform.runLater(new Runnable() {
+									
+									@Override
+									public void run() {
+										processBox.setVisible(false);
+										currentProcess.setText("0");
+										maxProcess.setText("0");
+										indicator.setProgress(0);
+										String savePathVariable = Statics.DEFAULT_DOWNLOAD_DIRECTORY+"submitted_data.zip";
+										FileReciever re = new FileReciever("localhost", 9090);
+										re.setSavePathVariable(savePathVariable);
+										re.setUI(loadingDialog, sManager.getStage());
+										
+										re.addDownloadFinishEventHandler(()->{
+											try {
+												Runtime.getRuntime().exec("explorer.exe /select,"+Statics.DEFAULT_DOWNLOAD_DIRECTORY+"submitted_data.zip");
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
+											Platform.runLater(()->{
+												loadingDialog.close();
+											});
+											}
+										);
+										re.openConnection();
+										loadingDialog.show();
+									}
+								});
+							}
+						}
+						else if(type.equals(NetworkProtocols.ADMIN_LOCAL_SAVE_RESPOND))
+						{
+							Platform.runLater(()->{
+								processBox.setVisible(true);
+								int cur = (int)line.get("progress-current");
+								int max = (int)line.get("progress-max");
+								indicator.setProgress((double)cur/(double)max);
+								currentProcess.setText(cur+"");
+								maxProcess.setText(max+"");
+							});
+						}
+						else if(type.equals(NetworkProtocols.EMAIL_SEND_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("메일 발송 성공", sManager.getStage());
+							});
+						}
+						else if(type.equals(NetworkProtocols.EMAIL_FILE_SIZE_LIMIT))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("첨부되는 파일 용량은 10MB보다 작아야합니다.", sManager.getStage());
+							});
+						}
+						else if(type.equals(NetworkProtocols.EMAIL_MAX_COUNT_EXCEED))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("첨부파일의 갯수는 10개이하여야 합니다.", sManager.getStage());
+							});
+						}
 					}
 					catch(ClassNotFoundException e)
 					{
@@ -1101,6 +1286,7 @@ public class AdministratorMainController implements Initializable {
 		sManager.doFullscreen(false);
 		sManager.changeListenController("ADMIN_MAIN");
 		sManager.changeScene(Statics.LOGIN_WINDOW_FXML);
+		//sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.LOGOUT_REQUEST));
 	}
 	
 	@FXML private void onAdd()
@@ -2410,12 +2596,15 @@ public class AdministratorMainController implements Initializable {
 			
 			JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
 			json.put("delete", array);
+			json.put("reqType", "R");
 			sendProtocol(json);
 		}
 		
+		@SuppressWarnings("unchecked")
 		@FXML public void onRallDelete()
 		{
 			JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
+			json.put("reqType", "R");
 			sendProtocol(json);
 			
 		}
@@ -2558,5 +2747,139 @@ public class AdministratorMainController implements Initializable {
 				board_tab_btn_box.getChildren().add(tab);
 			}
 		}
+
+		@FXML
+		private void onMenuSubmin()
+		{
+			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_REQUEST));
+		}
 		
+		@SuppressWarnings("unchecked")
+		@FXML
+		private void onAddSubmit()
+		{
+			CustomDialog dlg = new CustomDialog(Statics.ADD_SUBMIT_DIALOG_FXML, Statics.ADD_SUBMIT_DIALOG_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
+			AddSubmitDialogController con = (AddSubmitDialogController)dlg.getController();
+			con.setWindow(dlg);
+			dlg.showAndWait();
+			JSONObject intent = (JSONObject) dlg.getUserData();
+			if(intent!=null)
+			{
+				JSONObject request= Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_ENROLL_REQUEST);
+				request.put("data", intent);
+				sendProtocol(request);
+			}
+		}
+		
+		private void createNoSubmitUI()
+		{
+			if(submitListViewData==null)
+			{
+				submitListViewData = FXCollections.observableArrayList();
+			}
+			submitListViewData.clear();
+			submitTitle.setText("");
+			submitDeadLine.setText("");
+			processArea.setText("진행중인 제출이 없습니다.");
+			addSubmitBtn.setDisable(false);
+			disSubmitBtn.setDisable(true);
+			emailSubmitBtn.setDisable(true);
+			saveSubmitBtn.setDisable(true);
+			processBox.setVisible(false);
+			SUBMIT_VIEW.setVisible(true);
+		}
+		
+		private void createExistedSubmitUI(JSONObject dataBundle)
+		{
+			if(submitListViewData==null)
+			{
+				submitListViewData = FXCollections.observableArrayList();
+			}
+			submitListViewData.clear();
+			processBox.setVisible(false);
+			// 있는 경우 UI 꾸미깅
+			submitTitle.setText(dataBundle.get("제출분류명").toString());
+			submitDeadLine.setText(Toolbox.getSQLDateToFormat((java.sql.Date)dataBundle.get("마감시간"), "yyyy-MM-dd HH:mm"));
+			processArea.setText("진행중");
+			
+			for(Object o : (JSONArray)dataBundle.get("data-bundle"))
+			{
+				JSONObject target = (JSONObject)o;
+				HBox item = new HBox();
+				
+				Label no = new Label(target.get("서류번호")+"");
+				no.setPrefWidth(0);
+				no.setVisible(false);
+				
+				Label id = new Label(target.get("학번").toString());
+				id.setFont(Font.font("HYWulM", 20));
+				id.setAlignment(Pos.CENTER);
+				id.setPrefWidth(168);
+				
+				Label name = new Label(target.get("이름").toString());				
+				name.setFont(Font.font("HYWulM", 20));
+				name.setAlignment(Pos.CENTER);
+				name.setPrefWidth(168);
+				
+				Label isSubmit = new Label(target.get("제출여부").toString());
+				isSubmit.setFont(Font.font("HYWulM", 20));
+				isSubmit.setAlignment(Pos.CENTER);
+				isSubmit.setPrefWidth(168);
+				
+				Label submitTime = new Label(target.get("제출시간").toString().split("\\.")[0]);
+				submitTime.setFont(Font.font("HYWulM", 20));
+				submitTime.setAlignment(Pos.CENTER);				
+				submitTime.setPrefWidth(303);
+				
+				Separator s0 = new Separator(Orientation.VERTICAL);
+				Separator s1 = new Separator(Orientation.VERTICAL);
+				Separator s2 = new Separator(Orientation.VERTICAL);
+				
+				item.getChildren().addAll(id,s0,name,s1,isSubmit,s2,submitTime, no);
+				submitListViewData.add(item);
+			}
+			submitListView.setItems(submitListViewData);
+			addSubmitBtn.setDisable(true);
+			disSubmitBtn.setDisable(false);
+			emailSubmitBtn.setDisable(false);
+			saveSubmitBtn.setDisable(false);
+			shutdown();
+			SUBMIT_VIEW.setVisible(true);
+		}
+		
+		@FXML
+		private void onDisposeSubmit()
+		{
+			int re = CustomDialog.showConfirmDialog("[경 고] 데이터를 백업한 후 진행해주세요.", sManager.getStage());
+			if(re==CustomDialog.OK_OPTION)
+			{
+				sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_REQEUST));
+			}
+			else
+			{
+				CustomDialog.showMessageDialog("마감이 취소됐습니다.", sManager.getStage());
+			}
+		}
+		
+		@FXML
+		private void onEmailUpload()
+		{
+			CustomDialog dlg = new CustomDialog(Statics.EMAIL_SEND_FXML, Statics.EMAIL_SEND_TITLE, sManager.getStage(), Modality.WINDOW_MODAL);
+			EmailSendDialogController con = (EmailSendDialogController)dlg.getController();
+			con.setWindow(dlg);
+			dlg.showAndWait();
+			
+			if(dlg.getUserData()!=null)
+			{
+				sendProtocol((JSONObject)dlg.getUserData());
+			}
+		}
+		
+		@FXML
+		private void onSaveLocal()
+		{
+			//CustomDialog.showMessageDialog("압축이 끝난 후 다운로드가 시작됩니다.", sManager.getStage());
+			processBox.setVisible(true);
+			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_LOCAL_SAVE_REQUEST));
+		}
 }

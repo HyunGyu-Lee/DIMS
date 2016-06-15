@@ -61,10 +61,11 @@ public class CheckStudentDialog_Controller implements Initializable {
 	      hoomCellNum.setText(obj.get("자택전화번호").toString());
 	      address.setText(obj.get("주소").toString());
 	      
-	      byte[] data = (byte[])obj.get("이미지데이터");
-	      
-	      user_image.setImage(Toolbox.getWritableByArray(data));
-	      
+	      if(obj.get("이미지데이터").equals("no-image")==false)
+	      {
+	    	  byte[] data = (byte[])obj.get("이미지데이터");
+	    	  user_image.setImage(Toolbox.getWritableByArray(data));
+	      }
 	      classNameField.setEditable(false);
 	      classNumField.setEditable(false);
 	      Name.setEditable(false);

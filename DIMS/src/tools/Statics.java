@@ -25,7 +25,8 @@ public class Statics {
 		public static final String STUDENT_REAUTH_DIALOG_FXML = "../ui/ReAuthDialog.fxml";
 	    public static final String LOADING_DIALOG_FXML = "../ui/LoadingDialog.fxml";
 		public static final String CATEGORY_DELETE_DIALOG_FXML = "../ui/CategoryDeleteDialog.fxml";
-	    
+	    public static final String ADD_SUBMIT_DIALOG_FXML = "../ui/AddSubmitDialog.fxml";
+	    public static final String EMAIL_SEND_FXML = "../ui/EmailSendDialog.fxml";
 	    
 		/* UI 윈도우 창 이름 목록 */
 		public static final String LOGIN_WINDOW_TITLE = "DIMS - 로그인";					
@@ -46,6 +47,8 @@ public class Statics {
 		public static final String INPUT_DIALOG_TITLE = "DIMS - 입력하세요.";
 		
 		public static final String CATEGORY_DELETE_DIALOG_TITLE = "DIMS - 카테고리 삭제";
+		public static final String ADD_SUBMIT_DIALOG_TITLE = "DIMS - 새 제출서류 등록";
+	    public static final String EMAIL_SEND_TITLE = "DIMS - 이메일 보내기 ";
 		
 	/* Network 설정 */
 	public static final String DIMS_SERVER_IP_ADDRESS = "localhost";				// 서버 IP 주소
@@ -65,6 +68,8 @@ public class Statics {
 	public static final String DEFAULT_DATABASE_HOST_PASSWORD = "1234";		// 기본 데이터베이스 접속 비밀번호
 	
 	/* User Data */
-	public static final String DEFALUE_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";	// 프로필이미지
-	public static final String DEFALUE_MOVIE_DATA_DIRECTORY = "C:\\\\DIMS\\\\Movie\\\\";	// 영상
+	public static final String DEFAULT_USER_DATA_DIRECTORY = "C:\\\\DIMS\\\\Userdata\\\\";	// 프로필이미지
+	public static final String DEFAULT_MOVIE_DATA_DIRECTORY = "C:\\\\DIMS\\\\Movie\\\\";	// 영상
+	public static final String DEFAULT_SUBMITTED_DATA_DIRECTORY = "C:\\\\DIMS\\\\SubmittedData\\\\";	// 제출데이터
+	public static final String DEFAULT_DOWNLOAD_DIRECTORY = "C:\\DIMS Download\\";
 }

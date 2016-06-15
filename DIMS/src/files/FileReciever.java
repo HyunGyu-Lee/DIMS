@@ -24,6 +24,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
+import tools.Statics;
 import tools.Toolbox;
 
 public class FileReciever {
@@ -67,6 +68,12 @@ public class FileReciever {
 		this.maxT = maxT;
 		this.timeBar = timeBar;
 		this.loadingDialog = loadingDialog;
+		this.owner = owner;
+		con = (LoadingDialogController)loadingDialog.getController();
+	}
+	
+	public void setUI(CustomDialog loadingDialog, Stage owner)
+	{
 		this.owner = owner;
 		con = (LoadingDialogController)loadingDialog.getController();
 	}
@@ -179,11 +186,10 @@ public class FileReciever {
 							recieved++;
 						}
 						
-						
-						
-						savePath = "C:\\DIMS Download\\"+fileName;
+						savePath = Statics.DEFAULT_DOWNLOAD_DIRECTORY+"submitted_data.zip";
 						
 						savePathVariable = savePath;
+						
 						try
 						{
 							Files.write(new File(savePath).toPath(), recievedData);

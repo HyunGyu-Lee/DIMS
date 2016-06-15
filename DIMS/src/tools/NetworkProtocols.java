@@ -221,7 +221,7 @@ public class NetworkProtocols {
 		// 학생 - 동영상 전송 시작 알림
 		public static final String STUDENT_SEND_MEDIA_NOTIFICATION = "ssmn";
 		
-		public static final String LOGOUT_REQUESt = "logout";
+		public static final String LOGOUT_REQUEST = "logout";
 		
 		public static final String MESSAGE_REPLY_REQUEST = "mrreq";
 		public static final String MESSAGE_REPLY_RESPOND = "mrres";
@@ -233,4 +233,51 @@ public class NetworkProtocols {
 		// 학생 - 게시판 검색 요청
 		public static final String STUDENT_BOARD_SEARCH_REQUEST = "sbsreq";
 		public static final String STUDENT_BOARD_SEARCH_RESPOND = "sbsres";		
+		
+		// 관리자 - 제출서류 관리페이지 요청
+		public static final String ADMIN_SUBMIN_MAIN_REQUEST = "asmreq";
+		public static final String ADMIN_SUBMIN_MAIN_RESPOND = "asmres";
+		
+		// 관리자 - 제출서류 등록 요청
+		public static final String ADMIN_SUBMIT_ENROLL_REQUEST = "asereq";
+		public static final String ADMIN_SUBMIT_ENROLL_RESPOND = "aseres";
+		
+		// 관리자 - 제출서류 마감 전 확인 요청
+		public static final String ADMIN_SUBMIT_DISPOSE_ASK_REQEUST = "asdareq";
+		public static final String ADMIN_SUBMIT_DISPOSE_ASK_RESPOND = "asdares";
+
+		// 관리자 - 제출서류 마감 요청
+		public static final String ADMIN_SUBMIT_DISPOSE_REQEUST = "asdreq";
+		public static final String ADMIN_SUBMIT_DISPOSE_RESPOND = "asdres";
+		
+		// 학생 - 서류 제출 요청
+		public static final String STUDENT_SUBMIT_REQUEST = "ssreq";
+		public static final String STUDENT_SUBMIT_RESPOND = "ssres";		
+		
+		// 관리자 로컬저장 요청
+		public static final String ADMIN_LOCAL_SAVE_REQUEST = "alsreq";
+		public static final String ADMIN_LOCAL_SAVE_RESPOND = "alsres";	
+		
+		// 관리자 - 로컬저장준비 알림
+		public static final String ADMIN_LOCAL_SAVE_NOTIFICATION = "alsnoti";
+		
+		// 관리자 - 메일 발송 요청
+		public static final String EMAIL_SEND_REQUEST = "esreq";
+		public static final String EMAIL_SEND_RESPOND = "esres";
+		
+		// 메일 - 파일첨부갯수 초과
+		public static final String EMAIL_MAX_COUNT_EXCEED = "emcexc";
+		// 메일 - 파일첨부용량 초과
+		public static final String EMAIL_FILE_SIZE_LIMIT = "efsl";
+		
+		// 비밀번호찾기 - 질문목록
+		public static final String PASSWORD_FIND_QUESTION_LIST = "pfql";
+		
+		// 비밀번호찾기 - 본인인증
+		public static final String PASSWORD_FIND_IDENTIFY_REQUEST = "pfireq";
+		public static final String PASSWORD_FIND_IDENTIFY_RESPOND = "pfires";		
+		
+		// 비밀번호찾기 - 새 비밀번호 설정
+		public static final String PASSWORD_FIND_MODIFY_REQUEST = "pfmreq";
+		public static final String PASSWORD_FIND_MODIFY_RESPOND = "pfmres";		
 }

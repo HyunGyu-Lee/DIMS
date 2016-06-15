@@ -13,10 +13,121 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" stylesheets="@AdministratorMain.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.AdministratorMainController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1900.0" style="-fx-background-color: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%);" stylesheets="@AdministratorMain.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clients.controllers.AdministratorMainController">
    <center>
-      <StackPane fx:id="stack" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <StackPane fx:id="stack" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1020.0" prefWidth="1900.0" BorderPane.alignment="CENTER">
          <children>
+            <AnchorPane fx:id="SUBMIT_VIEW" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <VBox layoutX="1147.0" layoutY="87.0" prefHeight="116.0" prefWidth="468.0">
+                     <children>
+                        <Label fx:id="processArea1" alignment="CENTER" prefHeight="39.0" prefWidth="468.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);" text="진 행 상 태">
+                           <font>
+                              <Font name="HYwulM" size="29.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="processArea" alignment="CENTER" layoutX="1146.0" layoutY="107.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="39.0" prefWidth="468.0" style="-fx-background-color: white;" text="현재 진행중인 서류제출이 없습니다" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="HYwulM" size="29.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <Button fx:id="addSubmitBtn" layoutX="1280.0" layoutY="357.0" mnemonicParsing="false" onAction="#onAddSubmit" prefHeight="44.0" prefWidth="200.0" styleClass="confirm_btn" text="제출등록">
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                  </Button>
+                  <Label fx:id="submitTitle" layoutX="250.0" layoutY="87.0" prefHeight="39.0" prefWidth="812.0" text="기본 필요 양식 건강진단서 1부, 등본 1부, 증명사진 2매 제출" underline="true">
+                     <font>
+                        <Font name="HYwulM" size="25.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="103.0" layoutY="126.0" prefHeight="39.0" prefWidth="136.0" text="◎ 마감일">
+                     <font>
+                        <Font name="HYwulM" size="29.0" />
+                     </font>
+                  </Label>
+                  <HBox layoutX="103.0" layoutY="263.0" prefHeight="40.0" prefWidth="835.0" style="-fx-background-color: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);;">
+                     <children>
+                        <Label alignment="CENTER" layoutX="103.0" layoutY="263.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="170.0" text="학   번">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="170.0" text="이   름">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="29.0" prefWidth="170.0" text="제출여부">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="29.0" prefWidth="305.0" text="제출시간">
+                           <font>
+                              <Font name="HYwulM" size="28.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <ListView fx:id="submitListView" layoutX="103.0" layoutY="303.0" prefHeight="492.0" prefWidth="835.0" />
+                  <Button fx:id="emailSubmitBtn" layoutX="1278.0" layoutY="496.0" mnemonicParsing="false" onAction="#onEmailUpload" prefHeight="45.0" prefWidth="205.0" styleClass="confirm_btn" text="E-mail로 업로드">
+                     <font>
+                        <Font name="HYwulM" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="saveSubmitBtn" layoutX="1278.0" layoutY="567.0" mnemonicParsing="false" onAction="#onSaveLocal" prefHeight="45.0" prefWidth="205.0" styleClass="confirm_btn" text="로컬에 저장">
+                     <font>
+                        <Font name="HYwulM" size="20.0" />
+                     </font>
+                  </Button>
+                  <Label layoutX="103.0" layoutY="217.0" prefHeight="39.0" prefWidth="165.0" text="◎ 제출명단">
+                     <font>
+                        <Font name="HYwulM" size="29.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="submitDeadLine" layoutX="250.0" layoutY="126.0" prefHeight="39.0" prefWidth="300.0" text="2016-06-13 00:00" underline="true">
+                     <font>
+                        <Font name="HYwulM" size="25.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="103.0" layoutY="87.0" prefHeight="39.0" prefWidth="136.0" text="◎ 제   목">
+                     <font>
+                        <Font name="HYwulM" size="29.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="disSubmitBtn" layoutX="1280.0" layoutY="425.0" mnemonicParsing="false" onAction="#onDisposeSubmit" prefHeight="44.0" prefWidth="200.0" styleClass="confirm_btn" text="마감처리">
+                     <font>
+                        <Font name="HYwulM" size="24.0" />
+                     </font>
+                  </Button>
+                  <AnchorPane fx:id="processBox" layoutX="1291.0" layoutY="649.0">
+                     <children>
+                        <Label alignment="CENTER" layoutX="71.0" layoutY="121.0" prefHeight="15.0" prefWidth="39.0" text="/">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                        <ProgressIndicator fx:id="indicator" layoutX="44.0" prefHeight="110.0" prefWidth="94.0" progress="0.0" />
+                        <Label fx:id="maxProcess" alignment="CENTER" layoutX="118.0" layoutY="120.0" prefHeight="26.0" prefWidth="71.0" text="0">
+                           <font>
+                              <Font name="HYwulM" size="20.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="currentProcess" alignment="CENTER" layoutY="120.0" prefHeight="26.0" prefWidth="63.0" text="0">
+                           <font>
+                              <Font name="HYwulM" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
             <TabPane fx:id="MESSAGE" onMouseClicked="#onMSGTabClick" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" visible="false">
               <tabs>
                 <Tab styleClass="tap" text="받은메세지함">
@@ -608,7 +719,7 @@
               </tabs>
             </TabPane>
 
-            <BorderPane fx:id="BOARD" prefHeight="200.0" prefWidth="200.0">
+            <BorderPane fx:id="BOARD" prefHeight="200.0" prefWidth="200.0" visible="false">
                <top>
                   <HBox>
                      <children>
@@ -1136,6 +1247,7 @@
                         <Font name="HYwulM" size="22.0" />
                      </font>
                   </Button>
+                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMenuSubmin" styleClass="mainMenuBtn" text="제출서류관리" HBox.hgrow="ALWAYS" />
                   <Button alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMenu_4" styleClass="mainMenuBtn" text="외박 관리" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets />

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.sql.Date;
 import java.sql.Savepoint;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,6 +81,7 @@ public class StudentMain implements Initializable {
 	@FXML StackPane OVERNIGHT_MAIN_VIEW;
 	@FXML AnchorPane OVERNIGHT_INFO_VIEW;
 	@FXML AnchorPane OVERNIGHT_REQUEST_VIEW;
+	
 	
 	// 외박관리 - 내역
 	@FXML ListView<HBox> overnight_list_view;	// 외박 내역 리스트뷰
@@ -156,6 +158,9 @@ public class StudentMain implements Initializable {
 	@FXML Label mainString;
 	private ObservableList<HBox> rm_data, board_data;
 	Animation animation;
+	@FXML Label processArea, submitTitle, submitDeadLine, submitExist, submitTime;
+	@FXML VBox submitInfoBox;
+	@FXML Button submitBtn;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -247,12 +252,23 @@ public class StudentMain implements Initializable {
 							uID = line.get("uID").toString();
 							JSONArray data = (JSONArray)line.get("board-data");
 							JSONArray data2 = (JSONArray)line.get("message-data");
+							JSONObject data3 = (JSONObject)line.get("submit-data");
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
 									userName.setText(uName);
 									createMainBoard(data);
 									createMainMessage(data2);
+									if(data3==null)
+									{
+										createNoSubmitUI();
+									}
+									else
+									{
+										createExistSubmitUI(data3);										
+									}
+									shutdown();
+									MAIN_VIEW.setVisible(true);
 								}
 							});
 						}
@@ -548,6 +564,7 @@ public class StudentMain implements Initializable {
 									public void run() {
 										loadingDialog = new CustomDialog(Statics.LOADING_DIALOG_FXML, Statics.LOADING_DIALOG_TITLE, sManager.getStage(), Modality.NONE);
 										loadingController = (LoadingDialogController)loadingDialog.getController();
+										loadingController.setMessage("서버로부터 교육영상 내려받는중...");
 										loadingController.setProperty(notification.get("name").toString(), (int)notification.get("size"));
 										loadingDialog.show();
 										String savePathVariable = "";
@@ -759,6 +776,15 @@ public class StudentMain implements Initializable {
 								CustomDialog.showMessageDialog("검색결과가 없습니다.", sManager.getStage());
 							});
 						}
+						else if(type.equals(NetworkProtocols.STUDENT_SUBMIT_RESPOND))
+						{
+							Platform.runLater(()->{
+								CustomDialog.showMessageDialog("제출이 완료 됐습니다.", sManager.getStage());
+								JSONObject reqeust = Toolbox.createJSONProtocol(NetworkProtocols.WINDOW_INIT_PROPERTY);
+								reqeust.put("client-type", "student");
+								sendProtocol(reqeust);
+							});
+						}
 						else if(type.equals(NetworkProtocols.EXIT_RESPOND))
 						{
 							break;
@@ -773,6 +799,7 @@ public class StudentMain implements Initializable {
 			}
 			catch(IOException e)
 			{
+				e.printStackTrace();
 				Platform.runLater(()->{
 					CustomDialog.showConfirmDialog("서버와 연결이 끊어져 프로그램을 강제로 종료합니다.", sManager.getStage());
 					System.exit(-1);
@@ -1072,13 +1099,14 @@ public class StudentMain implements Initializable {
 		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ENROLL_OVERNIGHT_REQUEST, keys, values));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@FXML
 	public void onMainLogoClicked()
 	{
 		isMainFlow = true;
-		shutdown();
-		MAIN_VIEW.setVisible(true);
-		animation.play();
+		JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.WINDOW_INIT_PROPERTY);
+		request.put("client-type", "student");
+		sendProtocol(request);
 	}
 	
 	@FXML
@@ -1087,7 +1115,7 @@ public class StudentMain implements Initializable {
 		sManager.doFullscreen(false);
 		sManager.changeListenController("STUDENT_MAIN");
 		sManager.changeScene(Statics.LOGIN_WINDOW_FXML);
-		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.LOGOUT_REQUESt));
+		//sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.LOGOUT_REQUEST));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1829,6 +1857,95 @@ public class StudentMain implements Initializable {
 			rm_data.add(item);
 		}
 		summary_rm_view.setItems(rm_data);
+	}
+	
+	@FXML private void onSubmitStudent()
+	{
+		if(CustomDialog.showConfirmDialog("여러개의 경우 압축하여 제출하세요.", sManager.getStage())==CustomDialog.OK_OPTION)
+		{
+			FileChooser s = new FileChooser();
+			File selectedFile = s.showOpenDialog(sManager.getStage());
+			
+			if(selectedFile!=null)
+			{
+				String fileName = selectedFile.getName();
+				int dotCount = 0;
+				for(int i=0;i<fileName.length();i++)
+				{
+					if(fileName.charAt(i)=='.')
+					{
+						dotCount++;
+					}
+				}
+
+				fileName = fileName.split("\\.")[dotCount];
+				
+				byte[] sendable = null;
+				try
+				{
+					sendable = Files.readAllBytes(selectedFile.toPath());
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+				System.out.println("파일명               : "+fileName);
+				System.out.println("보낼 데이터 길이 : "+sendable.length);
+				// 여기서 JSON만들어서 데이터 담아서 요청
+				String[] keys = {"확장자","데이터"};
+				Object[] values = {fileName, sendable};
+				sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SUBMIT_REQUEST, keys, values));
+			}
+			
+		}
+	}
+	
+	private void createNoSubmitUI()
+	{
+		processArea.setText("진행중인 서류제출 없음");
+		submitTitle.setText("");
+		submitDeadLine.setText("");
+		submitExist.setText("");
+		submitTime.setText("");
+		submitBtn.setDisable(true);
+		submitInfoBox.setDisable(true);
+	}
+	
+	private void createExistSubmitUI(JSONObject data)
+	{
+		processArea.setText("진행중");
+		submitBtn.setDisable(false);
+		submitInfoBox.setDisable(false);
+		
+		submitTitle.setText(data.get("제출분류명").toString());
+		submitDeadLine.setText(Toolbox.getSQLDateToFormat((java.sql.Date)data.get("마감시간"), "yyyy-MM-dd")+"까지");
+		if(data.get("제출여부").equals("미제출"))
+		{
+			submitExist.setText(data.get("제출여부").toString());
+			submitTime.setText(data.get("제출시각").toString());
+		}
+		else
+		{
+			submitExist.setText(data.get("제출여부").toString());
+			submitExist.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					byte[] file = (byte[])data.get("데이터");
+					try
+					{
+						String saveFile = Statics.DEFAULT_DOWNLOAD_DIRECTORY+System.currentTimeMillis()+"."+data.get("확장자");
+						Files.write(new File(saveFile).toPath(), file);
+						Runtime.getRuntime().exec("explorer.exe /select,"+saveFile);
+						System.out.println(saveFile);
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+			submitTime.setText(data.get("제출시각").toString().split("\\.")[0]);		
+		}
 	}
 	
 	public void sendProtocol(JSONObject protocol)

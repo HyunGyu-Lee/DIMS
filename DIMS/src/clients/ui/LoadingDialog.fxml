@@ -14,7 +14,7 @@
             <Image url="@../../resources/rolling.gif" />
          </image>
       </ImageView>
-      <Label layoutX="66.0" layoutY="153.0" prefHeight="41.0" prefWidth="308.0" text="서버로부터 교육영상을 내려받는중..." textFill="WHITE">
+      <Label fx:id="messageArea" layoutX="66.0" layoutY="153.0" prefHeight="41.0" prefWidth="308.0" text="서버로부터 교육영상을 내려받는중..." textFill="WHITE">
          <font>
             <Font name="HYwulM" size="18.0" />
          </font>
