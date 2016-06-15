@@ -620,78 +620,99 @@ public class DIMS_Server {
 						sendProtocol(res);
 					}
 					else if(type.equals(NetworkProtocols.MESSAGE_RECIEVE_LIST_REQUEST))
-					{
-						String qry = "select M.메세지번호, S.이름, M.메세지제목, M.발신시각 from 메세지 M, 사용자 S where M.수신자='"+userIdentify+"' and M.발신자=S.학번";
-						
-						ResultSet rs = handler.excuteQuery(qry);
-						JSONArray mArr = new JSONArray();
-						
-						String[] keys = {"No","발신자","메세지제목","발신시각"};
-						
-						while(rs.next())
-						{
-							Object[] values = {
-									rs.getString("메세지번호"),
-									rs.getString("이름"),
-									rs.getString("메세지제목"),
-									rs.getDate("발신시각")
-							};
-							mArr.add(Toolbox.createJSONProtocol(keys, values));
-						}
-						
-						JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RECIEVE_LIST_RESPOND);
-						res.put("message_list", mArr);
-						sendProtocol(res);
-					}
+		               {
+		                 try
+		                 {
+		                     String qry = "select M.메세지번호, S.이름, S.학번 , M.메세지제목, M.메세지본문 ,M.발신시각 from 메세지 M, 사용자 S where M.수신자='"+userIdentify+"' and M.발신자=S.학번 and M.구분='R' order by 발신시각 asc" ;
+		                     
+		                     ResultSet rs = handler.excuteQuery(qry);
+		                     JSONArray mArr = new JSONArray();
+		                     
+		                     String[] keys = {"No","발신자","학번","메세지제목","메세지본문","발신시각"};
+		                        
+		                     while(rs.next())
+		                     {
+		                        Object[] values = {
+		                              rs.getString("메세지번호"),
+		                              rs.getString("이름"),
+		                              rs.getString("학번"),
+		                              rs.getString("메세지제목"),
+		                              rs.getString("메세지본문"),
+		                              rs.getDate("발신시각")
+		                            
+		                        };
+		                        mArr.add(Toolbox.createJSONProtocol(keys, values));
+		                      }
+		                     
+		                     JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RECIEVE_LIST_RESPOND);
+		                     res.put("message_list", mArr);
+		                     sendProtocol(res);
+		                 }
+		                 catch(Exception e)
+		                 {
+		                    e.printStackTrace();
+		                 }
+		            }
 					else if(type.equals(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST))
 		               {
-		                  String qry = "select M.메세지번호, S.이름, S.학번 , M.메세지제목, M.메세지본문 ,M.발신시각 from 메세지 M, 사용자 S where M.수신자='"+userIdentify+"' and M.발신자=S.학번";
+		                 try
+		                 {
+		                     String qry = "select M.메세지번호, S.이름, S.학번 , M.메세지제목, M.메세지본문 ,M.발신시각 from 메세지 M, 사용자 S where M.수신자='"+userIdentify+"' and M.발신자=S.학번 and M.구분='R' order by 발신시각 asc" ;
+		                     
+		                     ResultSet rs = handler.excuteQuery(qry);
+		                     JSONArray mArr = new JSONArray();
+		                     
+		                     String[] keys = {"No","발신자","학번","메세지제목","메세지본문","발신시각"};
+		                        
+		                     while(rs.next())
+		                     {
+		                        Object[] values = {
+		                              rs.getString("메세지번호"),
+		                              rs.getString("이름"),
+		                              rs.getString("학번"),
+		                              rs.getString("메세지제목"),
+		                              rs.getString("메세지본문"),
+		                              rs.getDate("발신시각")
+		                            
+		                        };
+		                        mArr.add(Toolbox.createJSONProtocol(keys, values));
+		                      }
+		                     
+		                     JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_RESPOND);
+		                     res.put("message_list", mArr);
+		                     sendProtocol(res);
+		                 }
+		                 catch(Exception e)
+		                 {
+		                    e.printStackTrace();
+		                 }
+		                  }
+		               else if(type.equals(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST))
+		               {
+		                  String qry = "select M.메세지번호, S.이름, S.학번 , M.메세지제목, M.메세지본문 ,M.발신시각  from 메세지 M, 사용자 S where M.발신자='"+userIdentify+"' and M.수신자=S.학번 and M.구분='S' order by 발신시각 asc";
 		                  
 		                  ResultSet rs = handler.excuteQuery(qry);
 		                  JSONArray mArr = new JSONArray();
+		                  String[] keys = {"No","수신자","학번","메세지제목","메세지본문","발신시각"};
 		                  
-		                  String[] keys = {"No","발신자","학번","메세지제목","메세지본문","발신시각"};
-		                     
 		                  while(rs.next())
-		                  {
-		                     Object[] values = {
-		                           rs.getString("메세지번호"),
-		                           rs.getString("이름"),
-		                           rs.getString("학번"),
-		                           rs.getString("메세지제목"),
-		                           rs.getString("메세지본문"),
-		                           rs.getDate("발신시각")
-		                     };
-		                     mArr.add(Toolbox.createJSONProtocol(keys, values));
-		                  }
-		                  
-		                  JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_RESPOND);
+		                      {
+		                           Object[] values = {
+		                                 rs.getString("메세지번호"),
+		                                 rs.getString("이름"),
+		                                 rs.getString("학번"),
+		                                 rs.getString("메세지제목"),
+		                                 rs.getString("메세지본문"),
+		                                 rs.getDate("발신시각")
+		       
+		                 
+		                            };
+		                             mArr.add(Toolbox.createJSONProtocol(keys, values));
+		                      }
+		                  JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_RESPOND);
 		                  res.put("message_list", mArr);
 		                  sendProtocol(res);
-		               }
-					else if(type.equals(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST))
-					{
-						String qry = "select M.메세지번호, S.이름, M.메세지제목, M.발신시각 from 메세지 M, 사용자 S where M.발신자='"+userIdentify+"' and M.수신자=S.학번";
-						
-						ResultSet rs = handler.excuteQuery(qry);
-						JSONArray mArr = new JSONArray();
-						String[] keys = {"No","발신자","메세지제목","발신시각"};
-						
-						while(rs.next())
-						{
-							Object[] values = {
-									rs.getString("메세지번호"),
-									rs.getString("이름"),
-									rs.getString("메세지제목"),
-									rs.getDate("발신시각")
-							};
-							mArr.add(Toolbox.createJSONProtocol(keys, values));
-						}
-						
-						JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_RESPOND);
-						res.put("message_list", mArr);
-						sendProtocol(res);
-					}
+		            }
 					else if(type.equals(NetworkProtocols.VIDIO_REQUEST))
 					{
 						byte[] arr = Files.readAllBytes(Paths.get("c:\\movie\\독.mp4"));
@@ -1067,56 +1088,60 @@ public class DIMS_Server {
 	                        res.put("user_list", mArr);
 	                        sendProtocol(res);
 	                }
-					 else if(type.equals(NetworkProtocols.USER_CONTENT_REQUEST))
-	                   {
-	                      String num = request.get("학번").toString();
-	                      
-	                      String qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름, S.프로필사진URL  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 and S.학번 = '"+num+"'";
-	                      ResultSet rs = handler.excuteQuery(qry);
-	                   
-	                     JSONObject mArr = new JSONObject();
-	                           
-	                     String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","소속학과","이미지데이터"};
-	                     while(rs.next())
-	                     {
-	                     	if(rs.getString("프로필사진URL")!=null)
-	                     	{
-	                     		Object[] values = {
-	    	                            rs.getString("학번"),
-	    	                            rs.getString("이름"),
-	    	                            rs.getString("주소"),
-	    	                            rs.getString("휴대폰번호"),
-	    	                            rs.getString("자택전화번호"),
-	    	                            rs.getString("주민등록번호"),
-	    	                            rs.getString("성별"),
-	    	                            rs.getString("방번호"),
-	    	                            rs.getInt("학년"),
-	    	                            rs.getString("학과이름"),
-	    	                            Files.readAllBytes(new File(rs.getString("프로필사진URL")).toPath())
-	    	                            };
-	                            mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
-	                     	}
-	                     	else
-	                     	{
-	                     		Object[] values = {
-	    	                            rs.getString("학번"),
-	    	                            rs.getString("이름"),
-	    	                            rs.getString("주소"),
-	    	                            rs.getString("휴대폰번호"),
-	    	                            rs.getString("자택전화번호"),
-	    	                            rs.getString("주민등록번호"),
-	    	                            rs.getString("성별"),
-	    	                            rs.getString("방번호"),
-	    	                            rs.getInt("학년"),
-	    	                            rs.getString("학과이름"),
-	    	                            "no-image"
-	    	                            };
-	                            mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
-	                     	}
+		               else if(type.equals(NetworkProtocols.USER_CONTENT_REQUEST))
+	                    {
+	                       String num = request.get("학번").toString();
+	                       
+	                       System.out.println(num);
+	                       String qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름, S.프로필사진URL  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 and S.학번 = '"+num+"'";
+	                       ResultSet rs = handler.excuteQuery(qry);
+	                     
+	                       JSONObject mArr = new JSONObject();
+	                             
+	                       String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","소속학과","이미지데이터"};
+	                       while(rs.next())
+	                       {
+	                          if(rs.getString("프로필사진URL")!=null)
+	                          {
+	                              Object[] values = {
+	                                     rs.getString("학번"),
+	                                     rs.getString("이름"),
+	                                     rs.getString("주소"),
+	                                     rs.getString("휴대폰번호"),
+	                                     rs.getString("자택전화번호"),
+	                                     rs.getString("주민등록번호"),
+	                                     rs.getString("성별"),
+	                                     rs.getString("방번호"),
+	                                     rs.getInt("학년"),
+	                                     rs.getString("학과이름"),
+	                                     Files.readAllBytes(new File(rs.getString("프로필사진URL")).toPath())
+	                                     };
+	                              mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
+	                          }
+	                          else
+	                          {
+	                              Object[] values = {
+	                                     rs.getString("학번"),
+	                                     rs.getString("이름"),
+	                                     rs.getString("주소"),
+	                                     rs.getString("휴대폰번호"),
+	                                     rs.getString("자택전화번호"),
+	                                     rs.getString("주민등록번호"),
+	                                     rs.getString("성별"),
+	                                     rs.getString("방번호"),
+	                                     rs.getInt("학년"),
+	                                     rs.getString("학과이름"),
+	                                     "no-image"
+	                                     };
+	                              mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
+	                          }
 
-	                        }
-	                       sendProtocol(mArr);   
-	                   }
+	                       }
+
+	                       sendProtocol(mArr);  
+	               
+	                    }
+					
 	                else if(type.equals(NetworkProtocols.WEABAK_INFO_TAP_REQUEST))
 	                {
 	                   
@@ -1676,53 +1701,56 @@ public class DIMS_Server {
 						 }
 					 }
 					 else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST))
-		                {
-						   JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_RESPOND);
-		                   
-						   if(request.get("reqType").equals("R"))
-						   {
-							   json.put("resType", "R");
-						   }
-						   else
-						   {
-							   json.put("resType", "S");							   
-						   }
-						   
-						   JSONArray jarray = (JSONArray) request.get("delete");
-		                   
-		                   for(Object a : jarray)
-		                   {
-		                      JSONObject aa = (JSONObject)a;
-		                      
-		                      String No = aa.get("No").toString();
-		                      
-		                      String qry = "delete from 메세지 where 메세지번호 = '"+No+"'";
-		                      
-		                      handler.excuteUpdate(qry);
-		                   }
-		                   
-		                   sendProtocol(json);
-		                   
-		                }
-		                else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST))
-		                {
-		                	JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND);
-		                	String qry = "";
-		                	if(request.get("reqType").equals("R"))
-		                	{
-		                		qry = "delete from 메세지 where 수신자 = '"+userIdentify+"' and 구분='R';";
-		                		json.put("resType", "R");
-		                	}
-		                	else
-		                	{
-		                		qry = "delete from 메세지 where 발신자 = '"+userIdentify+"' and 구분='S';";		                		
-		                		json.put("resType", "S");
-		                	}
-		                   handler.excuteUpdate(qry);
-		                   
-		                   
-		                   sendProtocol(json);
-		                }
+                     {
+                    JSONObject json ;
+                        
+                    if(request.get("reqType").equals("R"))
+                    {
+                       json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_RESPOND);
+                       json.put("resType", "R");
+                    }
+                    else
+                    {
+                       json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_SELECT_DELETE_RESPOND);
+                       json.put("resType", "S");                        
+                    }
+                    
+                    JSONArray jarray = (JSONArray)request.get("delete");
+                        
+                        for(Object a : jarray)
+                        {
+                           JSONObject aa = (JSONObject)a;
+                           
+                           String typemessage = aa.get("No").toString();
+                           
+                           String qry = "delete from 메세지 where 메세지번호 = '"+typemessage+"'";
+                           
+                           handler.excuteUpdate(qry);
+                        }
+                        
+                        sendProtocol(json);
+                        
+                     }
+					 else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST))
+                     {
+                        JSONObject json ;
+                        String qry = "";
+                        if(request.get("reqType").equals("R"))
+                        {
+                           json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND);
+                           qry = "delete from 메세지 where 수신자 = '"+userIdentify+"' and 구분='R';";
+                           json.put("resType", "R");
+                        }
+                        else
+                        {
+                           json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_ALL_DELETE_RESPOND);
+                           qry = "delete from 메세지 where 발신자 = '"+userIdentify+"' and 구분='S';";                            
+                           json.put("resType", "S");
+                        }
+                        handler.excuteUpdate(qry);
+                        
+                        sendProtocol(json);
+                     }
 		                else if(type.equals(NetworkProtocols.LOGOUT_REQUEST))
 		                {
 		                	System.out.println("로그아웃");
@@ -1748,6 +1776,75 @@ public class DIMS_Server {
 		                		e.printStackTrace();
 		                	}
 		                }
+		                else if(type.equals(NetworkProtocols.STUDENT_SORT_OVERLAP_REQUEST))
+		                  {
+		                      int classnum = (int)request.get("class")-1;
+		                      int levelnum = (int)request.get("level")-1;
+		                      String qry ="";
+		                      if(classnum == 0 && levelnum == 0)
+		                      {
+		                         qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 order by S.방번호";
+		                      }
+		                      else if(classnum == 0)
+		                      {
+		                         qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 and S.층="+"'"+levelnum+"'order by S.방번호";
+		                      }
+		                      else if(levelnum == 0)
+		                      {
+		                         qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 and S.소속학과="+"'"+classnum+"'order by S.방번호";
+		                      }
+		                      else
+		                      {
+		                         qry = "select S.학번, A.이름 ,S.주소,S.휴대폰번호, S.자택전화번호,S.주민등록번호 ,S.성별 ,S.방번호 ,S.학년 ,M.학과이름  from 학생 S, 사용자 A, 학과_목록 M  where S.소속학과 = M.학과번호 and S.학번 = A.학번 and S.층="+"'"+levelnum+"' and"+" S.소속학과 = '"+classnum+"' order by S.방번호";
+		                      }
+		                      ResultSet rs = handler.excuteQuery(qry);
+		                      
+		                      JSONArray mArr = new JSONArray();
+		                      
+		                          String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","소속학과"};
+		                          while(rs.next())
+		                          {
+		                             Object[] values = {
+		                                  rs.getString("학번"),
+		                                  rs.getString("이름"),
+		                                  rs.getString("주소"),
+		                                  rs.getString("휴대폰번호"),
+		                                  rs.getString("자택전화번호"),
+		                                  rs.getString("주민등록번호"),
+		                                  rs.getString("성별"),
+		                                  rs.getString("방번호"),
+		                                  rs.getInt("학년"),
+		                                  rs.getString("학과이름")
+		                                  };
+		                                 mArr.add(Toolbox.createJSONProtocol(keys, values));
+		                              }
+		                         
+		                              // 새로운 제이슨에 프로토콜 넣음
+		                              JSONObject res = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SORT_OVERLAP_RESPOND);
+		                              // 제이슨 어레이 넣음 
+		                              res.put("user_list", mArr);
+		                              sendProtocol(res);   
+		                   }
+		                else if(type.equals(NetworkProtocols.MEMBER_JOIN_REQUEST))
+		                   {
+		                      System.out.println("Member Join Info : "+request.toJSONString());
+		                      
+		                      String qry1 = "insert into 사용자 values('"+request.get("학번").toString()+"','"+request.get("이름").toString()+"','"
+			                            +request.get("비밀번호").toString()+"', '학생');";
+			                      
+			                  handler.excuteUpdate(qry1);
+		                      
+		                      String qry = "insert into 학생 values('"+request.get("학번").toString()+"',"+(int)request.get("질문")+",'"+request.get("답변").toString()+"','"+request.get("주소").toString()+"','"
+		                            +request.get("핸드폰번호").toString()+"','"+request.get("자택전화번호").toString()+"','"+request.get("주민등록번호").toString()+"','"+request.get("성별").toString()+"','"
+		                            +request.get("방번호").toString()+"',NULL,"+(int)request.get("학년")+","+(int)request.get("소속학과")+",'"+request.get("방번호").toString()+"');";
+		                      
+		                      System.out.println(qry);
+		                      handler.excuteUpdate(qry);
+		                      
+		                      JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MEMBER_JOIN_RESPOND);
+		                      
+		                      sendProtocol(json);
+		                   }
 		                else if(type.equals(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST))
 						 {
 							 String check = request.get("comboCheck").toString();

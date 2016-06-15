@@ -76,6 +76,10 @@ public class AdministratorMainController implements Initializable {
 	@FXML Button answer_btn;
 	
 	boolean isDraging = false;
+	boolean classcheck = false;
+	boolean levelcheck = false;
+	int check_class;
+	int check_level;
 	
 	AdministratorMainController me;
 	SceneManager sManager;
@@ -89,10 +93,13 @@ public class AdministratorMainController implements Initializable {
 	
 	private JSONArray checkjarray;
 	
+	@FXML TextField MsgSenderField;
+	
 	/* 화면 최상단 */
 	@FXML StackPane stack;
 	@FXML Label idField;
 	@FXML Label dateText, dateTime;
+	@FXML BorderPane MAINPANE;
 	
 	/* 제출서류 관리 */
 	@FXML AnchorPane SUBMIT_VIEW;
@@ -323,7 +330,7 @@ public class AdministratorMainController implements Initializable {
 		checkjarray = new JSONArray();
 		
 		shutdown();
-
+		MAINPANE.setVisible(true);
 	}
 	
 	public void INIT_CONTROLLER(SceneManager manager, ObjectInputStream fromServer, ObjectOutputStream toServer)
@@ -342,6 +349,7 @@ public class AdministratorMainController implements Initializable {
 		STUDNETMANAGER.setVisible(false);
 		USERINFO.setVisible(false);
 		Schedule_Main.setVisible(false);
+		MAINPANE.setVisible(false);
 	}
 	
 	public void startListener()
@@ -459,16 +467,24 @@ public class AdministratorMainController implements Initializable {
 								@Override
 								public void run() {
 									CustomDialog.showMessageDialog("메세지 발송 성공!", sManager.getStage());
+									JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST);
+			                        sendProtocol(json);
+			                           
+			                        display_reciever.setText("");
+			                        msgTitle.setText("");
+			                        msgContent.setText("");
 								}
 							});
 						}
 						else if(type.equals(NetworkProtocols.MESSAGE_RECIEVE_LIST_RESPOND))
 						{
 							Platform.runLater(new Runnable() {
-								
 								@Override
 								public void run() {
-									createRecivedmessage((JSONArray)line.get("message_list"));
+									jarray = (JSONArray)line.get("message_list");
+									createRecivedmessage(jarray);
+									shutdown();
+									MESSAGE.setVisible(true);
 								}
 							});
 						}
@@ -630,17 +646,28 @@ public class AdministratorMainController implements Initializable {
 
 						}
 						else if(type.equals(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_RESPOND))
-						{
+		                {
+		                     Platform.runLater(new Runnable() {
+		                     
+		                     @Override
+		                     public void run() {
+		                        jarray = (JSONArray)line.get("message_list");
+		                        createRecivedmessage(jarray);
+		                        shutdown();
+		                        MESSAGE.setVisible(true);
+		                     }
+		                     });
+		                }
+						else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_RESPOND))
+		                {
 							Platform.runLater(new Runnable() {
-							
-							@Override
-							public void run() {
-								createRecivedmessage((JSONArray)line.get("message_list"));
-								shutdown();
-								MESSAGE.setVisible(true);
-							}
-							});
-						}
+		                        public void run() {
+		                           CustomDialog.showMessageDialog("선택한 메세지들이 삭제되었습니다.", sManager.getStage());
+		                           JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST);
+		                           sendProtocol(json);
+		                        }
+		                     });
+		                 }
 						else if(type.equals(NetworkProtocols.MONTHLY_SCHEDULE_VIEW_RESPOND))
 						{
 							SCHEDULE_DISPLAY_DATA = (JSONArray)line.get("todays");
@@ -1023,6 +1050,48 @@ public class AdministratorMainController implements Initializable {
 								CustomDialog.showMessageDialog("첨부파일의 갯수는 10개이하여야 합니다.", sManager.getStage());
 							});
 						}
+						else if(type.equals(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND))
+		                  {
+		                     Platform.runLater(new Runnable() {
+		                        public void run() {
+		                           CustomDialog.showMessageDialog("전체삭제되었습니다.", sManager.getStage());
+		                           JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST);
+		                           sendProtocol(json);
+		                        }
+		                     });
+		                  }
+		                  else if(type.equals(NetworkProtocols.MESSAGE_SEND_SELECT_DELETE_RESPOND))
+		                  {
+		                     Platform.runLater(new Runnable() {
+		                        public void run() {
+		                           CustomDialog.showMessageDialog("선택한 메세지들이 삭제되었습니다.", sManager.getStage());
+		                           JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST);
+		                           sendProtocol(json);
+		                           
+		                        
+		                        }
+		                     });
+		                  }
+		                  else if(type.equals(NetworkProtocols.MESSAGE_SEND_ALL_DELETE_RESPOND))
+		                  {
+		                     Platform.runLater(new Runnable() {
+		                        public void run() {
+		                           CustomDialog.showMessageDialog("전체삭제되었습니다.", sManager.getStage());
+		                           JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST);
+		                           sendProtocol(json);
+		                        }
+		                     });
+		                  }
+		                  else if(type.equals(NetworkProtocols.STUDENT_SORT_OVERLAP_RESPOND))
+		                  {
+		                     Platform.runLater(new Runnable() {
+		                        public void run() {
+		                           jarray = (JSONArray)line.get("user_list");
+		                           createStudentSearch(jarray);
+		                           StudentList.refresh();
+		                        }
+		                     });
+		                  }
 					}
 					catch(ClassNotFoundException e)
 					{
@@ -1229,7 +1298,7 @@ public class AdministratorMainController implements Initializable {
 	@FXML private void onMenu_2()
 	{
 		/* 2번 메뉴 클릭시 */
-		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
+		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RECIEVE_LIST_REQUEST));
 	}
 	
 	@FXML private void onMenu_3()
@@ -1300,23 +1369,23 @@ public class AdministratorMainController implements Initializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@FXML private void onSendMsg()
-    {
-		long curTime = System.currentTimeMillis();
-		
-		String data = display_reciever.getText();
-		ArrayList<String> sList = Toolbox.arrToList(data.split("\t"));
-      
-		JSONObject msg = new JSONObject();
-		msg.put("type", NetworkProtocols.MESSAGE_SEND_REQUEST);
-		msg.put("sender", uID);
-		msg.put("reciever", sList);
-		msg.put("msgTitle", msgTitle.getText());
-		msg.put("msgContent", msgContent.getText());
-		msg.put("sendTime", curTime);
- 
-		sendProtocol(msg);
-	}
+	   @FXML private void onSendMsg()
+	    {
+	      long curTime = System.currentTimeMillis();
+	      
+	      String data = display_reciever.getText();
+	      ArrayList<String> sList = Toolbox.arrToList(data.split("\t"));
+	      
+	      JSONObject msg = new JSONObject();
+	      msg.put("type", NetworkProtocols.MESSAGE_SEND_REQUEST);
+	      msg.put("sender", uID);
+	      msg.put("reciever", sList);
+	      msg.put("msgTitle", msgTitle.getText());
+	      msg.put("msgContent", msgContent.getText());
+	      msg.put("sendTime", curTime);
+	 
+	      sendProtocol(msg);	      
+	   }
 
 	//JSONObject o = Toolbox.createJSONProtocol(NetworkProtocols.BOARD_LIST_REQUEST);
 	//o.put("category", "공지사항");
@@ -1392,207 +1461,230 @@ public class AdministratorMainController implements Initializable {
 	}
 	
 	public void createRecivedmessage(JSONArray arr) // 양훈
-	{
-		recievermessageListData.removeAll(recievermessageListData);
-		checkjarray = new JSONArray();
-	    for(Object t : arr)
-	    {
-	        JSONObject tt = (JSONObject)t;
-	        CheckBox left = new CheckBox();
-	        left.setAlignment(Pos.CENTER_LEFT);
-	        left.setMaxHeight(Double.MIN_VALUE);
-	        left.setMaxWidth(Double.MIN_VALUE);
-	        Label Date = new Label(tt.get("발신시각").toString());
-	        Date.setAlignment(Pos.CENTER_LEFT);
-	        Date.setMaxHeight(30);
-	        Date.setMaxWidth(150);
-	        Label Center = new Label(tt.get("발신자").toString());
-	        Center.setAlignment(Pos.CENTER_LEFT);
-	        Center.setMaxHeight(30);
-	        Center.setMaxWidth(150);
-	        Label right = new Label(tt.get("메세지제목").toString());
-	        right.setAlignment(Pos.CENTER);;
-	        right.setMaxHeight(Double.MAX_VALUE);
-	        right.setMaxWidth(Double.MAX_VALUE);
-	        int no = Integer.parseInt(tt.get("No").toString());
-	        Label left2 = new Label(no+"");
-	        left2.setAlignment(Pos.CENTER_LEFT);
-	        left2.setMaxHeight(30);
-	        left2.setMaxWidth(150);
-	        left2.setVisible(false);
-	        HBox item = new HBox();
-	        item.getChildren().addAll(left, left2, Date, Center,right);
-	        HBox.setHgrow(right, Priority.ALWAYS);
-	        HBox.setHgrow(Date, Priority.ALWAYS);
-	        HBox.setHgrow(Center, Priority.ALWAYS);
-	        HBox.setHgrow(left, Priority.ALWAYS);
-	        item.setAlignment(Pos.CENTER);
-	        item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+   {
+      recievermessageListData.removeAll(recievermessageListData);
+      checkjarray = new JSONArray();
+       for(Object t : arr)
+       {
+           JSONObject tt = (JSONObject)t;
+           CheckBox left = new CheckBox();
+           left.setAlignment(Pos.CENTER_LEFT);
+           left.setMaxHeight(Double.MIN_VALUE);
+           left.setMaxWidth(Double.MIN_VALUE);
+           Label Date = new Label(tt.get("발신시각").toString());
+           Date.setAlignment(Pos.CENTER_LEFT);
+           Date.setMaxHeight(30);
+           Date.setMaxWidth(150);
+           Label Center = new Label(tt.get("발신자").toString());
+           Center.setAlignment(Pos.CENTER_LEFT);
+           Center.setMaxHeight(30);
+           Center.setMaxWidth(150);
+           Label right = new Label(tt.get("메세지제목").toString());
+           right.setAlignment(Pos.CENTER);;
+           right.setMaxHeight(Double.MAX_VALUE);
+           right.setMaxWidth(Double.MAX_VALUE);
+           int no = Integer.parseInt(tt.get("No").toString());
+           Label left2 = new Label(no+"");
+           left2.setAlignment(Pos.CENTER_LEFT);
+           left2.setMaxHeight(30);
+           left2.setMaxWidth(150);
+           left2.setVisible(false);
+           HBox item = new HBox();
+           item.getChildren().addAll(left, left2, Date, Center,right);
+           HBox.setHgrow(right, Priority.ALWAYS);
+           HBox.setHgrow(Date, Priority.ALWAYS);
+           HBox.setHgrow(Center, Priority.ALWAYS);
+           HBox.setHgrow(left, Priority.ALWAYS);
+           item.setAlignment(Pos.CENTER);
+           item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public void handle(MouseEvent event) {
-						
-				 if(event.getClickCount()==2)
-				 {
-					  JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_CONTENT_REQUEST);
-					  req.put("No", no);
-					  req.put("content_type", "recieve");
-					  sendProtocol(req);
-				 }
-			  }}); 
-	         left.setOnAction(new EventHandler<ActionEvent>() {
+         @SuppressWarnings("unchecked")
+         @Override
+         public void handle(MouseEvent event) {
+                  
+             if(event.getClickCount()==2)
+             {
+                 JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_CONTENT_REQUEST);
+                 req.put("No", no);
+                 req.put("content_type", "recieve");
+                 sendProtocol(req);
+             }
+          }}); 
+            left.setOnAction(new EventHandler<ActionEvent>() {
 
-	        	@SuppressWarnings("unchecked")
-				@Override
-				public void handle(ActionEvent event) {
-					checkjarray.add(tt);
-				}
-			});
-	         
-	          recievermessageListData.add(item);
-	       }
+              @SuppressWarnings("unchecked")
+            @Override
+            public void handle(ActionEvent event) {
+                 checkjarray.removeAll(checkjarray);
+                 ObservableList<HBox> a = messageList.getItems();
+                 for(HBox box : a)
+                 {
+                    if(((CheckBox)box.getChildren().get(0)).isSelected())
+                    {
+                       checkjarray.add(tt);
+                    }
+                 }   
+            }
+         });
+            
+             recievermessageListData.add(item);
+          }
         
-	       messageList.setItems(recievermessageListData);
-	 
-	   }
+          messageList.setItems(recievermessageListData);
+    
+      }
 	   
-	   @SuppressWarnings("unchecked")
-	   public void createStudentSearch(JSONArray arr) // 영훈
-	   {
-		   StudentListData.removeAll(StudentListData);
-		      select_find_mode.setItems(alloption);
-		      select_room_mode.setItems(roomoption);
-		      
-		         for(Object tt : arr)
-		         {
-		        	JSONObject t = (JSONObject)tt;
-		        	String rnum = t.get("방번호").toString();
-		            Label roomnum = new Label(rnum+"");
-		            roomnum.setAlignment(Pos.CENTER_LEFT);
-		            roomnum.setMaxWidth(120);
-		            roomnum.setMaxHeight(Double.MAX_VALUE);
-		            String name = t.get("소속학과").toString();
-		            Label classname = new Label(name);
-		            classname.setAlignment(Pos.CENTER_LEFT);
-		            classname.setMaxWidth(270);
-		            classname.setMaxHeight(Double.MAX_VALUE);
-		            int cnum = (int)t.get("학년");
-		            Label classnum = new Label(cnum+"");
-		            classnum.setAlignment(Pos.CENTER);
-		            classnum.setMaxWidth(190);
-		            classnum.setMaxHeight(Double.MAX_VALUE);
-		            String snum = t.get("학번").toString();
-		            Label studentnum = new Label(snum);
-		            studentnum.setAlignment(Pos.CENTER);
-		            studentnum.setMaxWidth(240);
-		            studentnum.setMaxHeight(Double.MAX_VALUE);
-		            String sname = t.get("이름").toString();
-		            Label studentname = new Label(sname);
-		            studentname.setAlignment(Pos.CENTER);
-		            studentname.setMaxWidth(350);
-		            studentname.setMaxHeight(Double.MAX_VALUE);
-		            String sex = t.get("성별").toString();
-		            Label studentsex = new Label(sex);
-		            studentsex.setAlignment(Pos.CENTER);
-		            studentsex.setMaxWidth(220);
-		            studentsex.setMaxHeight(Double.MAX_VALUE);
-		            String pnum = t.get("휴대폰번호").toString();
-		            Label phone = new Label(pnum);
-		            phone.setAlignment(Pos.CENTER);
-		            phone.setMaxWidth(400);
-		            phone.setMaxHeight(Double.MAX_VALUE);
-		            HBox item = new HBox();
-		            //item.setMaxSize(Double.MAX_VALUE, maxHeight);
-		            item.getChildren().addAll(roomnum, classname,classnum,studentnum,studentname,studentsex,phone);
-		            HBox.setHgrow(roomnum, Priority.ALWAYS);
-		            HBox.setHgrow(classname, Priority.ALWAYS);
-		            HBox.setHgrow(classnum, Priority.ALWAYS);
-		            HBox.setHgrow(studentnum, Priority.ALWAYS);
-		            HBox.setHgrow(studentname, Priority.ALWAYS);
-		            HBox.setHgrow(studentsex, Priority.ALWAYS);
-		            HBox.setHgrow(phone, Priority.ALWAYS);
-		            item.setAlignment(Pos.CENTER);
-		            EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
+	public void createStudentSearch(JSONArray arr) // 영훈
+    {
+       StudentListData.removeAll(StudentListData);
+          select_find_mode.setItems(alloption);
+          select_room_mode.setItems(roomoption);
+          
+             for(Object tt : arr)
+             {
+               JSONObject t = (JSONObject)tt;
+               String rnum = t.get("방번호").toString();
+                Label roomnum = new Label(rnum+"");
+                roomnum.setAlignment(Pos.CENTER_LEFT);
+                roomnum.setMaxWidth(120);
+                roomnum.setMaxHeight(Double.MAX_VALUE);
+                String name = t.get("소속학과").toString();
+                Label classname = new Label(name);
+                classname.setAlignment(Pos.CENTER_LEFT);
+                classname.setMaxWidth(270);
+                classname.setMaxHeight(Double.MAX_VALUE);
+                int cnum = (int)t.get("학년");
+                Label classnum = new Label(cnum+"");
+                classnum.setAlignment(Pos.CENTER);
+                classnum.setMaxWidth(190);
+                classnum.setMaxHeight(Double.MAX_VALUE);
+                String snum = t.get("학번").toString();
+                Label studentnum = new Label(snum);
+                studentnum.setAlignment(Pos.CENTER);
+                studentnum.setMaxWidth(240);
+                studentnum.setMaxHeight(Double.MAX_VALUE);
+                String sname = t.get("이름").toString();
+                Label studentname = new Label(sname);
+                studentname.setAlignment(Pos.CENTER);
+                studentname.setMaxWidth(350);
+                studentname.setMaxHeight(Double.MAX_VALUE);
+                String sex = t.get("성별").toString();
+                Label studentsex = new Label(sex);
+                studentsex.setAlignment(Pos.CENTER);
+                studentsex.setMaxWidth(220);
+                studentsex.setMaxHeight(Double.MAX_VALUE);
+                String pnum = t.get("휴대폰번호").toString();
+                Label phone = new Label(pnum);
+                phone.setAlignment(Pos.CENTER);
+                phone.setMaxWidth(400);
+                phone.setMaxHeight(Double.MAX_VALUE);
+                HBox item = new HBox();
+                //item.setMaxSize(Double.MAX_VALUE, maxHeight);
+                item.getChildren().addAll(roomnum, classname,classnum,studentnum,studentname,studentsex,phone);
+                HBox.setHgrow(roomnum, Priority.ALWAYS);
+                HBox.setHgrow(classname, Priority.ALWAYS);
+                HBox.setHgrow(classnum, Priority.ALWAYS);
+                HBox.setHgrow(studentnum, Priority.ALWAYS);
+                HBox.setHgrow(studentname, Priority.ALWAYS);
+                HBox.setHgrow(studentsex, Priority.ALWAYS);
+                HBox.setHgrow(phone, Priority.ALWAYS);
+                item.setAlignment(Pos.CENTER);
+                EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
 
-						@Override
-						public void handle(MouseEvent event) {
+                @SuppressWarnings("unchecked")
+				@Override
+                public void handle(MouseEvent event) {
 
-							if(event.getClickCount() == 2)
-							{
-								System.out.println("신상정보 탭 더블 클릭 ");
-								JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_REQUEST);
-								req.put("학번",snum);
-								req.put("이름",name);
-								sendProtocol(req);
-							}
-						}
-		            	
-					};							
-					item.setOnMouseClicked(eh);
-		            StudentListData.add(item);
-		         }
-		         
-		         StudentList.setItems(StudentListData);
-		         StudentList.setVisible(true);
-	   }
+                   if(event.getClickCount() == 2)
+                   {
+                      System.out.println("신상정보 탭 더블 클릭 ");
+                      JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_REQUEST);
+                      req.put("학번",snum);
+                      req.put("이름",name);
+                      sendProtocol(req);
+                   }
+                }
+                   
+             };                     
+             item.setOnMouseClicked(eh);
+                StudentListData.add(item);
+             }
+             
+             StudentList.setItems(StudentListData);
+             StudentList.setVisible(true);
+    }
 	   
-	   public void createSendMassageList(JSONArray arr)
-	   {
-		   sendmessageListData.removeAll(sendmessageListData);
-		   for(Object t : arr)
-		   {
-			   System.out.println(t);
-			   JSONObject tt = (JSONObject)t;
-			   CheckBox left = new CheckBox();
-			   left.setAlignment(Pos.CENTER_LEFT);
-			   left.setMaxHeight(Double.MIN_VALUE);
-			   left.setMaxWidth(Double.MIN_VALUE);
-			   Label Date = new Label(tt.get("발신시각").toString());
-			   Date.setAlignment(Pos.CENTER_LEFT);
-			   Date.setMaxHeight(30);
-			   Date.setMaxWidth(150);
-			   Label Center = new Label(tt.get("발신자").toString());
-			   Center.setAlignment(Pos.CENTER_LEFT);
-			   Center.setMaxHeight(30);
-			   Center.setMaxWidth(150);
-			   Label right = new Label(tt.get("메세지제목").toString());
-			   right.setAlignment(Pos.CENTER);;
-			   right.setMaxHeight(Double.MAX_VALUE);
-			   right.setMaxWidth(Double.MAX_VALUE);
-			   HBox item = new HBox();
-			   int no = Integer.parseInt(tt.get("No").toString());
-			   Label left2 = new Label(no+"");
-			   left2.setVisible(false);
-			   left2.setAlignment(Pos.CENTER);
-			   left2.setMaxHeight(Double.MAX_VALUE);
-			   left2.setMaxWidth(Double.MAX_VALUE);
-			   item.getChildren().addAll(left, left2 , Date,Center,right);
-			   HBox.setHgrow(right, Priority.ALWAYS);
-			   HBox.setHgrow(Date, Priority.ALWAYS);
-			   HBox.setHgrow(Center, Priority.ALWAYS);
-			   HBox.setHgrow(left, Priority.ALWAYS);
-			   item.setAlignment(Pos.CENTER);
-			   
-			   item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	  public void createSendMassageList(JSONArray arr)
+      {
+         sendmessageListData.removeAll(sendmessageListData);
+         for(Object t : arr)
+         {
+            JSONObject tt = (JSONObject)t;
+            CheckBox left = new CheckBox();
+            left.setAlignment(Pos.CENTER_LEFT);
+            left.setMaxHeight(Double.MIN_VALUE);
+            left.setMaxWidth(Double.MIN_VALUE);
+            Label Date = new Label(tt.get("발신시각").toString());
+            Date.setAlignment(Pos.CENTER_LEFT);
+            Date.setMaxHeight(30);
+            Date.setMaxWidth(150);
+            Label Center = new Label(tt.get("수신자").toString());
+            Center.setAlignment(Pos.CENTER_LEFT);
+            Center.setMaxHeight(30);
+            Center.setMaxWidth(150);
+            Label right = new Label(tt.get("메세지제목").toString());
+            right.setAlignment(Pos.CENTER);;
+            right.setMaxHeight(Double.MAX_VALUE);
+            right.setMaxWidth(Double.MAX_VALUE);
+            HBox item = new HBox();
+            int no = Integer.parseInt(tt.get("No").toString());
+            Label left2 = new Label(no+"");
+            left2.setVisible(false);
+            left2.setAlignment(Pos.CENTER);
+            left2.setMaxHeight(Double.MAX_VALUE);
+            left2.setMaxWidth(Double.MAX_VALUE);
+            item.getChildren().addAll(left, Date,Center,right);
+            HBox.setHgrow(right, Priority.ALWAYS);
+            HBox.setHgrow(Date, Priority.ALWAYS);
+            HBox.setHgrow(Center, Priority.ALWAYS);
+            HBox.setHgrow(left, Priority.ALWAYS);
+            item.setAlignment(Pos.CENTER);
+            
+            item.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-					@SuppressWarnings("unchecked")
-					@Override
-					public void handle(MouseEvent event) {
-						if(event.getClickCount()==2)
-						{
-							JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_CONTENT_REQUEST);
-							req.put("No", no);
-							req.put("content_type", "send");
-							sendProtocol(req);
-						}
-					}
-				});
-			   
-			   sendmessageListData.add(item);
-		   }
-		   sendmessageList.setItems(sendmessageListData);
-	   }
+               @SuppressWarnings("unchecked")
+               @Override
+               public void handle(MouseEvent event) {
+                  if(event.getClickCount()==2)
+                  {
+                     JSONObject req = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_CONTENT_REQUEST);
+                     req.put("No", no);
+                     req.put("content_type", "send");
+                     sendProtocol(req);
+                  }
+               }
+            });
+              left.setOnAction(new EventHandler<ActionEvent>() {
+
+                 @SuppressWarnings("unchecked")
+               @Override
+               public void handle(ActionEvent event) {
+                    checkjarray.removeAll(checkjarray);
+                    ObservableList<HBox> a = sendmessageList.getItems();
+                    for(HBox box : a)
+                    {
+                       if(((CheckBox)box.getChildren().get(0)).isSelected())
+                       {
+                          checkjarray.add(tt);
+                       }
+                    }   
+               }
+            });
+            
+            sendmessageListData.add(item);
+         }
+         sendmessageList.setItems(sendmessageListData);
+      }
 	   
 	   
 	   @SuppressWarnings("unchecked")
@@ -2433,28 +2525,37 @@ public class AdministratorMainController implements Initializable {
 		messageList.refresh();
 	}
 	
-	   @FXML public void onMSGTabClick()
-	   {
-		   int current = MESSAGE.getSelectionModel().getSelectedIndex();
+	@FXML public void onMSGTabClick()
+    {
+       int current = MESSAGE.getSelectionModel().getSelectedIndex();
 
-		   if(saved==current)return;
-		   
-		   saved = current;
-		   
-		   switch(saved)
-		   {
-		   case 0 :
-			   		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
-			   break;
-		   case 1 :
-			   		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST));
-			   break;
-		   case 2 : 
-		   		sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));			   
-			   break;
-		   }
-		   
-	   } 
+       if(saved==current)return;
+       
+       saved = current;
+       
+       switch(saved)
+       {
+       case 0 :
+                sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
+                display_reciever.setText("");
+                msgTitle.setText("");
+                msgContent.setText("");
+          break;
+       case 1 :
+                sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST));
+                display_reciever.setText("");
+                msgTitle.setText("");
+                msgContent.setText("");
+          break;
+       case 2 : 
+             sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+             display_reciever.setText("");
+             msgTitle.setText("");
+             msgContent.setText("");
+          break;
+       }
+       
+    }
 	
 	   @SuppressWarnings("unchecked")
 	   @FXML public void onWeabakTabClick()
@@ -2534,189 +2635,246 @@ public class AdministratorMainController implements Initializable {
 		
 		// 메세지 버튼 이벤트
 		
-		@FXML private void onAnswer()
-		{
-			display_reciever.setText("");
-			msgTitle.setText("");
-			msgContent.setText("");
-			MESSAGE.getSelectionModel().select(2);
-			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
-			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
-			
-			for(Object a : checkjarray)
-			{
-				JSONObject aa = (JSONObject)a;
-				String num = aa.get("학번").toString();
-				String name = aa.get("발신자").toString();
-				
-				display_reciever.appendText(name+num+" ");	
-			}	
-			checkjarray.clear();
-		}
+      @FXML private void onAnswer()
+      {
+         display_reciever.setText("");
+         msgTitle.setText("");
+         msgContent.setText("");
+         if(checkjarray.size() == 1)
+         {
+            MESSAGE.getSelectionModel().select(2);
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));      
+            for(Object a : checkjarray)
+            {
+               JSONObject aa = (JSONObject)a;
+               String num = aa.get("학번").toString();
+               String name = aa.get("발신자").toString();
+            
+               display_reciever.appendText(num+","+name+"\t");   
+            }
+         }
+         else if(checkjarray.size() > 1)
+         {
+            CustomDialog.showMessageDialog("보내실분 한명만 선택하세요.", sManager.getStage());
+            JSONObject json= Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST);
+            
+            sendProtocol(json);
+         }
+         else
+         {
+            CustomDialog.showMessageDialog("보낼사람을 선택하세요.", sManager.getStage());
+         }
+         checkjarray.clear();
+      }
 		
-		@FXML private void onRDelivery()
-		{
-			msgTitle.setText("");
-			msgContent.setText("");
-			
-			System.out.println("전달 버튼 클릭");
-			MESSAGE.getSelectionModel().select(2);
-			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
-			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
-			if(checkjarray.size() == 1)
-			{
-				for(Object a : checkjarray)
-				{
-					JSONObject json = (JSONObject)a;
-					System.out.println(json.toJSONString());
-					String msgcontent = json.get("메세지본문").toString();
-					String msgtitle = json.get("메세지제목").toString();
-					
-					msgTitle.setText(msgtitle);
-					msgContent.appendText(msgcontent+"\n"+"====================== 전달 ===================== \n");	 
-				}
-			}
-			else
-			{
-				System.out.println("에러 메세지 출력");
-			}
-			
-			checkjarray.clear();
-		}
+      @FXML private void onRDelivery()
+      {
+         display_reciever.setText("");
+         msgTitle.setText("");
+         msgContent.setText("");
+         
+         
+         if(checkjarray.size() == 1)
+         {
+            MESSAGE.getSelectionModel().select(2);
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
+            for(Object a : checkjarray)
+            {
+               JSONObject json = (JSONObject)a;
+               String msgcontent = json.get("메세지본문").toString();
+               String msgtitle = json.get("메세지제목").toString();
+               
+               msgTitle.setText(msgtitle);
+               msgContent.appendText(msgcontent+"\n"+"====================== 전달 ===================== \n");    
+            }
+         }
+         else if(checkjarray.size() > 1)
+         {
+            CustomDialog.showMessageDialog("전달 할 내용 한가지만 선택하세요.", sManager.getStage());
+            JSONObject json= Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST);
+            
+            sendProtocol(json);
+         }
+         else
+         {
+            CustomDialog.showMessageDialog("전달 할 내용을 선택하세요.", sManager.getStage());
+         }
+         
+         checkjarray.clear();
+      }
 		
-		@SuppressWarnings("unchecked")
-		@FXML public void onRdelite()
-		{
-			JSONArray array = new JSONArray();
-			for(Object a : checkjarray)
-			{
-				JSONObject aa = (JSONObject)a;
-				array.add(aa);
-			}
-			
-			JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
-			json.put("delete", array);
-			json.put("reqType", "R");
-			sendProtocol(json);
-		}
+      @SuppressWarnings("unchecked")
+      @FXML public void onRdelite()
+      {
+         if(checkjarray.size() < 1)
+         {
+            CustomDialog.showMessageDialog("삭제 할 메세지를 선택해주세요.", sManager.getStage());
+         }
+         else
+         {
+            JSONArray array = new JSONArray();
+            for(Object a : checkjarray)
+            {
+               JSONObject aa = (JSONObject)a;
+               array.add(aa);
+            }
+            
+            JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
+            json.put("delete", array);
+            json.put("reqType", "R");
+            sendProtocol(json);
+         }
+      }
 		
-		@SuppressWarnings("unchecked")
-		@FXML public void onRallDelete()
-		{
-			JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
-			json.put("reqType", "R");
-			sendProtocol(json);
-			
-		}
+      @SuppressWarnings("unchecked")
+      @FXML public void onRallDelete()
+      {
+         int selection = CustomDialog.showConfirmDialog("정말 모든 메세지를 삭제하시겠습니까?", sManager.getStage());
+         
+         if(selection==CustomDialog.OK_OPTION)
+         {
+            JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
+            request.put("reqType", "R");
+            sendProtocol(request);
+         }
+         else if(selection==CustomDialog.CANCEL_OPTION)
+         {
+            CustomDialog.showMessageDialog("전체삭제를 취소하셨습니다.", sManager.getStage());
+         }
+      }
 		
-		@SuppressWarnings("unchecked")
-		@FXML public void onFindCombo()
-		{
-			 int check_find =select_find_mode.getSelectionModel().getSelectedIndex()+1;
-			 System.out.println(check_find);
-			 if(check_find == 1)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "1");
-				 sendProtocol(json);
- 
-			 }
-			 else if(check_find == 2)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "2");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 3)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "3");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 4)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "4");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 5)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "5");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 6)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "6");
-				 
-				 sendProtocol(json);
-			 }
-			 else
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CLASS_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "7");
-				 
-				 sendProtocol(json);
-			 }
-		}
-		@SuppressWarnings("unchecked")
-		@FXML public void onLevelCombo()
-		{
-			int check_find =select_room_mode.getSelectionModel().getSelectedIndex()+1;
-			 System.out.println(check_find);
-			 if(check_find == 1)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "1");
-				 sendProtocol(json);
-				 
-			 }
-			 else if(check_find == 2)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "2");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 3)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "3");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 4)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "4");
-				 
-				 sendProtocol(json);
-			 }
-			 else if(check_find == 5)
-			 {
-				 JSONObject json = new JSONObject();
-				 json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_LEVEL_SELECT_COMBOBOX_REQUEST);
-				 json.put("comboCheck", "5");
-				 
-				 sendProtocol(json);
-			 }
-		}
+      
+      @FXML public void onSDelivery()
+      {
+         display_reciever.setText("");
+         msgTitle.setText("");
+         msgContent.setText("");
+         
+         
+         if(checkjarray.size() == 1)
+         {
+            MESSAGE.getSelectionModel().select(2);
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
+            for(Object a : checkjarray)
+            {
+               JSONObject json = (JSONObject)a;
+               String msgcontent = json.get("메세지본문").toString();
+               String msgtitle = json.get("메세지제목").toString();
+               
+               msgTitle.setText(msgtitle);
+               msgContent.appendText(msgcontent+"\n"+"====================== 전달 ===================== \n");    
+            }
+         }
+         else if(checkjarray.size() > 1)
+         {
+            CustomDialog.showMessageDialog("전달 할 내용 한가지만 선택하세요.", sManager.getStage());
+            JSONObject json= Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST);
+            
+            sendProtocol(json);
+         }
+         else
+         {
+            CustomDialog.showMessageDialog("전달 할 내용을 선택하세요.", sManager.getStage());
+         }
+         
+         checkjarray.clear();
+      }
+      // 보낸함 삭제
+      @SuppressWarnings("unchecked")
+      @FXML public void onSelectDelete()
+      {
+         if(checkjarray.size() < 1)
+         {
+            CustomDialog.showMessageDialog("삭제 할 메세지를 선택해주세요.", sManager.getStage());
+         }
+         else
+         {
+            JSONArray array = new JSONArray();
+            for(Object a : checkjarray)
+            {
+               JSONObject aa = (JSONObject)a;
+               array.add(aa);
+            }
+            
+            JSONObject json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_SELECT_DELETE_REQUEST);
+            json.put("delete", array);
+            json.put("reqType", "S");
+            sendProtocol(json);
+         }
+      }
+      // 보낸함 전체삭제
+      @SuppressWarnings("unchecked")
+      @FXML public void onRAllDelete()
+      {
+         
+         int selection = CustomDialog.showConfirmDialog("정말 모든 메세지를 삭제하시겠습니까?", sManager.getStage());
+         
+         if(selection==CustomDialog.OK_OPTION)
+         {
+            JSONObject request = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_REQUEST);
+            request.put("reqType", "S");
+            sendProtocol(request);
+         }
+         else if(selection==CustomDialog.CANCEL_OPTION)
+         {
+            CustomDialog.showMessageDialog("전체삭제를 취소하셨습니다.", sManager.getStage());
+         }
+      }
+      
+      
+       //복붙해야함 원래있떤거 지우고 밑에 메소드까지
+      @FXML public void onFindCombo()
+      {
+         
+          check_class =select_find_mode.getSelectionModel().getSelectedIndex()+1; //학생신상정보 소속학과 체크시
+          classcheck = true;
+          overlap();
+      }
+      @FXML public void onLevelCombo()
+      {
+          check_level =select_room_mode.getSelectionModel().getSelectedIndex()+1; //학생신상정보 층별 체크시
+          levelcheck = true;
+          overlap();
+      }
+      
+      
+      
+      @FXML public void onUidDelete()
+      {
+         display_reciever.setText("");
+      }
+      
+      @SuppressWarnings("unchecked")
+      public void overlap()
+      {
+         JSONObject json;
+         if(classcheck && levelcheck)
+         {
+            json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SORT_OVERLAP_REQUEST);
+            json.put("class", check_class);
+            json.put("level", check_level);
+            sendProtocol(json);
+         }
+         else if(classcheck == true && levelcheck == false)
+         {
+            json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SORT_OVERLAP_REQUEST);
+            json.put("class", check_class);
+            json.put("level", 1);
+            sendProtocol(json);
+         }
+         else
+         {
+            json = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SORT_OVERLAP_REQUEST);
+            json.put("class", 1);
+            json.put("level", check_level);
+            sendProtocol(json);
+         }
+      }
+      
+		
 		
 		private void createBoardCategoryList(JSONArray data)
 		{
@@ -2749,9 +2907,56 @@ public class AdministratorMainController implements Initializable {
 		}
 
 		@FXML
+		private void onResend()
+		{
+			  display_reciever.setText("");
+		         msgTitle.setText("");
+		         msgContent.setText("");
+		         
+		         if(checkjarray.size() == 1)
+		         {
+		            MESSAGE.getSelectionModel().select(2);
+		            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_USER_LIST_REQUEST));
+		            sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SHOW_MESSAGE_TAP_REQUEST));
+		            for(Object a : checkjarray)
+		            {
+		               JSONObject aa = (JSONObject)a;
+		               String num = aa.get("학번").toString();
+		               String name = aa.get("수신자").toString();
+		               String content = aa.get("메세지본문").toString();
+		               String title = aa.get("메세지제목").toString();
+		               
+		               
+		                msgTitle.setText(title); 
+		               display_reciever.appendText(num+","+name+"\t");
+		               msgContent.setText(content);
+		            }
+		         }   
+		         else if(checkjarray.size() > 1)
+		         {
+		            CustomDialog.showMessageDialog("보내실분 한명만 선택하세요.", sManager.getStage());
+		            JSONObject json= Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST);
+		            
+		            sendProtocol(json);
+		         }
+		         else
+		         {
+		            CustomDialog.showMessageDialog("보낼사람을 선택하세요.", sManager.getStage());
+		         }
+		         checkjarray.clear();
+
+		}
+		
+		@FXML
 		private void onMenuSubmin()
 		{
 			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_REQUEST));
+		}
+		
+		@FXML private void onMainImage()
+		{
+			shutdown();
+		    MAINPANE.setVisible(true);
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -2882,4 +3087,22 @@ public class AdministratorMainController implements Initializable {
 			processBox.setVisible(true);
 			sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_LOCAL_SAVE_REQUEST));
 		}
+		
+	   @SuppressWarnings("unchecked")
+	   @FXML public void onSendListSearch()
+	   {
+	      String searchKey = MsgSenderField.getText();
+	      JSONArray jarr = new JSONArray();
+	      for(Object a : jarray)
+	      {
+	         JSONObject aa = (JSONObject)a;
+	         if((aa.get("발신시각").toString().contains(searchKey) || aa.get("수신자").toString().contains(searchKey)) ||(aa.get("메세지제목").toString().contains(searchKey)))
+	         {
+	            jarr.add(aa);
+	         }         
+	      }
+	      createSendMassageList(jarr);
+	      sendmessageList.refresh();
+	   }
+		
 }

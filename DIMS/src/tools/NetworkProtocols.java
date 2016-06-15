@@ -279,5 +279,15 @@ public class NetworkProtocols {
 		
 		// 비밀번호찾기 - 새 비밀번호 설정
 		public static final String PASSWORD_FIND_MODIFY_REQUEST = "pfmreq";
-		public static final String PASSWORD_FIND_MODIFY_RESPOND = "pfmres";		
+		public static final String PASSWORD_FIND_MODIFY_RESPOND = "pfmres";
+		
+		
+		public static final String MESSAGE_SEND_ALL_DELETE_RESPOND = "msadres";
+		public static final String MESSAGE_SEND_SELECT_DELETE_RESPOND = "mssdres";
+		
+		public static final String STUDENT_SORT_OVERLAP_REQUEST = "ssoreq";
+		public static final String STUDENT_SORT_OVERLAP_RESPOND = "ssores";
+		
+		public static final String MEMBER_JOIN_REQUEST = "mjreq";
+		public static final String MEMBER_JOIN_RESPOND = "mjres";
 }
