@@ -2,12 +2,10 @@ package com.hst.dims.clients;
 
 import javafx.application.Application;
 
-public class Tester {
+public class ClientLauncher {
 	
 	public static void main(String[] args) {
-
-		Application.launch(MainApplication.class);
-		
+		Application.launch(DimsClientApplication.class);
 	}
 	
 }

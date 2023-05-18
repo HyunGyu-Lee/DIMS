@@ -12,7 +12,7 @@ import javafx.scene.text.Font;
 import com.hst.dims.tools.Toolbox;
 
 public class ScheduleObject extends AnchorPane{
-	
+
 	private Label title;
 	private Label date;
 	private TextArea content;
@@ -23,21 +23,21 @@ public class ScheduleObject extends AnchorPane{
 	private Date dateValue;
 	private double width = 295, height = 200;
 	private boolean isSelected = false;
-	
+
 	public static final String VIEWTYPE_GRID = "grid";
 	public static final String VIEWTYPE_LIST = "list";
 	public static final String VIEWTYPE_CELL = "cell";
-	
+
 	public ScheduleObject(){}
-	
+
 	public ScheduleObject(String titleValue, Date dateValue, String categoryValue, String contentValue, String viewtype)
 	{
 		me = this;
 		switch(categoryValue)
 		{
-		case "�Ϲ�" : backgroundInfo = "-fx-background-color: cyan;"; break;
-		case "�߿�" : backgroundInfo = "-fx-background-color: red;"; break;
-		case "���" : backgroundInfo = "-fx-background-color: green;"; break;
+			case "일반" : backgroundInfo = "-fx-background-color: cyan;"; break;
+			case "중요" : backgroundInfo = "-fx-background-color: red;"; break;
+			case "행사" : backgroundInfo = "-fx-background-color: green;"; break;
 		}
 		this.titleValue = titleValue;
 		this.categoryValue = categoryValue;
@@ -53,33 +53,33 @@ public class ScheduleObject extends AnchorPane{
 			objectType_LIST(titleValue, dateValue, categoryValue, contentValue);
 		}
 	}
-	
+
 	public void objectType_GRID(String titleValue, Date dateValue, String categoryValue, String contentValue)
 	{
 		DropShadow s = new DropShadow();
 		s.setWidth(21);
 		s.setHeight(21);
 		s.setRadius(10);
-		
+
 		this.setPrefSize(width, height);
 		this.setEffect(s);
 		this.setLayoutX(10);
 		this.setLayoutY(10);
-		
+
 		switch(categoryValue)
 		{
-		case "�Ϲ�" : backgroundInfo = "-fx-background-color: cyan;"; break;
-		case "�߿�" : backgroundInfo = "-fx-background-color: red;"; break;
-		case "���" : backgroundInfo = "-fx-background-color: green;"; break;
+			case "일반" : backgroundInfo = "-fx-background-color: cyan;"; break;
+			case "중요" : backgroundInfo = "-fx-background-color: red;"; break;
+			case "행사" : backgroundInfo = "-fx-background-color: green;"; break;
 		}
 		this.setStyle(backgroundInfo);
 		title = createTitleLabel_GRID(titleValue);
 		date = createDateLabel_GRID(Toolbox.getCurrentTimeFormat(dateValue, "yyyy-MM-dd HH:mm"));
 		category = createCategoryLabel_GRID(categoryValue);
 		content = createContentArea_GRID(contentValue);
-		
-		
-		
+
+
+
 		this.setOnMouseDragged(new EventHandler<javafx.scene.input.MouseEvent>() {
 			@Override
 			public void handle(javafx.scene.input.MouseEvent event) {
@@ -87,34 +87,34 @@ public class ScheduleObject extends AnchorPane{
 				me.setLayoutY(event.getSceneY()-105);
 			}
 		});
-		
+
 		this.getChildren().addAll(title, category, date, content);
 	}
-	
+
 	public void objectType_LIST(String titleValue, Date dateValue, String categoryValue, String contentValue)
 	{
 		DropShadow s = new DropShadow();
 		s.setWidth(21);
 		s.setHeight(21);
 		s.setRadius(10);
-		
+
 		this.setPrefSize(581, 136);
 		this.setEffect(s);
 		this.setLayoutX(10);
 		this.setLayoutY(10);
-		
+
 		switch(categoryValue)
 		{
-		case "�Ϲ�" : backgroundInfo = "-fx-background-color: cyan;"; break;
-		case "�߿�" : backgroundInfo = "-fx-background-color: red;"; break;
-		case "���" : backgroundInfo = "-fx-background-color: green;"; break;
+			case "일반" : backgroundInfo = "-fx-background-color: cyan;"; break;
+			case "중요" : backgroundInfo = "-fx-background-color: red;"; break;
+			case "행사" : backgroundInfo = "-fx-background-color: green;"; break;
 		}
 		this.setStyle(backgroundInfo);
 		title = createTitleLabel_LIST(titleValue);
 		date = createDateLabel_LIST(Toolbox.getCurrentTimeFormat(dateValue, "yyyy-MM-dd HH:mm"));
 		category = createCategoryLabel_LIST(categoryValue);
 		content = createContentArea_LIST(contentValue);
-		
+
 		this.setOnMouseDragged(new EventHandler<javafx.scene.input.MouseEvent>() {
 			@Override
 			public void handle(javafx.scene.input.MouseEvent event) {
@@ -122,35 +122,35 @@ public class ScheduleObject extends AnchorPane{
 				me.setLayoutY(event.getSceneY()-105);
 			}
 		});
-		
+
 		this.getChildren().addAll(title, category, date, content);
 	}
-	
+
 	public void setScheduleID(int id)
 	{
 		this.scheduleID = id;
 	}
-	
+
 	public int getScheduleID()
 	{
 		return scheduleID;
 	}
-	
+
 	public String getTitle()
 	{
 		return titleValue;
 	}
-	
+
 	public String getDateText()
 	{
 		return dateText;
 	}
-	
+
 	public String getCategory()
 	{
 		return categoryValue;
 	}
-	
+
 	public String getContent()
 	{
 		return contentValue;
@@ -164,9 +164,9 @@ public class ScheduleObject extends AnchorPane{
 		s.setHeight(10);
 		s.setRadius(10);
 		this.setEffect(s);
-	
+
 		this.setStyle(backgroundInfo);
-		
+
 		title = new Label(titleValue);
 		title.setStyle("-fx-background-color: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%);");
 		title.setTextFill(Paint.valueOf("white"));
@@ -175,19 +175,19 @@ public class ScheduleObject extends AnchorPane{
 		title.setLayoutX(15);
 		title.setLayoutY(14);
 		title.setPrefSize(118, 17);
-		
+
 		date = new Label(new java.text.SimpleDateFormat("d").format(dateValue));
 		date.setTextFill(Paint.valueOf("white"));
 		date.setLayoutX(58);
 		date.setLayoutY(48);
 		date.setFont(Font.font("HYwulM",20));
 		date.setPrefSize(26, 25);
-		
+
 		this.getChildren().addAll(title,date);
-		
+
 		return this;
 	}
-	
+
 	private Label createTitleLabel_GRID(String value)
 	{
 		Label temp = new Label(value);
@@ -196,23 +196,23 @@ public class ScheduleObject extends AnchorPane{
 		temp.setAlignment(Pos.CENTER);
 		temp.setLayoutX(0);
 		temp.setLayoutY(0);
-		
+
 		if(value.length()>6)
 		{
 			temp.setFont(Font.font("HYwulM",20));
 		}
 		else if(value.length()>10)
 		{
-			temp.setFont(Font.font("HYwulM",10));			
+			temp.setFont(Font.font("HYwulM",10));
 		}
 		else
 		{
-			temp.setFont(Font.font("HYwulM",30));		
+			temp.setFont(Font.font("HYwulM",30));
 		}
-	
+
 		temp.setStyle("-fx-background-color: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%);");
 		temp.setTextFill(Paint.valueOf("white"));
-		return temp;		
+		return temp;
 	}
 	private Label createDateLabel_GRID(String value)
 	{
@@ -237,7 +237,7 @@ public class ScheduleObject extends AnchorPane{
 	private TextArea createContentArea_GRID(String content)
 	{
 		StringBuilder b = new StringBuilder();
-		
+
 		for(int i = 0;i<content.length();i++)
 		{
 			b.append(content.charAt(i));
@@ -246,7 +246,7 @@ public class ScheduleObject extends AnchorPane{
 				b.append("\n");
 			}
 		}
-		
+
 		TextArea temp = new TextArea();
 		temp.setText(b.toString());
 		temp.setFont(Font.font("HYwulM",20));
@@ -256,7 +256,7 @@ public class ScheduleObject extends AnchorPane{
 		temp.setEditable(false);
 		return temp;
 	}
-	
+
 	private Label createTitleLabel_LIST(String value)
 	{
 		Label temp = new Label(value);
@@ -265,21 +265,21 @@ public class ScheduleObject extends AnchorPane{
 		temp.setAlignment(Pos.CENTER);
 		temp.setLayoutX(14);
 		temp.setLayoutY(14);
-		
+
 		if(value.length()>6)
 		{
 			temp.setFont(Font.font("HYwulM",20));
 		}
 		else if(value.length()>10)
 		{
-			temp.setFont(Font.font("HYwulM",10));			
+			temp.setFont(Font.font("HYwulM",10));
 		}
 		else
 		{
-			temp.setFont(Font.font("HYwulM",30));		
+			temp.setFont(Font.font("HYwulM",30));
 		}
-	
-		return temp;		
+
+		return temp;
 	}
 	private Label createDateLabel_LIST(String value)
 	{
@@ -304,7 +304,7 @@ public class ScheduleObject extends AnchorPane{
 	private TextArea createContentArea_LIST(String content)
 	{
 		StringBuilder b = new StringBuilder();
-		
+
 		for(int i = 0;i<content.length();i++)
 		{
 			b.append(content.charAt(i));
@@ -313,7 +313,7 @@ public class ScheduleObject extends AnchorPane{
 				b.append("\n");
 			}
 		}
-		
+
 		TextArea temp = new TextArea();
 		temp.setText(b.toString());
 		temp.setFont(Font.font("HYwulM",20));
@@ -323,19 +323,19 @@ public class ScheduleObject extends AnchorPane{
 		temp.setEditable(false);
 		return temp;
 	}
-	
+
 	public void selected()
 	{
 		isSelected = true;
 		this.setStyle(backgroundInfo+"-fx-border-color : black;"+"-fx-border-width : 5px;");
 	}
-	
+
 	public void unSelect()
 	{
 		isSelected = false;
 		this.setStyle(backgroundInfo);
 	}
-	
+
 	public boolean isSelected()
 	{
 		return isSelected;

@@ -185,12 +185,7 @@ public class SceneManager {
 	
 	private void toAdminMainWindow(FXMLLoader loader)
 	{
-		Platform.runLater(new Runnable() {			
-			@Override
-			public void run() {
-				stage.setTitle(Statics.ADMIN_MAIN_TITLE);
-			}
-		});
+		Platform.runLater(() -> stage.setTitle(Statics.ADMIN_MAIN_TITLE));
 		AdministratorMainController control = loader.getController();
 		control.INIT_CONTROLLER(this, fromServer, toServer);
 		control.startListener();

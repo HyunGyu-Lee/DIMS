@@ -19,41 +19,41 @@ import com.hst.dims.tools.Toolbox;
 
 public class CalendarObject extends AnchorPane{
 
-	// �޷� ��ü ũ��
+	// 달력 객체 크기
 	private double CALENDAR_WIDTH = 1024, CALENDAR_HEIGHT = 768;
-	
-	// ������Ʈ
-	public GridPane calendar;	
+
+	// 컴포넌트
+	public GridPane calendar;
 	public Label DateHeader;
 	public DatePicker pick;
-	
-	// ������
+
+	// 데이터
 	CalendarDataManager cDataManager = new CalendarDataManager();
 	ArrayList<ScheduleObject> sObjList;
-	
+
 	public CalendarObject()
 	{
-		
+
 	}
-	
+
 	public CalendarObject(ArrayList<ScheduleObject> sObjList)
 	{
-		// �޷°�ü ����
+		// 달력객체 설정
 		this.setPrefWidth(CALENDAR_WIDTH);
 		this.setPrefHeight(CALENDAR_HEIGHT+200);
-		
+
 		calendar = new GridPane();
 		DateHeader = new Label();
-		
-		// �޷� ������ ������ �������� �ʱ�ȭ
+
+		// 달력 데이터 오늘자 기준으로 초기화
 		this.sObjList = sObjList;
 		calendar.setLayoutX(0);
 		calendar.setLayoutY(70);
 		initCalendarHeader();
 		initDate();
 
-		//�޷°�ü ���
-		DateHeader.setText(new SimpleDateFormat("yyyy�� M��").format(new Date(System.currentTimeMillis())));
+		//달력객체 헤더
+		DateHeader.setText(new SimpleDateFormat("yyyy년 M월").format(new Date(System.currentTimeMillis())));
 		DateHeader.setStyle("-fx-background-color: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%);");
 		DateHeader.setAlignment(Pos.CENTER);
 		DateHeader.setTextFill(Paint.valueOf("white"));
@@ -61,51 +61,51 @@ public class CalendarObject extends AnchorPane{
 		DateHeader.setLayoutX(1024/4);
 		DateHeader.setLayoutY(0);
 		DateHeader.setPrefSize(512, 70);
-		
-		//�޷°�ü ��¥����
+
+		//달력객체 날짜선택
 		pick = new DatePicker();
 		pick.setPrefSize(188, 32);
 		pick.setLayoutX(36);
 		pick.setLayoutY(19);
-		
-		
-		
+
+
+
 		this.getChildren().addAll(pick, DateHeader, calendar);
 	}
-	
+
 	public CalendarDataManager getDataInstance()
 	{
 		return cDataManager;
 	}
-	
+
 	public void initCalendarComponent()
 	{
 		calendar.setHgap(3);
 		calendar.setVgap(3);
 		calendar.setPrefSize(CALENDAR_WIDTH, CALENDAR_HEIGHT);
-		
+
 	}
-	
+
 	public void initCalendarHeader()
 	{
-		calendar.add(new Cell("��", "gray"), 0, 0);
-		calendar.add(new Cell("��", "gray"), 1, 0);
-		calendar.add(new Cell("ȭ", "gray"), 2, 0);
-		calendar.add(new Cell("��", "gray"), 3, 0);
-		calendar.add(new Cell("��", "gray"), 4, 0);
-		calendar.add(new Cell("��", "gray"), 5, 0);
-		calendar.add(new Cell("��", "gray"), 6, 0);
+		calendar.add(new Cell("일", "gray"), 0, 0);
+		calendar.add(new Cell("월", "gray"), 1, 0);
+		calendar.add(new Cell("화", "gray"), 2, 0);
+		calendar.add(new Cell("수", "gray"), 3, 0);
+		calendar.add(new Cell("목", "gray"), 4, 0);
+		calendar.add(new Cell("금", "gray"), 5, 0);
+		calendar.add(new Cell("토", "gray"), 6, 0);
 	}
-	
+
 	public void setScheduleData(ArrayList<ScheduleObject> sObjList)
 	{
 		this.sObjList = sObjList;
 	}
-	
+
 	public void initDate()
 	{
 		cDataManager.setFirstDayOfMonth();
-		
+
 		calendar.getChildren().clear();
 		initCalendarHeader();
 		int processMonth = cDataManager.getMonth();
@@ -128,12 +128,12 @@ public class CalendarObject extends AnchorPane{
 					cDataManager.nextDay();
 				}
 			}
-			
+
 			for(int dayIdx = cDataManager.getDayOfWeekIndex() ; dayIdx <= cDataManager.getDayOfWeekCount() ; dayIdx++)
 			{
 				Cell targetCell = new Cell(cDataManager.getDayInt()+"", "white");
 				targetCell.setFont(Font.font("HYwulM", 20));
-				
+
 				if(cDataManager.getDayOfWeekIndex()==1)
 				{
 					targetCell.setTextFill(Paint.valueOf("red"));
@@ -144,9 +144,9 @@ public class CalendarObject extends AnchorPane{
 				}
 				else
 				{
-					targetCell.setTextFill(Paint.valueOf("black"));					
+					targetCell.setTextFill(Paint.valueOf("black"));
 				}
-				
+
 				if(cDataManager.getMonth()!=processMonth)
 				{
 //					targetCell.setStyle("-fx-background-color : #e1e1ea");
@@ -155,7 +155,7 @@ public class CalendarObject extends AnchorPane{
 				}
 
 				calendar.add(targetCell, cDataManager.getDayOfWeekIndex()-1, weekIdx+1);
-				
+
 				for(ScheduleObject oo : sObjList)
 				{
 					if(oo.getDateText().contains(cDataManager.toString()))
@@ -165,27 +165,27 @@ public class CalendarObject extends AnchorPane{
 				}
 				cDataManager.nextDay();
 			}
-			
-			
-			
+
+
+
 		}
-		
-		
+
+
 	}
-	
+
 	class Cell extends Label
 	{
 		Cell()
 		{
 			init();
 		}
-		
+
 		Cell(String title, String cellColor)
 		{
 			super.setText(title);
 			init(cellColor);
 		}
-		
+
 		private void init()
 		{
 			this.setFont(Font.font("HYwulM",25));
@@ -193,7 +193,7 @@ public class CalendarObject extends AnchorPane{
 			this.setPrefHeight(CALENDAR_HEIGHT/6);
 			this.setAlignment(Pos.CENTER);
 		}
-		
+
 		private void init(String cellColor)
 		{
 			this.setFont(Font.font("HYwulM",25));
@@ -202,65 +202,65 @@ public class CalendarObject extends AnchorPane{
 			this.setPrefHeight(CALENDAR_HEIGHT/6);
 			this.setAlignment(Pos.CENTER);
 		}
-		
+
 	}
-	
+
 	public class CalendarDataManager
 	{
-		private String[] DAY_STRING = {"","��","��","ȭ","��","��","��","��"};
-		
+		private String[] DAY_STRING = {"","일","월","화","수","목","금","토"};
+
 		private Calendar calendarData = Calendar.getInstance();
-		
+
 		public CalendarDataManager()
 		{
 			//setFirstDayOfMonth();
 		}
-		
+
 		public int getYear()
 		{
 			return calendarData.get(Calendar.YEAR);
 		}
-		
+
 		public int getMonth()
 		{
 			return (calendarData.get(Calendar.MONTH)+1);
 		}
-		
+
 		public int getDayInt()
 		{
 			return calendarData.get(Calendar.DATE);
 		}
-		
+
 		public int getWeekOfMonthCount()
 		{
 			return calendarData.getActualMaximum(Calendar.WEEK_OF_MONTH);
 		}
-		
+
 		public int getDayOfWeekCount()
 		{
 			return calendarData.getActualMaximum(Calendar.DAY_OF_WEEK);
 		}
-		
+
 		public int getDayOfWeekIndex()
 		{
 			return calendarData.get(Calendar.DAY_OF_WEEK);
 		}
-		
+
 		public int getEndDayIntMonth()
 		{
 			return calendarData.getActualMaximum(Calendar.DATE);
 		}
-		
+
 		public int getWeekOfMonth()
 		{
 			return calendarData.get(Calendar.WEEK_OF_MONTH);
 		}
-		
+
 		public String getDayString()
 		{
 			return DAY_STRING[getDayOfWeekIndex()];
 		}
-		
+
 		public String getStartDateOfMonth()
 		{
 			String str = getYear()+"-"+getMonth()+"-"+calendarData.getActualMinimum(Calendar.DAY_OF_MONTH);
@@ -275,7 +275,7 @@ public class CalendarObject extends AnchorPane{
 			}
 			return new SimpleDateFormat("yyyy-MM-dd").format(d);
 		}
-		
+
 		public String getEndDateOfMonth()
 		{
 			String str = getYear()+"-"+getMonth()+"-"+calendarData.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -290,55 +290,55 @@ public class CalendarObject extends AnchorPane{
 			}
 			return new SimpleDateFormat("yyyy-MM-dd").format(d);
 		}
-		
+
 		public Calendar getCalander()
 		{
 			return calendarData;
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			
+
 			return sdf.format(calendarData.getTime());
 		}
-		
+
 		public void setFirstDayOfMonth()
 		{
 			calendarData.add(Calendar.DATE, -getDayInt()+1);
 		}
-		
+
 		public void nextDay()
 		{
 			calendarData.add(Calendar.DATE, 1);
 		}
-		
+
 		public void prevDay()
 		{
 			calendarData.add(Calendar.DATE, -1);
 		}
-		
+
 		public void prevMonth()
 		{
 			calendarData.add(Calendar.MONTH, -1);
 		}
-		
+
 		public void nextMonth()
 		{
 			calendarData.add(Calendar.MONTH, 1);
 		}
-		
+
 		public void prevYear()
 		{
 			calendarData.add(Calendar.YEAR, -1);
 		}
-		
+
 		public void nextYear()
 		{
 			calendarData.add(Calendar.YEAR, 1);
 		}
-		
+
 	}
-	
+
 }

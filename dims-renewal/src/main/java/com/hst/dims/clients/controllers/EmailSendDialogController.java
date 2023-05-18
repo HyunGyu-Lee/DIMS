@@ -18,37 +18,37 @@ public class EmailSendDialogController implements Initializable{
 	@FXML TextArea mailContent;
 	@FXML ComboBox<String> mailServer;
 	private CustomDialog window;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 		mailServer.getItems().addAll("naver.com","gmail.com");
 	}
-	
+
 	public void setWindow(CustomDialog window)
 	{
 		this.window = window;
 	}
-	
+
 	@FXML
 	private void onSendMail()
 	{
 		if(mailId.getLength()==0||mailServer.getValue()==null||mailTitle.getText().length()==0||mailContent.getText().length()==0)
 		{
-			CustomDialog.showMessageDialog("�߼������� ��Ȯ�� �Է��ϼ���.", window);
+			CustomDialog.showMessageDialog("발송정보를 정확히 입력하세요.", window);
 			return;
 		}
-		
-		String[] keys = {"��������","���Ϻ���","�������"};
+
+		String[] keys = {"메일제목","메일본문","받을사람"};
 		Object[] values = {mailTitle.getText(),
-						   mailContent.getText(),
-						   mailId.getText()+"@"+mailServer.getValue()
+				mailContent.getText(),
+				mailId.getText()+"@"+mailServer.getValue()
 		};
-		
+
 		window.setUserData(Toolbox.createJSONProtocol(NetworkProtocols.EMAIL_SEND_REQUEST, keys, values));
 		window.close();
 	}
-	
-	
-	
+
+
+
 }

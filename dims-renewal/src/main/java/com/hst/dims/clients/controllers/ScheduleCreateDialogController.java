@@ -17,20 +17,20 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class ScheduleCreateDialogController implements Initializable{
-	
+
 	private Stage window;
 	@FXML TextField sTitle;
 	@FXML DatePicker datePick;
 	@FXML ComboBox<String> hourPick, minitePick;
 	@FXML CheckBox cate_im, cate_ev, cate_norm;
-	@FXML TextArea contentA; 
-	
+	@FXML TextArea contentA;
+
 	public void initialize(java.net.URL location, java.util.ResourceBundle resources)
 	{
 		initCategory();
 		initDateTime();
 	}
-	
+
 	private void initCategory()
 	{
 		cate_im.setOnAction(new EventHandler<ActionEvent>() {
@@ -40,7 +40,7 @@ public class ScheduleCreateDialogController implements Initializable{
 				cate_norm.setSelected(false);
 			}
 		});
-		
+
 		cate_ev.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -48,7 +48,7 @@ public class ScheduleCreateDialogController implements Initializable{
 				cate_norm.setSelected(false);
 			}
 		});
-		
+
 		cate_norm.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -57,7 +57,7 @@ public class ScheduleCreateDialogController implements Initializable{
 			}
 		});
 	}
-	
+
 	private void initDateTime()
 	{
 		hourPick.getItems().addAll("00","01","02","03","04","05","06","07","08","09","10"
@@ -71,65 +71,65 @@ public class ScheduleCreateDialogController implements Initializable{
 				,"40","41","42","43","44","45","46","47","48","49"
 				,"50","51","52","53","54","55","56","57","58","59");
 	}
-	
-	
+
+
 	public void setWindow(Stage window)
 	{
 		this.window = window;
 		this.window.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			
+
 			@Override
 			public void handle(WindowEvent event) {
 				window.setUserData("cancel");
 			}
 		});
 	}
-			
+
 	@SuppressWarnings("unchecked")
 	@FXML public void onCreate()
 	{
 		String date = "";
 		if(datePick.getValue()==null)
-	    {
-	    	CustomDialog.showMessageDialog("��¥�� �������ּ���!", window);
-	    }
-	    else
-	    {
-	    	date = datePick.getValue().toString();
-	    }
-	   
-	    if(hourPick.getValue()==null||minitePick.getValue()==null)
-	    {
-	    	CustomDialog.showMessageDialog("�ð��� �������ּ���!", window);
-		    return;
-	    }
-		
-	    date = date + " " + hourPick.getValue() + ":" + minitePick.getValue();
-	    String cate = "";
+		{
+			CustomDialog.showMessageDialog("날짜를 선택해주세요!", window);
+		}
+		else
+		{
+			date = datePick.getValue().toString();
+		}
+
+		if(hourPick.getValue()==null||minitePick.getValue()==null)
+		{
+			CustomDialog.showMessageDialog("시간을 선택해주세요!", window);
+			return;
+		}
+
+		date = date + " " + hourPick.getValue() + ":" + minitePick.getValue();
+		String cate = "";
 
 		if(cate_im.isSelected()==true)
 		{
-			cate = "�߿�";
+			cate = "중요";
 		}
-		   
-	    if(cate_ev.isSelected()==true)
-	    {
-		    cate = "���";
-	    }
-	   
-	    if(cate_norm.isSelected()==true)
-	    {
-		   cate = "�Ϲ�";
-	    }
-	    
-	    JSONObject create_info = new JSONObject();
-		create_info.put("����", sTitle.getText());
-		create_info.put("�Ͻ�", date);
-		create_info.put("�з�", cate);
-		create_info.put("����", contentA.getText());
+
+		if(cate_ev.isSelected()==true)
+		{
+			cate = "행사";
+		}
+
+		if(cate_norm.isSelected()==true)
+		{
+			cate = "일반";
+		}
+
+		JSONObject create_info = new JSONObject();
+		create_info.put("제목", sTitle.getText());
+		create_info.put("일시", date);
+		create_info.put("분류", cate);
+		create_info.put("내용", contentA.getText());
 		System.out.println(create_info.toJSONString());
 		window.setUserData(create_info);
 		window.close();
 	}
-	
+
 }

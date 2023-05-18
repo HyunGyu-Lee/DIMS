@@ -17,77 +17,77 @@ import com.hst.dims.tools.Toolbox;
 
 public class CheckStudentDialog_Controller implements Initializable {
 
-	   @FXML Label Lable_name;
-	   @FXML TextField classNameField;   //�а���
-	   @FXML TextField classNumField;    //�й�
-	   @FXML TextField Name;  //�̸�
-	   @FXML TextField RoomNum; //���ȣ
-	   @FXML TextField bigNum; // �г�
-	   @FXML TextField StudentInfoNum; //�ֹε�Ϲ�ȣ
-	   @FXML TextField phoneNum; // ����ȣ
-	   @FXML TextArea address; // �ּ�
-	   @FXML TextField hoomCellNum; // ���ּ�
-	   CustomDialog window;
-	   @FXML ImageView user_image;
-	   
-	   
-	   @Override
-	   public void initialize(URL location, ResourceBundle resources) {
-	      // TODO Auto-generated method stub
-	      
-	   }
+	@FXML Label Lable_name;
+	@FXML TextField classNameField;   //학과명
+	@FXML TextField classNumField;    //학번
+	@FXML TextField Name;  //이름
+	@FXML TextField RoomNum; //방번호
+	@FXML TextField bigNum; // 학년
+	@FXML TextField StudentInfoNum; //주민등록번호
+	@FXML TextField phoneNum; // 폰번호
+	@FXML TextArea address; // 주소
+	@FXML TextField hoomCellNum; // 집주소
+	CustomDialog window;
+	@FXML ImageView user_image;
+
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		// TODO Auto-generated method stub
+
+	}
 
 
 
-	   public void setWindow(CustomDialog window)
-	   {
-	      this.window = window;
-	   }
-	   
-	   
-	   public void setProperty(JSONObject obj)
-	   {
-	      Lable_name.setText(obj.get("�̸�").toString());
-	      classNameField.setText(obj.get("�Ҽ��а�").toString());
-	      classNumField.setText(obj.get("�й�").toString());
-	      Name.setText(obj.get("�̸�").toString());
-	      RoomNum.setText(obj.get("���ȣ").toString()+"ȣ");
-	      int a = (int)obj.get("�г�");
-	      System.out.println(a);
-	      bigNum.setText(a+"");
-	      System.out.println(bigNum);
-	      StudentInfoNum.setText(obj.get("�ֹε�Ϲ�ȣ").toString());
-	      phoneNum.setText(obj.get("�޴�����ȣ").toString());
-	      hoomCellNum.setText(obj.get("������ȭ��ȣ").toString());
-	      address.setText(obj.get("�ּ�").toString());
-	      
-	      if(obj.get("�̹���������").equals("no-image")==false)
-	      {
-	    	  byte[] data = (byte[])obj.get("�̹���������");
-	    	  user_image.setImage(Toolbox.getWritableByArray(data));
-	      }
-	      classNameField.setEditable(false);
-	      classNumField.setEditable(false);
-	      Name.setEditable(false);
-	      RoomNum.setEditable(false);
-	      bigNum.setEditable(false);
-	      StudentInfoNum.setEditable(false);
-	      phoneNum.setEditable(false);
-	      hoomCellNum.setEditable(false);
-	      address.setEditable(false);
-	      
-	   }
-	   
-	   @FXML public void onConfirm()
-	   {
-	      window.setUserData("confirm");
-	      window.close();      
-	   }
-	   
-	   @FXML public void onReply()
-	   {
-	      window.setUserData("reply");
-	      window.close();
-	   }
+	public void setWindow(CustomDialog window)
+	{
+		this.window = window;
+	}
+
+
+	public void setProperty(JSONObject obj)
+	{
+		Lable_name.setText(obj.get("이름").toString());
+		classNameField.setText(obj.get("소속학과").toString());
+		classNumField.setText(obj.get("학번").toString());
+		Name.setText(obj.get("이름").toString());
+		RoomNum.setText(obj.get("방번호").toString()+"호");
+		int a = (int)obj.get("학년");
+		System.out.println(a);
+		bigNum.setText(a+"");
+		System.out.println(bigNum);
+		StudentInfoNum.setText(obj.get("주민등록번호").toString());
+		phoneNum.setText(obj.get("휴대폰번호").toString());
+		hoomCellNum.setText(obj.get("자택전화번호").toString());
+		address.setText(obj.get("주소").toString());
+
+		if(obj.get("이미지데이터").equals("no-image")==false)
+		{
+			byte[] data = (byte[])obj.get("이미지데이터");
+			user_image.setImage(Toolbox.getWritableByArray(data));
+		}
+		classNameField.setEditable(false);
+		classNumField.setEditable(false);
+		Name.setEditable(false);
+		RoomNum.setEditable(false);
+		bigNum.setEditable(false);
+		StudentInfoNum.setEditable(false);
+		phoneNum.setEditable(false);
+		hoomCellNum.setEditable(false);
+		address.setEditable(false);
+
+	}
+
+	@FXML public void onConfirm()
+	{
+		window.setUserData("confirm");
+		window.close();
+	}
+
+	@FXML public void onReply()
+	{
+		window.setUserData("reply");
+		window.close();
+	}
 
 }
