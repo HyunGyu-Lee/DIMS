@@ -35,6 +35,9 @@ public class DatabaseHandler {
     }
 
     public ResultSet executeQuery(String query) {
+        System.out.println("===================================");
+        System.out.println("실행된 쿼리 >>> " + query);
+        System.out.println("===================================");
         ResultSet rs = null;
         try {
             Statement stmt = connection.createStatement();
@@ -47,6 +50,9 @@ public class DatabaseHandler {
     }
 
     public void excuteUpdate(String query) {
+        System.out.println("===================================");
+        System.out.println("실행된 쿼리 >>> " + query);
+        System.out.println("===================================");
         int rs;
         try {
             Statement stmt = connection.createStatement();

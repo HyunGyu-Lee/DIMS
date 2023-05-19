@@ -298,10 +298,10 @@ public class DIMS_Server {
 
 						if(request.get("client-type")!=null)
 						{
-							ResultSet rs = handler.executeQuery("select G.게시글번호, S.NAME, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M "
-									+ "where S.STUDENT_NO=G.작성자 and G.카테고리=1 and M.카테고리번호=G.카테고리;");
+							ResultSet rs = handler.executeQuery("select G.NO, S.NAME, G.TITLE, G.CREATED_AT, G.CONTENT, M.CATEGORY_NAME from DIMS_USER S, BOARD G, BOARD_CATEGORY M "
+									+ "where S.STUDENT_NO=G.CREATOR and G.CATEGORY_NO=1 and M.NO=G.CATEGORY_NO;");
 
-							ResultSet rs2 = handler.executeQuery("select M.메세지번호, S.STUDENT_NO, S.NAME, M.메세지제목, M.발신시각, M.메세지본문  from 메세지 M, DIMS_USER S where M.수신자='"+userIdentify+"' and M.발신자=S.STUDENT_NO and M.구분='R' order by 발신시각 asc");
+							ResultSet rs2 = handler.executeQuery("select M.MESSAGE_NO, S.STUDENT_NO, S.NAME, M.MESSAGE_TITLE, M.SEND_AT, M.MESSAGE_CONTENT  from MESSAGE M, DIMS_USER S where M.RECEIVER='"+userIdentify+"' and M.SENDER=S.STUDENT_NO and M.TYPE='R' order by M.SEND_AT asc");
 
 							String[] keys = {"No","이름", "게시글제목", "작성일자", "게시글본문", "카테고리"};
 							JSONArray data = new JSONArray();
@@ -309,12 +309,12 @@ public class DIMS_Server {
 							{
 								while(rs.next())
 								{
-									Object[] o = {rs.getInt("게시글번호"),
+									Object[] o = {rs.getInt("NO"),
 											rs.getString("NAME"),
-											rs.getString("게시글제목"),
-											rs.getDate("작성일자"),
-											rs.getString("게시글본문"),
-											rs.getString("카테고리이름")};
+											rs.getString("TITLE"),
+											rs.getDate("CREATED_AT"),
+											rs.getString("CONTENT"),
+											rs.getString("CATEGORY_NAME")};
 
 									JSONObject n = Toolbox.createJSONProtocol(keys, o);
 									data.add(n);
@@ -325,38 +325,40 @@ public class DIMS_Server {
 								while(rs2.next())
 								{
 									Object[] values = {
-											rs2.getInt("메세지번호"),
+											rs2.getInt("MESSAGE_NO"),
 											rs2.getString("STUDENT_NO"),
 											rs2.getString("NAME"),
-											rs2.getString("메세지제목"),
-											rs2.getDate("발신시각"),
-											rs2.getString("메세지본문")
+											rs2.getString("MESSAGE_TITLE"),
+											rs2.getDate("SEND_AT"),
+											rs2.getString("MESSAGE_CONTENT")
 									};
 									mArr.add(Toolbox.createJSONProtocol(keys2, values));
 								}
 
-								ResultSet rs3 = handler.executeQuery("select * from 제출서류목록");
+								ResultSet rs3 = handler.executeQuery("select * from SUBMIT_DOCUMENT");
 
 								JSONObject dataBundle = null;
-								if(Toolbox.getResultSetSize(rs3)!=0)
+
+//								if(Toolbox.getResultSetSize(rs3)!=0)
+								if(rs3.next())
 								{
 									try
 									{
 										dataBundle = new JSONObject();
 										rs3.next();
-										dataBundle.put("제출분류명", rs3.getString("제출분류명"));
-										dataBundle.put("마감시간", rs3.getDate("마감시간"));
+										dataBundle.put("제출분류명", rs3.getString("SUBMIT_NAME"));
+										dataBundle.put("마감시간", rs3.getDate("DUE_DATE"));
 
-										ResultSet rs4 = handler.executeQuery("select M.서류번호,M.제출자,S.NAME,M.제출서류저장URL,M.제출시간 from 제출서류함 M, DIMS_USER S where M.제출자=S.STUDENT_NO and M.제출자 = '"+userIdentify+"';");
+										ResultSet rs4 = handler.executeQuery("select M.DOCUMENT_NO,M.SUBMITTER,S.NAME,M.DOCUMENT_URL,M.SUBMIT_DATE from STUDENT_SUBMIT_DOCUMENT M, DIMS_USER S where M.SUBMITTER=S.STUDENT_NO and M.SUBMITTER = '"+userIdentify+"';");
 										rs4.next();
-										dataBundle.put("서류번호", rs4.getInt("서류번호"));
+										dataBundle.put("서류번호", rs4.getInt("DOCUMENT_NO"));
 
-										if(rs4.getString("제출서류저장URL")!=null)
+										if(rs4.getString("DOCUMENT_URL")!=null)
 										{
 											dataBundle.put("제출여부", "제출완료");
-											dataBundle.put("제출시각", rs4.getTimestamp("제출시간"));
-											dataBundle.put("데이터", Files.readAllBytes(new File(rs4.getString("제출서류저장URL")).toPath()));
-											dataBundle.put("확장자", rs4.getString("제출서류저장URL").split("\\.")[1]);
+											dataBundle.put("제출시각", rs4.getTimestamp("SUBMIT_DATE"));
+											dataBundle.put("데이터", Files.readAllBytes(new File(rs4.getString("DOCUMENT_URL")).toPath()));
+											dataBundle.put("확장자", rs4.getString("DOCUMENT_URL").split("\\.")[1]);
 										}
 										else
 										{
@@ -412,7 +414,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.ADMIN_ADD_TAP_REQUEST))
 					{
-						String qry = "select count(*) from 게시글_카테고리목록;";
+						String qry = "select count(*) from BOARD_CATEGORY;";
 						ResultSet rs = handler.executeQuery(qry);
 						rs.next();
 						int cnt = rs.getInt("count(*)");
@@ -441,8 +443,8 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.BOARD_LIST_REQUEST))
 					{
-						ResultSet rs = handler.executeQuery("select G.게시글번호, S.NAME, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M "
-								+ "where S.STUDENT_NO=G.작성자 and G.카테고리='"+request.get("category").toString()+"' and M.카테고리번호=G.카테고리;");
+						ResultSet rs = handler.executeQuery("select G.NO, S.NAME, G.TITLE, G.CREATED_AT, G.CONTENT, M.CATEGORY_NAME from DIMS_USER S, BOARD G, BOARD_CATEGORY M "
+								+ "where S.STUDENT_NO=G.CREATOR and G.CATEGORY_NO='"+request.get("category").toString()+"' and M.NO=G.CATEGORY_NO;");
 						JSONArray arr = new JSONArray();
 						JSONArray arr2 = new JSONArray();
 
@@ -451,12 +453,12 @@ public class DIMS_Server {
 						{
 							while(rs.next())
 							{
-								Object[] o = {rs.getInt("게시글번호"),
+								Object[] o = {rs.getInt("NO"),
 										rs.getString("NAME"),
-										rs.getString("게시글제목"),
-										rs.getDate("작성일자"),
-										rs.getString("게시글본문"),
-										rs.getString("카테고리이름")};
+										rs.getString("TITLE"),
+										rs.getDate("CREATED_AT"),
+										rs.getString("CONTENT"),
+										rs.getString("CATEGORY_NAME")};
 
 								JSONObject n = Toolbox.createJSONProtocol(keys, o);
 								arr.add(n);
@@ -467,7 +469,7 @@ public class DIMS_Server {
 							e.printStackTrace();
 						}
 
-						String qry2 = "select 카테고리이름 from 게시글_카테고리목록;";
+						String qry2 = "select CATEGORY_NAME from BOARD_CATEGORY;";
 
 						ResultSet rs2 = handler.executeQuery(qry2);
 
@@ -492,13 +494,13 @@ public class DIMS_Server {
 					else if(type.equals(NetworkProtocols.BOARD_CONTENT_REQUEST))
 					{
 						int reqno = (int)request.get("No");
-						String qry = "select S.NAME, G.게시글제목, G.게시글본문, M.카테고리이름, G.작성일자 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M"
-								+    " where S.STUDENT_NO=G.작성자 and G.게시글번호="+reqno+" and G.카테고리=M.카테고리번호; ";
+						String qry = "select S.NAME, G.TITLE, G.CONTENT, M.CATEGORY_NAME, G.CREATED_AT from DIMS_USER S, BOARD G, BOARD_CATEGORY M"
+								+    " where S.STUDENT_NO=G.CREATOR and G.NO="+reqno+" and G.CATEGORY_NO=M.NO; ";
 						ResultSet rs = handler.executeQuery(qry);
 						while(rs.next())
 						{
 							String[] keys = {"이름","게시글제목","게시글본문","카테고리","작성일자"};
-							Object[] values = {rs.getString("NAME"),rs.getString("게시글제목"),rs.getString("게시글본문"),rs.getString("카테고리이름"),rs.getDate("작성일자")};
+							Object[] values = {rs.getString("NAME"),rs.getString("TITLE"),rs.getString("CONTENT"),rs.getString("CATEGORY_NAME"),rs.getDate("CREATED_AT")};
 
 							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.BOARD_CONTENT_RESPOND, keys, values));
 						}
@@ -510,13 +512,13 @@ public class DIMS_Server {
 						ResultSet rs = null;
 						if(category=="전체")
 						{
-							rs = handler.executeQuery("select G.게시글번호, S.NAME, G.게시글제목, G.작성일자 from DIMS_USER S, 게시글 G "
-									+ "where S.STUDENT_NO=G.작성자 and G.게시글제목 like '%"+request.get("search_key").toString()+"%';");
+							rs = handler.executeQuery("select G.NO, S.NAME, G.TITLE, G.CREATED_AT from DIMS_USER S, BOARD G "
+									+ "where S.STUDENT_NO=G.CREATOR and G.TITLE like '%"+request.get("search_key").toString()+"%';");
 						}
 						else
 						{
-							rs = handler.executeQuery("select G.게시글번호, S.NAME, G.게시글제목, G.작성일자 from DIMS_USER S, 게시글 G "
-									+ "where S.STUDENT_NO=G.작성자 and G.게시글제목 like '%"+request.get("search_key").toString()+"%' and G.카테고리 = '"+category+"';");
+							rs = handler.executeQuery("select G.NO, S.NAME, G.TITLE, G.CREATED_AT from DIMS_USER S, BOARD G "
+									+ "where S.STUDENT_NO=G.CREATOR and G.TITLE like '%"+request.get("search_key").toString()+"%' and G.CATEGORY_NO = '"+category+"';");
 						}
 
 						if(Toolbox.getResultSetSize(rs)==0)
@@ -529,10 +531,10 @@ public class DIMS_Server {
 						String[] keys = {"No","이름", "게시글제목", "작성일자"};
 						while(rs.next())
 						{
-							Object[] o = {rs.getInt("게시글번호"),
+							Object[] o = {rs.getInt("NO"),
 									rs.getString("NAME"),
-									rs.getString("게시글제목"),
-									rs.getDate("작성일자")};
+									rs.getString("TITLE"),
+									rs.getDate("CREATED_AT")};
 
 							JSONObject n = Toolbox.createJSONProtocol(keys, o);
 							arr.add(n);
@@ -591,8 +593,8 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.BOARD_MAIN_REQUEST))
 					{
-						ResultSet rs = handler.executeQuery("select G.게시글번호, S.NAME, G.게시글제목, G.작성일자 from DIMS_USER S, 게시글 G "
-								+ "where S.STUDENT_NO=G.작성자 and G.카테고리=1;");
+						ResultSet rs = handler.executeQuery("select G.NO, S.NAME, G.TITLE, G.CREATED_AT from DIMS_USER S, BOARD G "
+								+ "where S.STUDENT_NO=G.CREATOR and G.CATEGORY_NO=1;");
 						JSONArray arr = new JSONArray();
 
 						String[] keys = {"No","이름","게시글제목","작성일자"};
@@ -602,13 +604,13 @@ public class DIMS_Server {
 						{
 							values[0] = rs.getString("게시글번호").toString();
 							values[1] = rs.getString("NAME").toString();
-							values[2] = rs.getString("게시글제목").toString();
-							values[3] = rs.getDate("작성일자");
+							values[2] = rs.getString("TITLE").toString();
+							values[3] = rs.getDate("CREATED_AT");
 							arr.add(Toolbox.createJSONProtocol(keys, values));
 						}
 
 						JSONArray arr2 = new JSONArray();
-						String qry2 = "select 카테고리이름 from 게시글_카테고리목록;";
+						String qry2 = "select CATEGORY_NAME from BOARD_CATEGORY;";
 
 						ResultSet rs2 = handler.executeQuery(qry2);
 
@@ -633,7 +635,7 @@ public class DIMS_Server {
 					{
 						try
 						{
-							String qry = "select M.메세지번호, S.NAME, S.STUDENT_NO , M.메세지제목, M.메세지본문 ,M.발신시각 from 메세지 M, DIMS_USER S where M.수신자='"+userIdentify+"' and M.발신자=S.STUDENT_NO and M.구분='R' order by 발신시각 asc" ;
+							String qry = "select M.MESSAGE_NO, S.NAME, S.STUDENT_NO , M.MESSAGE_TITLE, M.MESSAGE_CONTENT ,M.SEND_AT from MESSAGE M, DIMS_USER S where M.RECEIVER='"+userIdentify+"' and M.SENDER=S.STUDENT_NO and M.TYPE='R' order by M.SEND_AT asc" ;
 
 							ResultSet rs = handler.executeQuery(qry);
 							JSONArray mArr = new JSONArray();
@@ -646,9 +648,9 @@ public class DIMS_Server {
 										rs.getString("메세지번호"),
 										rs.getString("NAME"),
 										rs.getString("STUDENT_NO"),
-										rs.getString("메세지제목"),
-										rs.getString("메세지본문"),
-										rs.getDate("발신시각")
+										rs.getString("MESSAGE_TITLE"),
+										rs.getString("MESSAGE_CONTENT"),
+										rs.getDate("SEND_AT")
 
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
@@ -667,7 +669,7 @@ public class DIMS_Server {
 					{
 						try
 						{
-							String qry = "select M.메세지번호, S.NAME, S.STUDENT_NO , M.메세지제목, M.메세지본문 ,M.발신시각 from 메세지 M, DIMS_USER S where M.수신자='"+userIdentify+"' and M.발신자=S.STUDENT_NO and M.구분='R' order by 발신시각 asc" ;
+							String qry = "select M.MESSAGE_NO, S.NAME, S.STUDENT_NO , M.MESSAGE_TITLE, M.MESSAGE_CONTENT ,M.SEND_AT from MESSAGE M, DIMS_USER S where M.RECEIVER='"+userIdentify+"' and M.SENDER=S.STUDENT_NO and M.TYPE='R' order by M.SEND_AT asc" ;
 
 							ResultSet rs = handler.executeQuery(qry);
 							JSONArray mArr = new JSONArray();
@@ -680,9 +682,9 @@ public class DIMS_Server {
 										rs.getString("메세지번호"),
 										rs.getString("NAME"),
 										rs.getString("STUDENT_NO"),
-										rs.getString("메세지제목"),
-										rs.getString("메세지본문"),
-										rs.getDate("발신시각")
+										rs.getString("MESSAGE_TITLE"),
+										rs.getString("MESSAGE_CONTENT"),
+										rs.getDate("SEND_AT")
 
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
@@ -699,7 +701,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.MESSAGE_SEND_LIST_REQUEST))
 					{
-						String qry = "select M.메세지번호, S.NAME, S.STUDENT_NO , M.메세지제목, M.메세지본문 ,M.발신시각  from 메세지 M, DIMS_USER S where M.발신자='"+userIdentify+"' and M.수신자=S.STUDENT_NO and M.구분='S' order by 발신시각 asc";
+						String qry = "select M.MESSAGE_NO, S.NAME, S.STUDENT_NO , M.MESSAGE_TITLE, M.MESSAGE_CONTENT ,M.SEND_AT  from MESSAGE M, DIMS_USER S where M.SENDER='"+userIdentify+"' and M.RECEIVER=S.STUDENT_NO and M.TYPE='S' order by M.SEND_AT asc";
 
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
@@ -711,9 +713,9 @@ public class DIMS_Server {
 									rs.getString("메세지번호"),
 									rs.getString("NAME"),
 									rs.getString("STUDENT_NO"),
-									rs.getString("메세지제목"),
-									rs.getString("메세지본문"),
-									rs.getDate("발신시각")
+									rs.getString("MESSAGE_TITLE"),
+									rs.getString("MESSAGE_CONTENT"),
+									rs.getDate("SEND_AT")
 
 
 							};
@@ -741,12 +743,12 @@ public class DIMS_Server {
 						if(request.get("content_type").toString().equals("send"))
 						{
 							send_json.put("content_type", "send");
-							qry = "select M.메세지번호, S.NAME, M.메세지제목, M.메세지본문, M.발신시각 from 메세지 M, DIMS_USER S where M.수신자=S.STUDENT_NO and M.메세지번호= "+reqNo;
+							qry = "select M.MESSAGE_NO, S.NAME, M.MESSAGE_TITLE, M.MESSAGE_CONTENT, M.SEND_AT from MESSAGE M, DIMS_USER S where M.RECEIVER=S.STUDENT_NO and M.MESSAGE_NO= "+reqNo;
 						}
 						else
 						{
 							send_json.put("content_type", "recieve");
-							qry = "select M.메세지번호, S.NAME, M.메세지제목, M.메세지본문, M.발신시각 from 메세지 M, DIMS_USER S where M.발신자=S.STUDENT_NO and M.메세지번호= "+reqNo;
+							qry = "select M.MESSAGE_NO, S.NAME, M.MESSAGE_TITLE, M.MESSAGE_CONTENT, M.SEND_AT from MESSAGE M, DIMS_USER S where M.SENDER=S.STUDENT_NO and M.MESSAGE_NO= "+reqNo;
 						}
 
 						ResultSet rs = handler.executeQuery(qry);
@@ -754,8 +756,8 @@ public class DIMS_Server {
 						while(rs.next())
 						{
 							String sender_m = rs.getString("NAME");
-							String msgTitle_m = rs.getString("메세지제목");
-							String msgContent_m = rs.getString("메세지본문");
+							String msgTitle_m = rs.getString("MESSAGE_TITLE");
+							String msgContent_m = rs.getString("MESSAGE_CONTENT");
 							String sendTime_m = rs.getString("발신시각");
 
 							send_json.put("type",NetworkProtocols.MESSAGE_CONTENT_RESPOND);
@@ -1069,7 +1071,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.SHOW_USER_INFO_TAP_REQUEST))
 					{
-						String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS, S.PHONE_TEL_NO, S.HOME_TEL_NO, S.ID_NO, S.SEX, S.ROOM_NO, S.GRADE, M.학과이름 from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
+						String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS, S.PHONE_TEL_NO, S.HOME_TEL_NO, S.ID_NO, S.SEX, S.ROOM_NO, S.GRADE, M.DEPARTMENT_NAME from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
 
 						ResultSet rs = handler.executeQuery(qry);
 
@@ -1088,7 +1090,7 @@ public class DIMS_Server {
 									rs.getString("SEX"),
 									rs.getString("ROOM_NO"),
 									rs.getInt("GRADE"),
-									rs.getString("학과이름")
+									rs.getString("DEPARTMENT_NAME")
 							};
 							mArr.add(Toolbox.createJSONProtocol(keys, values));
 						}
@@ -1103,7 +1105,7 @@ public class DIMS_Server {
 						String num = request.get("STUDENT_NO").toString();
 
 						System.out.println(num);
-						String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS, S.PHONE_TEL_NO, S.HOME_TEL_NO, S.ID_NO, S.SEX, S.ROOM_NO, S.GRADE, M.학과이름, S.PROFILE_IMAGE_URL from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.STUDENT_NO = '"+num+"'";
+						String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS, S.PHONE_TEL_NO, S.HOME_TEL_NO, S.ID_NO, S.SEX, S.ROOM_NO, S.GRADE, M.DEPARTMENT_NAME, S.PROFILE_IMAGE_URL from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.STUDENT_NO = '"+num+"'";
 						ResultSet rs = handler.executeQuery(qry);
 
 						JSONObject mArr = new JSONObject();
@@ -1123,7 +1125,7 @@ public class DIMS_Server {
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
 										rs.getInt("GRADE"),
-										rs.getString("학과이름"),
+										rs.getString("DEPARTMENT_NAME"),
 										Files.readAllBytes(new File(rs.getString("PROFILE_IMAGE_URL")).toPath())
 								};
 								mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
@@ -1140,7 +1142,7 @@ public class DIMS_Server {
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
 										rs.getInt("GRADE"),
-										rs.getString("학과이름"),
+										rs.getString("DEPARTMENT_NAME"),
 										"no-image"
 								};
 								mArr = Toolbox.createJSONProtocol(NetworkProtocols.USER_CONTENT_RESPOND, keys, values);
@@ -1401,7 +1403,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.STUDENT_RECIEVE_MESSAGE_REQUEST))
 					{
-						String qry = "select M.메세지번호, S.STUDENT_NO, S.NAME, M.메세지제목, M.발신시각, M.메세지본문  from 메세지 M, DIMS_USER S where M.수신자='"+userIdentify+"' and M.발신자=S.STUDENT_NO and M.구분='R' order by 발신시각 asc";
+						String qry = "select M.MESSAGE_NO, S.STUDENT_NO, S.NAME, M.MESSAGE_TITLE, M.SEND_AT, M.MESSAGE_CONTENT  from MESSAGE M, DIMS_USER S where M.RECEIVER='"+userIdentify+"' and M.SENDER=S.STUDENT_NO and M.TYPE='R' order by M.SEND_AT asc";
 
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
@@ -1411,12 +1413,12 @@ public class DIMS_Server {
 						while(rs.next())
 						{
 							Object[] values = {
-									rs.getInt("메세지번호"),
+									rs.getInt("MESSAGE_NO"),
 									rs.getString("STUDENT_NO"),
 									rs.getString("NAME"),
-									rs.getString("메세지제목"),
-									rs.getDate("발신시각"),
-									rs.getString("메세지본문")
+									rs.getString("MESSAGE_TITLE"),
+									rs.getDate("SEND_AT"),
+									rs.getString("MESSAGE_CONTENT")
 							};
 							mArr.add(Toolbox.createJSONProtocol(keys, values));
 						}
@@ -1428,7 +1430,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.STUDENT_SEND_MESSAGE_REQUEST))
 					{
-						String qry = "select M.메세지번호, S.STUDENT_NO, S.NAME, M.메세지제목, M.발신시각, M.메세지본문 from 메세지 M, DIMS_USER S where M.발신자='"+userIdentify+"' and M.수신자=S.STUDENT_NO and M.구분='S' order by 발신시각 asc";
+						String qry = "select M.MESSAGE_NO, S.STUDENT_NO, S.NAME, M.MESSAGE_TITLE, M.SEND_AT, M.MESSAGE_CONTENT from MESSAGE M, DIMS_USER S where M.SENDER='"+userIdentify+"' and M.RECEIVER=S.STUDENT_NO and M.TYPE='S' order by M.SEND_AT asc";
 						System.out.println("실행되는 쿼리 : "+qry);
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
@@ -1440,12 +1442,12 @@ public class DIMS_Server {
 							while(rs.next())
 							{
 								Object[] values = {
-										rs.getInt("메세지번호"),
+										rs.getInt("MESSAGE_NO"),
 										rs.getString("STUDENT_NO"),
 										rs.getString("NAME"),
-										rs.getString("메세지제목"),
-										rs.getDate("발신시각"),
-										rs.getString("메세지본문")
+										rs.getString("MESSAGE_TITLE"),
+										rs.getDate("SEND_AT"),
+										rs.getString("MESSAGE_CONTENT")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -1733,7 +1735,7 @@ public class DIMS_Server {
 
 							String typemessage = aa.get("No").toString();
 
-							String qry = "delete from 메세지 where 메세지번호 = '"+typemessage+"'";
+							String qry = "delete from MESSAGE where 메세지번호 = '"+typemessage+"'";
 
 							handler.excuteUpdate(qry);
 						}
@@ -1748,13 +1750,13 @@ public class DIMS_Server {
 						if(request.get("reqType").equals("R"))
 						{
 							json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND);
-							qry = "delete from 메세지 where 수신자 = '"+userIdentify+"' and 구분='R';";
+							qry = "delete from MESSAGE where 수신자 = '"+userIdentify+"' and 구분='R';";
 							json.put("resType", "R");
 						}
 						else
 						{
 							json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_ALL_DELETE_RESPOND);
-							qry = "delete from 메세지 where 발신자 = '"+userIdentify+"' and 구분='S';";
+							qry = "delete from MESSAGE where 발신자 = '"+userIdentify+"' and 구분='S';";
 							json.put("resType", "S");
 						}
 						handler.excuteUpdate(qry);
@@ -1793,19 +1795,19 @@ public class DIMS_Server {
 						String qry ="";
 						if(classnum == 0 && levelnum == 0)
 						{
-							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
+							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
 						}
 						else if(classnum == 0)
 						{
-							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR="+"'"+levelnum+"'order by S.ROOM_NO";
+							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR="+"'"+levelnum+"'order by S.ROOM_NO";
 						}
 						else if(levelnum == 0)
 						{
-							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT="+"'"+classnum+"'order by S.ROOM_NO";
+							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT="+"'"+classnum+"'order by S.ROOM_NO";
 						}
 						else
 						{
-							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR="+"'"+levelnum+"' and"+" S.DEPARTMENT = '"+classnum+"' order by S.ROOM_NO";
+							qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR="+"'"+levelnum+"' and"+" S.DEPARTMENT = '"+classnum+"' order by S.ROOM_NO";
 						}
 						ResultSet rs = handler.executeQuery(qry);
 
@@ -1823,8 +1825,8 @@ public class DIMS_Server {
 									rs.getString("ID_NO"),
 									rs.getString("SEX"),
 									rs.getString("ROOM_NO"),
-									rs.getString("GRADE"),
-									rs.getString("학과이름")
+									rs.getInt("GRADE"),
+									rs.getString("DEPARTMENT_NAME")
 							};
 							mArr.add(Toolbox.createJSONProtocol(keys, values));
 						}
@@ -1860,7 +1862,7 @@ public class DIMS_Server {
 						String check = request.get("comboCheck").toString();
 						if(check.equals("1"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -1880,8 +1882,8 @@ public class DIMS_Server {
 											rs.getString("ID_NO"),
 											rs.getString("SEX"),
 											rs.getString("ROOM_NO"),
-											rs.getString("GRADE"),
-											rs.getString("학과이름")
+											rs.getInt("GRADE"),
+											rs.getString("DEPARTMENT_NAME")
 									};
 									mArr.add(Toolbox.createJSONProtocol(keys, values));
 								}
@@ -1899,7 +1901,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("2"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=1 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=1 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -1917,8 +1919,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -1931,7 +1933,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("3"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=2 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=2 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -1949,8 +1951,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -1963,7 +1965,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("4"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=3 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=3 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -1981,8 +1983,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -1996,7 +1998,7 @@ public class DIMS_Server {
 						else if(check.equals("5"))
 						{
 
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=4 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=4 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2014,8 +2016,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2028,7 +2030,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("6"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=5 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=5 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2046,8 +2048,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2060,7 +2062,7 @@ public class DIMS_Server {
 						}
 						else
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=6 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.DEPARTMENT=6 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2078,8 +2080,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2098,7 +2100,7 @@ public class DIMS_Server {
 
 						if(check.equals("1"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2116,8 +2118,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2130,7 +2132,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("2"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=1 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=1 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2148,8 +2150,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2162,7 +2164,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("3"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=2 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=2 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2180,8 +2182,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2194,7 +2196,7 @@ public class DIMS_Server {
 						}
 						else if(check.equals("4"))
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=3 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=3 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2212,8 +2214,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2226,7 +2228,7 @@ public class DIMS_Server {
 						}
 						else
 						{
-							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.학과이름  from STUDENT S, DIMS_USER A, 학과_목록 M  where S.DEPARTMENT = M.학과번호 and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=4 order by S.ROOM_NO";
+							String qry = "select S.STUDENT_NO, A.NAME ,S.ADDRESS,S.PHONE_TEL_NO, S.HOME_TEL_NO,S.ID_NO ,S.SEX ,S.ROOM_NO ,S.GRADE ,M.DEPARTMENT_NAME  from STUDENT S, DIMS_USER A, DEPARTMENT M  where S.DEPARTMENT = M.DEPARTMENT_NO and S.STUDENT_NO = A.STUDENT_NO and S.ROOM_FLOOR=4 order by S.ROOM_NO";
 
 							ResultSet rs = handler.executeQuery(qry);
 
@@ -2244,8 +2246,8 @@ public class DIMS_Server {
 										rs.getString("ID_NO"),
 										rs.getString("SEX"),
 										rs.getString("ROOM_NO"),
-										rs.getString("GRADE"),
-										rs.getString("학과이름")
+										rs.getInt("GRADE"),
+										rs.getString("DEPARTMENT_NAME")
 								};
 								mArr.add(Toolbox.createJSONProtocol(keys, values));
 							}
@@ -2259,12 +2261,12 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.ADMIN_CATEGORY_DELETE_REQUEST))
 					{
-						String qry = "select 카테고리이름 from 게시글_카테고리목록;";
+						String qry = "select CATEGORY_NAME from BOARD_CATEGORY;";
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray data = new JSONArray();
 						while(rs.next())
 						{
-							data.add(rs.getString("카테고리이름"));
+							data.add(rs.getString("CATEGORY_NAME"));
 						}
 						JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_CATEGORY_DELETE_RESPOND);
 						respond.put("category-list", data);
@@ -2295,7 +2297,7 @@ public class DIMS_Server {
 						System.out.println();
 						handler.excuteUpdate(qry);
 
-						qry = "delete from 게시글_카테고리목록 where 카테고리번호 = "+request.get("category")+";";
+						qry = "delete from BOARD_CATEGORY where 카테고리번호 = "+request.get("category")+";";
 						handler.excuteUpdate(qry);
 
 						sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_DELETE_FINAL_RESPOND));
@@ -2304,12 +2306,12 @@ public class DIMS_Server {
 					{
 						try
 						{
-							ResultSet rs = handler.executeQuery("select 카테고리이름 from 게시글_카테고리목록");
+							ResultSet rs = handler.executeQuery("select CATEGORY_NAME from BOARD_CATEGORY");
 							JSONArray data = new JSONArray();
 
 							while(rs.next())
 							{
-								data.add(rs.getString("카테고리이름"));
+								data.add(rs.getString("CATEGORY_NAME"));
 							}
 							JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_CATEGORY_LIST_RESPOND);
 							respond.put("category-list", data);
@@ -2329,18 +2331,18 @@ public class DIMS_Server {
 
 						if(qType.equals("작성자"))
 						{
-							qry = "select G.게시글번호, S.NAME, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M "
-									+ "where S.STUDENT_NO=G.작성자 and M.카테고리번호=G.카테고리 and G.작성자 = (select STUDENT_NO from DIMS_USER where 이름 = '"+qWord+"');";
+							qry = "select G.NO, S.NAME, G.TITLE, G.CREATED_AT, G.CONTENT, M.CATEGORY_NAME from DIMS_USER S, BOARD G, BOARD_CATEGORY M "
+									+ "where S.STUDENT_NO=G.CREATOR and M.NO=G.CATEGORY_NO and G.CREATOR = (select STUDENT_NO from DIMS_USER where NAME = '"+qWord+"');";
 						}
 						else if(qType.equals("제목"))
 						{
-							qry = "select G.게시글번호, S.NAME, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M "
-									+ "where S.STUDENT_NO=G.작성자 and M.카테고리번호=G.카테고리 and G.게시글제목 like '%"+qWord+"%';";
+							qry = "select G.NO, S.NAME, G.TITLE, G.CREATED_AT, G.CONTENT, M.CATEGORY_NAME from DIMS_USER S, BOARD G, BOARD_CATEGORY M "
+									+ "where S.STUDENT_NO=G.CREATOR and M.NO=G.CATEGORY_NO and G.TITLE like '%"+qWord+"%';";
 						}
 						else if(qType.equals("내용"))
 						{
-							qry = "select G.게시글번호, S.NAME, G.게시글제목, G.작성일자, G.게시글본문, M.카테고리이름 from DIMS_USER S, 게시글 G, 게시글_카테고리목록 M "
-									+ "where S.STUDENT_NO=G.작성자 and M.카테고리번호=G.카테고리 and G.게시글본문 like '%"+qWord+"%';";
+							qry = "select G.NO, S.NAME, G.TITLE, G.CREATED_AT, G.CONTENT, M.CATEGORY_NAME from DIMS_USER S, BOARD G, BOARD_CATEGORY M "
+									+ "where S.STUDENT_NO=G.CREATOR and M.NO=G.CATEGORY_NO and G.CONTENT like '%"+qWord+"%';";
 						}
 						System.out.println(qry);
 						ResultSet rs = handler.executeQuery(qry);
@@ -2359,12 +2361,12 @@ public class DIMS_Server {
 							{
 								while(rs.next())
 								{
-									Object[] o = {rs.getInt("게시글번호"),
+									Object[] o = {rs.getInt("NO"),
 											rs.getString("NAME"),
-											rs.getString("게시글제목"),
-											rs.getDate("작성일자"),
-											rs.getString("게시글본문"),
-											rs.getString("카테고리이름")};
+											rs.getString("TITLE"),
+											rs.getDate("CREATED_AT"),
+											rs.getString("CONTENT"),
+											rs.getString("CATEGORY_NAME")};
 
 									JSONObject n = Toolbox.createJSONProtocol(keys, o);
 									arr.add(n);
@@ -2375,7 +2377,7 @@ public class DIMS_Server {
 								e.printStackTrace();
 							}
 
-							String qry2 = "select 카테고리이름 from 게시글_카테고리목록;";
+							String qry2 = "select CATEGORY_NAME from BOARD_CATEGORY;";
 
 							ResultSet rs2 = handler.executeQuery(qry2);
 
@@ -2403,7 +2405,8 @@ public class DIMS_Server {
 						JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIN_MAIN_RESPOND);
 
 						// 진행중인 서류가 없는 경우
-						if(Toolbox.getResultSetSize(handler.executeQuery("select * from 제출서류목록"))==0)
+//						if(Toolbox.getResultSetSize(handler.executeQuery("select * from SUBMIT_DOCUMENT"))==0)
+						if(!handler.executeQuery("select * from SUBMIT_DOCUMENT").next())
 						{
 							respond.put("submit-process", "no-data");
 						}
@@ -2412,12 +2415,12 @@ public class DIMS_Server {
 						{
 							respond.put("submit-process", "exist-data");
 
-							ResultSet rs = handler.executeQuery("select 제출분류명, 마감시간 from 제출서류목록;");
+							ResultSet rs = handler.executeQuery("select SUBMIT_NAME, DUE_DATE from SUBMIT_DOCUMENT;");
 							rs.next();
-							respond.put("제출분류명", rs.getString("제출분류명"));
-							respond.put("마감시간", rs.getDate("마감시간"));
+							respond.put("제출분류명", rs.getString("SUBMIT_NAME"));
+							respond.put("마감시간", rs.getDate("DUE_DATE"));
 
-							ResultSet rs2 = handler.executeQuery("select M.서류번호,M.제출자,S.NAME,M.제출서류저장URL,M.제출시간 from 제출서류함 M, DIMS_USER S where M.제출자=S.STUDENT_NO;");
+							ResultSet rs2 = handler.executeQuery("select M.DOCUMENT_NO,M.SUBMITTER,S.NAME,M.DOCUMENT_URL,M.SUBMIT_DATE from STUDENT_SUBMIT_DOCUMENT M, DIMS_USER S where M.SUBMITTER=S.STUDENT_NO;");
 							JSONArray data = new JSONArray();
 							try
 							{
@@ -2426,9 +2429,9 @@ public class DIMS_Server {
 									JSONObject rawData = null;
 									String[] keys = {"서류번호","STUDENT_NO","이름","제출여부","제출시간"};
 
-									if(rs2.getString("제출서류저장URL")==null)
+									if(rs2.getString("DOCUMENT_URL")==null)
 									{
-										Object[] values = {rs2.getInt("서류번호"),
+										Object[] values = {rs2.getInt("DOCUMENT_NO"),
 												rs2.getString("제출자"),
 												rs2.getString("이름"),
 												"미제출",
@@ -2437,11 +2440,11 @@ public class DIMS_Server {
 									}
 									else
 									{
-										Object[] values = {rs2.getInt("서류번호"),
+										Object[] values = {rs2.getInt("DOCUMENT_NO"),
 												rs2.getString("제출자"),
 												rs2.getString("이름"),
 												"제출",
-												rs2.getTimestamp("제출시간")};
+												rs2.getTimestamp("SUBMIT_DATE")};
 										rawData = Toolbox.createJSONProtocol(keys,values);
 									}
 									data.add(rawData);
@@ -2466,14 +2469,14 @@ public class DIMS_Server {
 						SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 						String dateString = d.format(date);
 
-						String qry = "insert into 제출서류목록(분류번호,제출분류명,마감시간) values(1,'"+title+"','"+dateString+"');";
+						String qry = "insert into SUBMIT_DOCUMENT(SUBMIT_TYPE,SUBMIT_NAME,DUE_DATE) values(1,'"+title+"','"+dateString+"');";
 						handler.excuteUpdate(qry);
 
 						ResultSet rs = handler.executeQuery("select STUDENT_NO from STUDENT;");
 						int count = 0;
 						while(rs.next())
 						{
-							handler.excuteUpdate("insert into 제출서류함(서류번호,제출자,분류) values("+count+",'"+rs.getString("STUDENT_NO")+"',1);");
+							handler.excuteUpdate("insert into STUDENT_SUBMIT_DOCUMENT(DOCUMENT_NO,SUBMITTER,SUBMIT_TYPE) values("+count+",'"+rs.getString("STUDENT_NO")+"',1);");
 							count++;
 						}
 
@@ -2482,7 +2485,7 @@ public class DIMS_Server {
 					else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_REQEUST))
 					{
 						JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_ASK_RESPOND);
-						if(Toolbox.getResultSetSize(handler.executeQuery("select * from 제출서류함 where 제출서류저장URL is NULL;"))!=0)
+						if(Toolbox.getResultSetSize(handler.executeQuery("select * from STUDENT_SUBMIT_DOCUMENT where DOCUMENT_URL is NULL;"))!=0)
 						{
 							respond.put("result", "re-ask");
 						}
@@ -2494,8 +2497,8 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.ADMIN_SUBMIT_DISPOSE_REQEUST))
 					{
-						handler.excuteUpdate("delete from 제출서류함;");
-						handler.excuteUpdate("delete from 제출서류목록;");
+						handler.excuteUpdate("delete from STUDENT_SUBMIT_DOCUMENT;");
+						handler.excuteUpdate("delete from SUBMIT_DOCUMENT;");
 						// C:\DIMS\SubmittedData 폴더 파일들 다 지워함
 
 						for(File target : new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).listFiles())
@@ -2509,18 +2512,18 @@ public class DIMS_Server {
 					{
 						String filename = Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY+userIdentify+"_submitted."+request.get("확장자");
 						byte[] data = (byte[])request.get("데이터");
-						ResultSet rs = handler.executeQuery("select 제출서류저장URL from 제출서류함 where 제출자 = '"+userIdentify+"';");
+						ResultSet rs = handler.executeQuery("select DOCUMENT_URL from STUDENT_SUBMIT_DOCUMENT where SUBMITTER = '"+userIdentify+"';");
 						rs.next();
-						if(rs.getString("제출서류저장URL")!=null)
+						if(rs.getString("DOCUMENT_URL")!=null)
 						{
-							File deleteTarget = new File(rs.getString("제출서류저장URL"));
+							File deleteTarget = new File(rs.getString("DOCUMENT_URL"));
 							deleteTarget.delete();
 						}
 
 						Files.write(new File(filename).toPath(), data);
 
-						handler.excuteUpdate("update 제출서류함 set 제출서류저장URL = '"+filename+"' where 제출자 = '"+userIdentify+"';");
-						handler.excuteUpdate("update 제출서류함 set 제출시간 = now() where 제출자 = '"+userIdentify+"';");
+						handler.excuteUpdate("update STUDENT_SUBMIT_DOCUMENT set DOCUMENT_URL = '"+filename+"' where SUBMITTER = '"+userIdentify+"';");
+						handler.excuteUpdate("update STUDENT_SUBMIT_DOCUMENT set SUBMIT_DATE = now() where SUBMITTER = '"+userIdentify+"';");
 						sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_SUBMIT_RESPOND));
 					}
 					else if(type.equals(NetworkProtocols.ADMIN_LOCAL_SAVE_REQUEST))
