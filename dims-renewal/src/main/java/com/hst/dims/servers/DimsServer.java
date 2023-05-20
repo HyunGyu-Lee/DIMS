@@ -298,11 +298,11 @@ public class DimsServer {
 											rs.getString("CONTENT"),
 											rs.getString("CATEGORY_NAME")};
 
-									JSONObject n = Toolbox.createJSONProtocol(keys, o);
+									환JSONObject n = Toolbox.createJSONProtocol(keys, o);
 									data.add(n);
 								}
 
-								String[] keys2 = {"메세지번호","STUDENT_NO","발신자","메세지제목","발신시각", "메세지본문"};
+								String[] keys2 = {"메세지번호","학번","발신자","메세지제목","발신시각", "메세지본문"};
 								JSONArray mArr = new JSONArray();
 								while(rs2.next())
 								{
@@ -622,7 +622,7 @@ public class DimsServer {
 							ResultSet rs = handler.executeQuery(qry);
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"No","발신자","STUDENT_NO","메세지제목","메세지본문","발신시각"};
+							String[] keys = {"No","발신자","학번","메세지제목","메세지본문","발신시각"};
 
 							while(rs.next())
 							{
@@ -656,7 +656,7 @@ public class DimsServer {
 							ResultSet rs = handler.executeQuery(qry);
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"No","발신자","STUDENT_NO","메세지제목","메세지본문","발신시각"};
+							String[] keys = {"No","발신자","학번","메세지제목","메세지본문","발신시각"};
 
 							while(rs.next())
 							{
@@ -687,7 +687,7 @@ public class DimsServer {
 
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
-						String[] keys = {"No","수신자","STUDENT_NO","메세지제목","메세지본문","발신시각"};
+						String[] keys = {"No","수신자","학번","메세지제목","메세지본문","발신시각"};
 
 						while(rs.next())
 						{
@@ -1059,7 +1059,7 @@ public class DimsServer {
 
 						JSONArray mArr = new JSONArray();
 
-						String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+						String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","소속학과"};
 						while(rs.next())
 						{
 							Object[] values = {
@@ -1092,7 +1092,7 @@ public class DimsServer {
 
 						JSONObject mArr = new JSONObject();
 
-						String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT","이미지데이터"};
+						String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT","이미지데이터"};
 						while(rs.next())
 						{
 							if(rs.getString("PROFILE_IMAGE_URL")!=null)
@@ -1167,7 +1167,7 @@ public class DimsServer {
 						}
 
 						JSONArray jarr = new JSONArray();
-						String keys[] = {"외박번호","이름","STUDENT_NO","사유","신청일자","외박일자","목적지","승인여부"};
+						String keys[] = {"외박번호","이름","학번","사유","신청일자","외박일자","목적지","승인여부"};
 						while(rs.next())
 						{
 							Object[] values ={
@@ -1196,25 +1196,25 @@ public class DimsServer {
 						ResultSet rs = handler.executeQuery(qry);
 
 						JSONArray jarr = new JSONArray();
-						String keys[] = {"STUDENT_NO","이름","상점","벌점","합계"};
+						String keys[] = {"학번","이름","상점","벌점","합계"};
 						while(rs.next())
 						{
 							String num = rs.getString("STUDENT_NO");
 							System.out.println("STUDENT_NO 찍기 : "+num);
 
-							String plusqry = "select sum(점수) from 상벌점부여목록 where STUDENT_NO ="+"'"+num+"'"+"and "+"상벌점타입 = '상점'";
-							String minusqry = "select sum(점수) from 상벌점부여목록 where STUDENT_NO ="+"'"+num+"'"+"and "+"상벌점타입 = '벌점'";
+							String plusqry = "select sum(SCORE) from REWARD where STUDENT_NO ="+"'"+num+"'"+"and "+"REWARD_TYPE = '상점'";
+							String minusqry = "select sum(SCORE) from REWARD where STUDENT_NO ="+"'"+num+"'"+"and "+"REWARD_TYPE = '벌점'";
 
 							ResultSet rs1 = handler.executeQuery(plusqry);
 							ResultSet rs2 = handler.executeQuery(minusqry);
 
 							while(rs1.next())
 							{
-								plus = rs1.getString("sum(점수)");
+								plus = rs1.getString("sum(SCORE)");
 							}
 							while(rs2.next())
 							{
-								minus = rs2.getString("sum(점수)");
+								minus = rs2.getString("sum(SCORE)");
 							}
 
 							if(plus == null)
@@ -1259,7 +1259,7 @@ public class DimsServer {
 
 						JSONObject arr = null;
 
-						String keys[] = {"외박번호","STUDENT_NO","사유","신청일자","외박일자","목적지","승인여부"};
+						String keys[] = {"외박번호","학번","사유","신청일자","외박일자","목적지","승인여부"};
 						while(rs.next())
 						{
 							Object values[] = {rs.getInt("외박번호"),rs.getString("신청자"),rs.getString("사유"),rs.getDate("신청일자"),rs.getDate("외박일자"),rs.getString("목적지"),rs.getInt("승인여부")};
@@ -1274,22 +1274,22 @@ public class DimsServer {
 					}
 					else if(type.equals(NetworkProtocols.PLUS_MINUS_TAP_INFO_REQUEST))
 					{
-						String qry = "select P.상벌점부여번호,P.날짜,S.STUDENT_NO ,S.NAME, P.내용 ,P.점수 ,P.상벌점타입  from 상벌점부여목록 P, DIMS_USER S where S.STUDENT_NO = P.STUDENT_NO";
+						String qry = "select P.REWARD_NO,P.CREATED_AT,S.STUDENT_NO ,S.NAME, P.CONTENT ,P.SCORE ,P.REWARD_TYPE  from REWARD P, DIMS_USER S where S.STUDENT_NO = P.STUDENT_NO";
 
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray jarray = new JSONArray();
 
-						String keys[] = {"No","날짜","STUDENT_NO","이름","내용","점수","상벌점타입"};
+						String keys[] = {"No","날짜","학번","이름","내용","점수","상벌점타입"};
 						while(rs.next())
 						{
 							Object values[] = {
-									rs.getInt("상벌점부여번호"),
-									rs.getDate("날짜"),
+									rs.getInt("REWARD_NO"),
+									rs.getDate("CREATED_AT"),
 									rs.getString("STUDENT_NO"),
 									rs.getString("NAME"),
-									rs.getString("내용"),
-									rs.getInt("점수"),
-									rs.getString("상벌점타입")
+									rs.getString("CONTENT"),
+									rs.getInt("SCORE"),
+									rs.getString("REWARD_TYPE")
 							};
 							jarray.add(Toolbox.createJSONProtocol(keys, values));
 						}
@@ -1349,7 +1349,7 @@ public class DimsServer {
 								rs = handler.executeQuery(qry2);
 
 								JSONArray jarr = new JSONArray();
-								String keys[] = {"외박번호","이름","STUDENT_NO","사유","신청일자","외박일자","목적지","승인여부"};
+								String keys[] = {"외박번호","이름","학번","사유","신청일자","외박일자","목적지","승인여부"};
 								while(rs.next())
 								{
 									Object[] values ={
@@ -1390,7 +1390,7 @@ public class DimsServer {
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
 
-						String[] keys = {"메세지번호","STUDENT_NO","발신자","메세지제목","발신시각", "메세지본문"};
+						String[] keys = {"메세지번호","학번","발신자","메세지제목","발신시각", "메세지본문"};
 
 						while(rs.next())
 						{
@@ -1417,7 +1417,7 @@ public class DimsServer {
 						ResultSet rs = handler.executeQuery(qry);
 						JSONArray mArr = new JSONArray();
 
-						String[] keys = {"메세지번호","STUDENT_NO","수신자","메세지제목","발신시각", "메세지본문"};
+						String[] keys = {"메세지번호","학번","수신자","메세지제목","발신시각", "메세지본문"};
 
 						try
 						{
@@ -1466,7 +1466,7 @@ public class DimsServer {
 								score = "-"+score;
 							}
 						}
-						String qry = "insert into 상벌점부여목록(STUDENT_NO,상벌점타입,점수,내용,날짜) values('"+num+"' , '"+choice+"' ,"+score+", '"
+						String qry = "insert into REWARD(STUDENT_NO,REWARD_TYPE,SCORE,CONTENT,CREATED_AT) values('"+num+"' , '"+choice+"' ,"+score+", '"
 								+content+"',now());";
 
 						handler.excuteUpdate(qry);
@@ -1497,7 +1497,7 @@ public class DimsServer {
 
 						try
 						{
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","이미지데이터","학년","DEPARTMENT","질문내용","비밀번호찾기_답변"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","이미지데이터","학년","소속학과","질문내용","비밀번호찾기_답변"};
 							JSONObject respond = null;
 							while(rs.next())
 							{
@@ -1544,13 +1544,13 @@ public class DimsServer {
 
 							}
 
-							String qry2 = "select sum(점수) AS 상벌점 from 상벌점부여목록 where STUDENT_NO='"+userIdentify+"';";
+							String qry2 = "select sum(SCORE) from REWARD where STUDENT_NO='"+userIdentify+"';";
 
 							ResultSet rs2 = handler.executeQuery(qry2);
 
 							while(rs2.next())
 							{
-								respond.put("상벌점", rs2.getInt("상벌점"));
+								respond.put("상벌점", rs2.getInt("sum(SCORE)"));
 							}
 
 							String qry3 = "select QUESTION_CONTENT from PASSWORD_FIND_QUESTION;";
@@ -1575,7 +1575,7 @@ public class DimsServer {
 						byte[] requestImageData = (byte[]) request.get("content");
 
 						// 서버 로컬에 저장작업
-						String savePath = Statics.DEFAULT_USER_DATA_DIRECTORY+userIdentify+"_profilePhoto."+requestFileFormat;
+						String savePath = String.format("%s/%s_profile.%s", Statics.DEFAULT_USER_DATA_DIRECTORY, userIdentify, requestFileFormat);
 						String qry = "update STUDENT set PROFILE_IMAGE_URL = '"+savePath+"' where STUDENT_NO='"+userIdentify+"';";
 
 						handler.excuteUpdate(qry);
@@ -1591,7 +1591,7 @@ public class DimsServer {
 						String qry = "update DIMS_USER set NAME = '"+request.get("이름")+"' where STUDENT_NO = '"+userIdentify+"';";
 						handler.excuteUpdate(qry);
 
-						String qry2 = "update DIMS_USER set 성별 = '"+request.get("성별")+"', PHONE_TEL_NO = '"+request.get("휴대폰번호")+"', ID_NO = '"+request.get("주민등록번호")+"', HOME_TEL_NO = '"+request.get("자택전화번호")+"', ADDRESS = '"+request.get("주소")+"', GRADE = '"+request.get("학년")+"', DEPARTMENT = '"+request.get("DEPARTMENT")+"' where STUDENT_NO = '"+userIdentify+"';";
+						String qry2 = "update DIMS_USER set SEX = '"+request.get("성별")+"', PHONE_TEL_NO = '"+request.get("휴대폰번호")+"', ID_NO = '"+request.get("주민등록번호")+"', HOME_TEL_NO = '"+request.get("자택전화번호")+"', ADDRESS = '"+request.get("주소")+"', GRADE = '"+request.get("학년")+"', DEPARTMENT = '"+request.get("DEPARTMENT")+"' where STUDENT_NO = '"+userIdentify+"';";
 						handler.excuteUpdate(qry2);
 						sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_MODIFY_USER_INFO_RESPOND));
 					}
@@ -1759,7 +1759,7 @@ public class DimsServer {
 							ResultSet rs = handler.executeQuery(qry);
 							rs.next();
 
-							String[] keys = {"STUDENT_NO","이름"};
+							String[] keys = {"학번","이름"};
 							Object[] values = {rs.getString("STUDENT_NO"),rs.getString("NAME")};
 
 							sendProtocol(Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_REPLY_RESPOND, keys, values));
@@ -1795,7 +1795,7 @@ public class DimsServer {
 
 						JSONArray mArr = new JSONArray();
 
-						String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+						String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 						while(rs.next())
 						{
 							Object[] values = {
@@ -1850,7 +1850,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							try
 							{
 								while(rs.next())
@@ -1889,7 +1889,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -1921,7 +1921,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -1953,7 +1953,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -1986,7 +1986,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2018,7 +2018,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2050,7 +2050,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2088,7 +2088,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2120,7 +2120,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2152,7 +2152,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2184,7 +2184,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2216,7 +2216,7 @@ public class DimsServer {
 
 							JSONArray mArr = new JSONArray();
 
-							String[] keys = {"STUDENT_NO","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
+							String[] keys = {"학번","이름","주소","휴대폰번호","자택전화번호","주민등록번호","성별","방번호","학년","DEPARTMENT"};
 							while(rs.next())
 							{
 								Object[] values = {
@@ -2409,7 +2409,7 @@ public class DimsServer {
 								while(rs2.next())
 								{
 									JSONObject rawData = null;
-									String[] keys = {"서류번호","STUDENT_NO","이름","제출여부","제출시간"};
+									String[] keys = {"서류번호","학번","이름","제출여부","제출시간"};
 
 									if(rs2.getString("DOCUMENT_URL")==null)
 									{
