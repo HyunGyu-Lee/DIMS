@@ -1,11 +1,14 @@
 package com.hst.dims.servers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
+import com.hst.dims.clients.customcontrols.CalendarObject;
+import com.hst.dims.clients.customcontrols.CalendarObject.CalendarDataManager;
+import com.hst.dims.databases.DatabaseHandler;
+import com.hst.dims.files.DIMSFileServer;
+import com.hst.dims.tools.*;
+import com.orsoncharts.util.json.JSONArray;
+import com.orsoncharts.util.json.JSONObject;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -16,84 +19,63 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.orsoncharts.util.json.JSONArray;
-import com.orsoncharts.util.json.JSONObject;
-
-import com.hst.dims.clients.customcontrols.CalendarObject;
-import com.hst.dims.clients.customcontrols.CalendarObject.CalendarDataManager;
-import com.hst.dims.databases.DatabaseHandler;
-import com.hst.dims.files.DIMSFileServer;
-import com.hst.dims.tools.MailProperties;
-import com.hst.dims.tools.MailProperty;
-import com.hst.dims.tools.MailingService;
-import com.hst.dims.tools.NetworkProtocols;
-import com.hst.dims.tools.Statics;
-import com.hst.dims.tools.Toolbox;
-
-public class DIMS_Server {
+public class DimsServer {
 
 	private ServerSocket server;
 	private static boolean SERVER_RUN = false;
 	private boolean PRINT_LOG = true;
 	private DatabaseHandler handler;
-	private ArrayList<ConnectedClient> clients;
+	private List<ConnectedClient> clients;
 	DIMSFileServer fileServer;
 
-	public DIMS_Server()
-	{
-
-		clients = new ArrayList<ConnectedClient>();
-		//new Controller().start();
-		//serverOpen();
-
+	public DimsServer() {
+		clients = new ArrayList<>();
 	}
 
-	public void serverOpen()
-	{
-		try
-		{
+	public void start() {
+		try {
 			server = new ServerSocket(8080);
-			if(PRINT_LOG)
-			{
+			if (PRINT_LOG) {
 				System.out.println("[Server] 서버 오픈");
-				if(new File(Statics.DEFAULT_DIMS_DIRECTORY).exists()==false)
-				{
+				if (new File(Statics.DEFAULT_DIMS_DIRECTORY).exists() == false) {
 					System.out.println("[Server] 디렉토리를 자동으로 생성합니다.");
-					System.out.println("[Server] 생성 : "+Statics.DEFAULT_DIMS_DIRECTORY);
+					System.out.println("[Server] 생성 : " + Statics.DEFAULT_DIMS_DIRECTORY);
 					new File(Statics.DEFAULT_DIMS_DIRECTORY).mkdir();
-					System.out.println("[Server] 생성 : "+Statics.DEFAULT_MOVIE_DATA_DIRECTORY);
+					System.out.println("[Server] 생성 : " + Statics.DEFAULT_MOVIE_DATA_DIRECTORY);
 					new File(Statics.DEFAULT_MOVIE_DATA_DIRECTORY).mkdir();
-					System.out.println("[Server] 생성 : "+Statics.DEFAULT_USER_DATA_DIRECTORY);
+					System.out.println("[Server] 생성 : " + Statics.DEFAULT_USER_DATA_DIRECTORY);
 					new File(Statics.DEFAULT_USER_DATA_DIRECTORY).mkdir();
-					System.out.println("[Server] 생성 : "+Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY);
+					System.out.println("[Server] 생성 : " + Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY);
 					new File(Statics.DEFAULT_SUBMITTED_DATA_DIRECTORY).mkdir();
 				}
 			}
 			handler = new DatabaseHandler();
-			if(PRINT_LOG) System.out.println("[Server] 데이터베이스와 연결 시도...");
+			if (PRINT_LOG) System.out.println("[Server] 데이터베이스와 연결 시도...");
 
 			int result = handler.connect();
 
-			switch(result)
-			{
-				case DatabaseHandler.DRIVER_INIT_ERROR : if(PRINT_LOG)System.out.println("[Server] JDBC드라이버 설정이 잘못됐습니다."); return;
-				case DatabaseHandler.LOGIN_FAIL_ERROR : if(PRINT_LOG)System.out.println("[Server] 데이터베이스에 로그인하지 못했습니다. 아이디 또는 비밀번호를 확인하세요"); return;
-				case DatabaseHandler.COMPLETE : if(PRINT_LOG)System.out.println("[Server] 연결 성공");
+			switch (result) {
+				case DatabaseHandler.DRIVER_INIT_ERROR:
+					if (PRINT_LOG) System.out.println("[Server] JDBC드라이버 설정이 잘못됐습니다.");
+					return;
+				case DatabaseHandler.LOGIN_FAIL_ERROR:
+					if (PRINT_LOG) System.out.println("[Server] 데이터베이스에 로그인하지 못했습니다. 아이디 또는 비밀번호를 확인하세요");
+					return;
+				case DatabaseHandler.COMPLETE:
+					if (PRINT_LOG) System.out.println("[Server] 연결 성공");
 					SERVER_RUN = true;
 			}
 
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(PRINT_LOG)System.out.println("[Server] Waiter 스레드 시작");
+		if (PRINT_LOG) System.out.println("[Server] Waiter 스레드 시작");
 		new Waiter().start();
 		fileServer = new DIMSFileServer(9090);
-
 	}
 
 	class Waiter extends Thread
@@ -270,11 +252,11 @@ public class DIMS_Server {
 								if(r.get("request-view")!=null)
 								{
 									JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_QUESTION_LIST);
-									ResultSet rs = handler.executeQuery("select 질문내용 from 비밀번호찾기_질문목록");
+									ResultSet rs = handler.executeQuery("select QUESTION_CONTENT from PASSWORD_FIND_QUESTION");
 									JSONArray data = new JSONArray();
 									while(rs.next())
 									{
-										data.add(rs.getString("질문내용"));
+										data.add(rs.getString("QUESTION_CONTENT"));
 									}
 									respond.put("data", data);
 									sendProtocol(respond);
@@ -1505,9 +1487,9 @@ public class DIMS_Server {
 								+ "S.PROFILE_IMAGE_URL, "
 								+ "S.GRADE, "
 								+ "S.DEPARTMENT,"
-								+ "Q.질문내용,"
+								+ "Q.QUESTION_CONTENT,"
 								+ "S.ANSWER "
-								+ "from STUDENT S, DIMS_USER U, 비밀번호찾기_질문목록 Q where S.STUDENT_NO=U.STUDENT_NO and U.STUDENT_NO='"+userIdentify+"' and Q.질문번호=S.QUESTION;";
+								+ "from STUDENT S, DIMS_USER U, PASSWORD_FIND_QUESTION Q where S.STUDENT_NO=U.STUDENT_NO and U.STUDENT_NO='"+userIdentify+"' and Q.QUESTION_NO=S.QUESTION;";
 						// 꺼내온 URL을 통해 서버 피시에 저장된 이미지 파일을 가져와 JSON에 같이 담아줌
 
 
@@ -1534,7 +1516,7 @@ public class DIMS_Server {
 											iData,
 											rs.getInt("GRADE"),
 											rs.getString("DEPARTMENT"),
-											rs.getString("질문내용"),
+											rs.getString("QUESTION_CONTENT"),
 											rs.getString("ANSWER")
 									};
 									respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_USER_INFO_RESPOND, keys, values);
@@ -1553,7 +1535,7 @@ public class DIMS_Server {
 											"imageX",
 											rs.getInt("GRADE"),
 											rs.getString("DEPARTMENT"),
-											rs.getString("질문내용"),
+											rs.getString("QUESTION_CONTENT"),
 											rs.getString("ANSWER")
 									};
 									respond = Toolbox.createJSONProtocol(NetworkProtocols.STUDENT_USER_INFO_RESPOND, keys, values);
@@ -1571,12 +1553,12 @@ public class DIMS_Server {
 								respond.put("상벌점", rs2.getInt("상벌점"));
 							}
 
-							String qry3 = "select 질문내용 from 비밀번호찾기_질문목록;";
+							String qry3 = "select QUESTION_CONTENT from PASSWORD_FIND_QUESTION;";
 							ResultSet rs3 = handler.executeQuery(qry3);
 							JSONArray qList = new JSONArray();
 							while(rs3.next())
 							{
-								qList.add(rs3.getString("질문내용"));
+								qList.add(rs3.getString("QUESTION_CONTENT"));
 							}
 							respond.put("질문목록", qList);
 							System.out.println(respond.toJSONString());
@@ -2623,7 +2605,7 @@ public class DIMS_Server {
 					}
 					else if(type.equals(NetworkProtocols.PASSWORD_FIND_IDENTIFY_REQUEST))
 					{
-						ResultSet rs = handler.executeQuery("select 비밀번호찾기_질문 as 질, 비밀번호찾기_답변 as 답 from STUDENT where STUDENT_NO = '"+request.get("STUDENT_NO")+"';");
+						ResultSet rs = handler.executeQuery("select QUESTION, ANSWER from STUDENT where STUDENT_NO = '"+request.get("STUDENT_NO")+"';");
 
 						JSONObject respond = Toolbox.createJSONProtocol(NetworkProtocols.PASSWORD_FIND_IDENTIFY_RESPOND);
 
@@ -2636,9 +2618,9 @@ public class DIMS_Server {
 						{
 							// 질, 답  = 질문, 답변
 							rs.next();
-							if(rs.getInt("질")==(int)request.get("질문"))
+							if(rs.getInt("QUESTION")==(int)request.get("질문"))
 							{
-								if(rs.getString("답").equals(request.get("답변").toString()))
+								if(rs.getString("ANSWER").equals(request.get("답변").toString()))
 								{
 									respond.put("identify-result", "commit");
 								}
@@ -2747,7 +2729,7 @@ public class DIMS_Server {
 				}
 				else if(command.equals("start server"))
 				{
-					serverOpen();
+					DimsServer.this.start();
 				}
 				else
 				{
@@ -2755,15 +2737,6 @@ public class DIMS_Server {
 				}
 			}
 		}
-	}
-
-	public static void main(String[] args)
-	{
-
-		DIMS_Server s = new DIMS_Server();
-
-		s.serverOpen();
-
 	}
 
 }
