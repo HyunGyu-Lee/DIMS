@@ -298,7 +298,7 @@ public class DimsServer {
 											rs.getString("CONTENT"),
 											rs.getString("CATEGORY_NAME")};
 
-									환JSONObject n = Toolbox.createJSONProtocol(keys, o);
+									JSONObject n = Toolbox.createJSONProtocol(keys, o);
 									data.add(n);
 								}
 
