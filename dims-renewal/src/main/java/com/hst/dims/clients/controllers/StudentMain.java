@@ -1914,21 +1914,18 @@ public class StudentMain implements Initializable {
 		else
 		{
 			submitExist.setText(data.get("제출여부").toString());
-			submitExist.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					byte[] file = (byte[])data.get("데이터");
-					try
-					{
-						String saveFile = Statics.DEFAULT_DOWNLOAD_DIRECTORY+System.currentTimeMillis()+"."+data.get("확장자");
-						Files.write(new File(saveFile).toPath(), file);
-						Runtime.getRuntime().exec("explorer.exe /select,"+saveFile);
-						System.out.println(saveFile);
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
+			submitExist.setOnMouseClicked(event -> {
+				byte[] file = (byte[])data.get("데이터");
+				try
+				{
+					String saveFile = Statics.DEFAULT_DOWNLOAD_DIRECTORY+System.currentTimeMillis()+"."+data.get("확장자");
+					Files.write(new File(saveFile).toPath(), file);
+					Runtime.getRuntime().exec("explorer.exe /select,"+saveFile);
+					System.out.println(saveFile);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
 				}
 			});
 			submitTime.setText(data.get("제출시각").toString().split("\\.")[0]);

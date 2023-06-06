@@ -552,11 +552,11 @@ public class DimsServer {
 
 						for(int i=0; reciever.size()>i ; i++)
 						{
-							String send_qurey = "insert into 메세지 (발신자,수신자,메세지제목,메세지본문,발신시각,구분) values("+"'"+sender+"'"+","+"'"+reciever.get(i).split(",")[0]+"'"+","+"'"+msgTitle+"'"+","+
+							String send_qurey = "insert into MESSAGE (SENDER,RECEIVER,MESSAGE_TITLE,MESSAGE_CONTENT,SEND_AT,TYPE) values("+"'"+sender+"'"+","+"'"+reciever.get(i).split(",")[0]+"'"+","+"'"+msgTitle+"'"+","+
 									"'"+msgContent+"'"+","+"now(),'S')";
 							handler.excuteUpdate(send_qurey);
 
-							send_qurey = "insert into 메세지 (발신자,수신자,메세지제목,메세지본문,발신시각,구분) values("+"'"+sender+"'"+","+"'"+reciever.get(i).split(",")[0]+"'"+","+"'"+msgTitle+"'"+","+
+							send_qurey = "insert into MESSAGE (SENDER,RECEIVER,MESSAGE_TITLE,MESSAGE_CONTENT,SEND_AT,TYPE) values("+"'"+sender+"'"+","+"'"+reciever.get(i).split(",")[0]+"'"+","+"'"+msgTitle+"'"+","+
 									"'"+msgContent+"'"+","+"now(),'R')";
 							handler.excuteUpdate(send_qurey);
 
@@ -1732,13 +1732,13 @@ public class DimsServer {
 						if(request.get("reqType").equals("R"))
 						{
 							json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_RICIEVER_ALL_DELETE_RESPOND);
-							qry = "delete from MESSAGE where 수신자 = '"+userIdentify+"' and 구분='R';";
+							qry = "delete from MESSAGE where RECEIVER = '"+userIdentify+"' and TYPE='R';";
 							json.put("resType", "R");
 						}
 						else
 						{
 							json = Toolbox.createJSONProtocol(NetworkProtocols.MESSAGE_SEND_ALL_DELETE_RESPOND);
-							qry = "delete from MESSAGE where 발신자 = '"+userIdentify+"' and 구분='S';";
+							qry = "delete from MESSAGE where SENDER = '"+userIdentify+"' and TYPE='S';";
 							json.put("resType", "S");
 						}
 						handler.excuteUpdate(qry);
